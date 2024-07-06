@@ -1,4 +1,3 @@
-// backend/services/dataSyncService.js
 const rundownApiService = require('./rundownApiService');
 const Game = require('../models/Game');
 const NFLTeam = require('../models/NFLTeam');
@@ -6,56 +5,43 @@ const Player = require('../models/Player');
 const Market = require('../models/Market');
 const config = require('../config/rundownApi');
 
-exports.syncNFLSchedule = async (season) => {
-  try {
-    const fromDate = new Date().toISOString().split('T')[0]; // Today's date
-    const events = await rundownApiService.fetchNFLSchedule(fromDate, season);
 
-    for (const event of events) {
-      let homeTeam = await NFLTeam.findOneAndUpdate(
-        { rundownId: event.home_team.id },
-        { 
-          name: event.home_team.name,
-          // You'll need to add logic to determine conference and division if not provided in V2
-        },
-        { upsert: true, new: true }
-      );
-
-      let awayTeam = await NFLTeam.findOneAndUpdate(
-        { rundownId: event.away_team.id },
-        { 
-          name: event.away_team.name,
-          // You'll need to add logic to determine conference and division if not provided in V2
-        },
-        { upsert: true, new: true }
-      );
-
-      await Game.findOneAndUpdate(
-        { rundownId: event.event_id },
-        {
-          sportId: event.sport_id,
-          eventDate: event.event_date,
-          homeTeam: homeTeam._id,
-          awayTeam: awayTeam._id,
-          season: season,
-          week: event.week // Make sure this field exists in V2 response
-        },
-        { upsert: true }
-      );
+exports.syncNFLSchedule = async (date, limit = 10) => {
+    try {
+      const events = await rundownApiService.fetchNFLSchedule(date, limit);
+  
+      for (const event of events) {
+        await Game.findOneAndUpdate(
+          { event_id: event.event_id },
+          {
+            sport_id: event.sport_id,
+            event_date: new Date(event.event_date),
+            rotation_number_away: event.rotation_number_away,
+            rotation_number_home: event.rotation_number_home,
+            teams: event.teams,
+            teams_normalized: event.teams_normalized,
+            score: event.score,
+            schedule: event.schedule,
+            venue: event.venue,
+            broadcast: event.broadcast,
+            odds: event.odds
+          },
+          { upsert: true, new: true }
+        );
+      }
+  
+      console.log('NFL schedule synced successfully');
+    } catch (error) {
+      console.error('Error syncing NFL schedule:', error);
     }
-
-    console.log('NFL schedule synced successfully');
-  } catch (error) {
-    console.error('Error syncing NFL schedule:', error);
-  }
-};
+  };
 
 exports.syncGameMarkets = async (gameId) => {
   try {
     const game = await Game.findById(gameId);
     if (!game) throw new Error('Game not found');
 
-    const markets = await rundownApiService.fetchEventMarkets(game.rundownId, config.PARTICIPANT_TYPE.TEAM);
+    const markets = await rundownApiService.fetchEventMarkets(game.event_id, config.PARTICIPANT_TYPE.TEAM);
     
     for (const market of markets) {
       await Market.findOneAndUpdate(
@@ -73,7 +59,7 @@ exports.syncGameMarkets = async (gameId) => {
     }
 
     const marketIds = markets.map(market => market.id);
-    const eventDetails = await rundownApiService.fetchEventDetails(game.rundownId, marketIds);
+    const eventDetails = await rundownApiService.fetchEventDetails(game.event_id, marketIds);
 
     game.markets = eventDetails.markets.map(market => ({
       marketId: market.market_id,
@@ -101,7 +87,7 @@ exports.syncTeamPlayers = async (teamId) => {
     const team = await NFLTeam.findById(teamId);
     if (!team) throw new Error('Team not found');
 
-    const players = await rundownApiService.fetchTeamPlayers(team.rundownId);
+    const players = await rundownApiService.fetchTeamPlayers(team.team_id);
 
     for (const playerData of players) {
       await Player.findOneAndUpdate(

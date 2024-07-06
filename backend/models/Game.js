@@ -1,20 +1,29 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const GameSchema = new Schema({
-  eventId: { type: String, required: true, unique: true },
-  weekNumber: { type: Number, required: true },
-  season: { type: Number, required: true },
-  homeTeam: { type: Schema.Types.ObjectId, ref: 'NFLTeam', required: true },
-  awayTeam: { type: Schema.Types.ObjectId, ref: 'NFLTeam', required: true },
-  dateTime: { type: Date, required: true },
-  status: { type: String, enum: ['scheduled', 'inProgress', 'final'], default: 'scheduled' },
-  finalScore: {
-    homeTeam: { type: Number },
-    awayTeam: { type: Number }
-  }
+const GameSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  event_uuid: { type: String, required: true, unique: true },
+  event_id: { type: String, required: true, unique: true },
+  sport_id: { type: Number, required: true },
+  season_type: { type: String, required: true },
+  season_year: { type: Number, required: true },
+  away_team_id: { type: Number, required: true },
+  home_team_id: { type: Number, required: true },
+  away_team: { type: String, required: true },
+  home_team: { type: String, required: true },
+  date_event: { type: Date, required: true },
+  neutral_site: { type: Boolean, required: true },
+  conference_competition: { type: Boolean, required: true },
+  away_score: { type: Number },
+  home_score: { type: Number },
+  league_name: { type: String, required: true },
+  event_name: { type: String, required: true },
+  broadcast: { type: String },
+  event_location: { type: String },
+  attendance: { type: Number, default: 0 },
+  updated_at: { type: Date, required: true }
 }, { timestamps: true });
 
-GameSchema.index({ season: 1, weekNumber: 1 });
+GameSchema.index({ event_id: 1, sport_id: 1, date_event: 1 });
 
 module.exports = mongoose.model('Game', GameSchema);
