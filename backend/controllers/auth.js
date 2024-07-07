@@ -1,5 +1,6 @@
 // backend/controllers/auth.js
 const User = require('../models/User');
+const Blacklist = require('../models/Blacklist');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/sendEmail');
@@ -52,6 +53,11 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/auth/logout
 // @access  Private
 exports.logout = asyncHandler(async (req, res, next) => {
+  const token = req.headers.authorization.split(' ')[1];
+
+  // Add the token to the blacklist
+  await Blacklist.create({ token });
+
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true
