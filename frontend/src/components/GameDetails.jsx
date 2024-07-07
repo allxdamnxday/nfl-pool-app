@@ -34,37 +34,53 @@ function GameDetails() {
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <h1 className="text-3xl font-bold mb-4">
-        {game.homeTeam.name} vs {game.awayTeam.name}
+        {game.away_team} vs {game.home_team}
       </h1>
       <div className="mb-4">
-        <p className="text-gray-600">Date: {new Date(game.eventDate).toLocaleString()}</p>
-        <p className="text-gray-600">Season: {game.season}</p>
-        <p className="text-gray-600">Week: {game.week}</p>
-        <p className="text-gray-600">Status: {game.status}</p>
+        <p className="text-gray-600">Date: {new Date(game.date_event).toLocaleString()}</p>
+        <p className="text-gray-600">Season: {game.season_year}</p>
+        <p className="text-gray-600">Type: {game.season_type}</p>
+        <p className="text-gray-600">Status: {game.event_status}</p>
+        {game.event_status_detail && <p className="text-gray-600">Status Detail: {game.event_status_detail}</p>}
+      </div>
+      <h2 className="text-2xl font-bold mb-2">Scores</h2>
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <p className="font-semibold">{game.away_team}</p>
+          <p className="text-2xl">{game.away_score || '-'}</p>
+        </div>
+        <div>
+          <p className="font-semibold">{game.home_team}</p>
+          <p className="text-2xl">{game.home_score || '-'}</p>
+        </div>
       </div>
       <h2 className="text-2xl font-bold mb-2">Markets</h2>
-      {game.markets.map((market) => (
-        <div key={market.marketId} className="mb-4 p-4 border rounded">
-          <h3 className="text-xl font-semibold mb-2">{market.name}</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {market.participants.map((participant) => (
-              <div key={participant.participantId} className="bg-gray-100 p-2 rounded">
-                <p className="font-medium">{participant.name}</p>
-                {participant.lines.map((line, index) => (
-                  <div key={index} className="text-sm">
-                    {line.value && <span>Line: {line.value}</span>}
-                    {Object.entries(line.prices).map(([affiliateId, price]) => (
-                      <p key={affiliateId}>
-                        Odds: {price.price} (Affiliate: {affiliateId})
-                      </p>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            ))}
+      {game.markets && game.markets.length > 0 ? (
+        game.markets.map((market) => (
+          <div key={market.marketId} className="mb-4 p-4 border rounded">
+            <h3 className="text-xl font-semibold mb-2">{market.name}</h3>
+            <div className="grid grid-cols-2 gap-4">
+              {market.participants.map((participant) => (
+                <div key={participant.participantId} className="bg-gray-100 p-2 rounded">
+                  <p className="font-medium">{participant.name}</p>
+                  {participant.lines.map((line, index) => (
+                    <div key={index} className="text-sm">
+                      {line.value && <span>Line: {line.value}</span>}
+                      {Object.entries(line.prices).map(([affiliateId, price]) => (
+                        <p key={affiliateId}>
+                          Odds: {price.price} (Affiliate: {affiliateId})
+                        </p>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <p>No market information available.</p>
+      )}
     </div>
   );
 }

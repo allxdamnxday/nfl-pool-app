@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const GameSchema = new mongoose.Schema({
-  id: { type: String, required: true, unique: true },
-  event_uuid: { type: String, required: true, unique: true },
+  id: { type: String, required: true },
   event_id: { type: String, required: true, unique: true },
+  event_uuid: { type: String, required: true },
   sport_id: { type: Number, required: true },
   season_type: { type: String, required: true },
   season_year: { type: Number, required: true },
@@ -18,12 +18,13 @@ const GameSchema = new mongoose.Schema({
   home_score: { type: Number },
   league_name: { type: String, required: true },
   event_name: { type: String, required: true },
-  broadcast: { type: String },
   event_location: { type: String },
-  attendance: { type: Number, default: 0 },
-  updated_at: { type: Date, required: true }
+  attendance: { type: Number },
+  updated_at: { type: Date, required: true },
+  event_status: { type: String },
+  event_status_detail: { type: String }
 }, { timestamps: true });
 
-GameSchema.index({ event_id: 1, sport_id: 1, date_event: 1 });
+GameSchema.index({ event_id: 1 }, { unique: true });
 
 module.exports = mongoose.model('Game', GameSchema);

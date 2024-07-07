@@ -1,3 +1,4 @@
+// /services/dataSyncService.js
 const rundownApiService = require('./rundownApiService');
 const Game = require('../models/Game');
 const NFLTeam = require('../models/NFLTeam');
@@ -6,25 +7,35 @@ const Market = require('../models/Market');
 const config = require('../config/rundownApi');
 
 
-exports.syncNFLSchedule = async (date, limit = 10) => {
+exports.syncNFLSchedule = async (fromDate, limit = 100) => {
     try {
-      const events = await rundownApiService.fetchNFLSchedule(date, limit);
+      const schedules = await rundownApiService.fetchNFLSchedule(fromDate, limit);
   
-      for (const event of events) {
+      for (const game of schedules) {
         await Game.findOneAndUpdate(
-          { event_id: event.event_id },
+          { event_id: game.event_id },
           {
-            sport_id: event.sport_id,
-            event_date: new Date(event.event_date),
-            rotation_number_away: event.rotation_number_away,
-            rotation_number_home: event.rotation_number_home,
-            teams: event.teams,
-            teams_normalized: event.teams_normalized,
-            score: event.score,
-            schedule: event.schedule,
-            venue: event.venue,
-            broadcast: event.broadcast,
-            odds: event.odds
+            id: game.id,
+            event_uuid: game.event_uuid,
+            sport_id: game.sport_id,
+            season_type: game.season_type,
+            season_year: game.season_year,
+            away_team_id: game.away_team_id,
+            home_team_id: game.home_team_id,
+            away_team: game.away_team,
+            home_team: game.home_team,
+            date_event: new Date(game.date_event),
+            neutral_site: game.neutral_site,
+            conference_competition: game.conference_competition,
+            away_score: game.away_score,
+            home_score: game.home_score,
+            league_name: game.league_name,
+            event_name: game.event_name,
+            event_location: game.event_location,
+            attendance: game.attendance,
+            updated_at: new Date(game.updated_at),
+            event_status: game.event_status,
+            event_status_detail: game.event_status_detail
           },
           { upsert: true, new: true }
         );

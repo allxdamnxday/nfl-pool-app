@@ -1,3 +1,4 @@
+// /services/rundownApiService.js
 const axios = require('axios');
 const config = require('../config/rundownApi');
 
@@ -10,26 +11,6 @@ const api = axios.create({
 });
 
 
-exports.fetchDates = async () => {
-    try {
-      const response = await api.get('/sports/1/dates');
-      return response.data.dates;
-    } catch (error) {
-      console.error('Error fetching dates:', error);
-      throw error;
-    }
-  };
-  
-  exports.fetchEventsForDate = async (date) => {
-    try {
-      const response = await api.get(`/sports/1/events/${date}`);
-      return response.data.events; // Adjust if the property name is different
-    } catch (error) {
-      console.error(`Error fetching events for date ${date}:`, error);
-      throw error;
-    }
-  };
-
 exports.fetchNFLTeams = async () => {
   try {
     const response = await api.get(`/sports/${config.SPORT_ID.NFL}/teams`);
@@ -40,19 +21,13 @@ exports.fetchNFLTeams = async () => {
   }
 };
 
-exports.fetchNFLSchedule = async (fromDate, limit = 10) => {
+exports.fetchNFLSchedule = async (fromDate, limit = 100) => {
     try {
-      const response = await api.get(`/sports/${config.SPORT_ID.NFL}/events`, {
-        params: {
-          include: 'all_periods',
-          offset: '240',
-          from: fromDate,
-          limit: limit.toString()
-        }
-      });
+      const url = `/sports/${config.SPORT_ID.NFL}/schedule?from=${fromDate}&limit=${limit}`;
+      const response = await api.get(url);
       
-      if (response.data && response.data.events) {
-        return response.data.events;
+      if (response.data && response.data.schedules) {
+        return response.data.schedules;
       } else {
         console.error('Unexpected API response structure:', response.data);
         throw new Error('Unexpected API response structure');
