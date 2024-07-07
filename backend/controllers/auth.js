@@ -11,13 +11,15 @@ const crypto = require('crypto');
 exports.register = asyncHandler(async (req, res, next) => {
   const { username, email, password } = req.body;
 
-  const user = await User.create({
-    username,
-    email,
-    password
-  });
+  // Validate input
+  if (!username || !email || !password) {
+    return next(new ErrorResponse('Please provide all required fields', 400));
+  }
 
-  sendTokenResponse(user, 200, res);
+  // Create user
+  const user = await User.create({ username, email, password });
+
+  sendTokenResponse(user, 201, res);
 });
 
 // @desc    Login user
@@ -26,18 +28,19 @@ exports.register = asyncHandler(async (req, res, next) => {
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
+  // Validate input
   if (!email || !password) {
     return next(new ErrorResponse('Please provide an email and password', 400));
   }
 
+  // Check for user
   const user = await User.findOne({ email }).select('+password');
-
   if (!user) {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
+  // Check password
   const isMatch = await user.matchPassword(password);
-
   if (!isMatch) {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
@@ -54,10 +57,7 @@ exports.logout = asyncHandler(async (req, res, next) => {
     httpOnly: true
   });
 
-  res.status(200).json({
-    success: true,
-    data: {}
-  });
+  res.status(200).json({ success: true, data: {} });
 });
 
 // @desc    Get current logged in user
@@ -65,11 +65,10 @@ exports.logout = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
-
-  res.status(200).json({
-    success: true,
-    data: user
-  });
+  if (!user) {
+    return next(new ErrorResponse('User not found', 404));
+  }
+  res.status(200).json({ success: true, data: user });
 });
 
 // @desc    Forgot password
@@ -82,13 +81,13 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('There is no user with that email', 404));
   }
 
+  // Get reset token
   const resetToken = user.getResetPasswordToken();
-
   await user.save({ validateBeforeSave: false });
 
+  // Create reset url
   const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
-
-  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a put request to: \n\n ${resetUrl}`;
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
   try {
     await sendEmail({
@@ -99,9 +98,9 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ success: true, data: 'Email sent' });
   } catch (err) {
+    console.error(err);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
-
     await user.save({ validateBeforeSave: false });
 
     return next(new ErrorResponse('Email could not be sent', 500));
@@ -112,6 +111,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/auth/resetpassword/:resettoken
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
+  // Get hashed token
   const resetPasswordToken = crypto
     .createHash('sha256')
     .update(req.params.resettoken)
@@ -126,6 +126,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Invalid token', 400));
   }
 
+  // Set new password
   user.password = req.body.password;
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
@@ -148,10 +149,7 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     runValidators: true
   });
 
-  res.status(200).json({
-    success: true,
-    data: user
-  });
+  res.status(200).json({ success: true, data: user });
 });
 
 // @desc    Update password
@@ -160,6 +158,7 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
 exports.updatePassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
 
+  // Check current password
   if (!(await user.matchPassword(req.body.currentPassword))) {
     return next(new ErrorResponse('Password is incorrect', 401));
   }

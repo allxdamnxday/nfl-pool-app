@@ -79,4 +79,54 @@ exports.getPicksForPool = asyncHandler(async (req, res, next) => {
   });
 });
 
-// ... (other methods remain the same)
+// @desc    Get pick for a specific week
+// @route   GET /api/v1/pools/:poolId/picks/:week
+// @access  Private
+exports.getPickForWeek = asyncHandler(async (req, res, next) => {
+  const pool = await Pool.findById(req.params.poolId);
+
+  if (!pool) {
+    return next(new ErrorResponse(`No pool with the id of ${req.params.poolId}`, 404));
+  }
+
+  const pick = await Pick.findOne({
+    pool: req.params.poolId,
+    user: req.user.id,
+    week: req.params.week
+  }).populate('team');
+
+  if (!pick) {
+    return next(new ErrorResponse(`No pick found for week ${req.params.week}`, 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: pick
+  });
+});
+
+// @desc    Update pick
+// @route   PUT /api/v1/picks/:id
+// @access  Private
+exports.updatePick = asyncHandler(async (req, res, next) => {
+  let pick = await Pick.findById(req.params.id);
+
+  if (!pick) {
+    return next(new ErrorResponse(`No pick with the id of ${req.params.id}`, 404));
+  }
+
+  // Make sure user is pick owner
+  if (pick.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this pick`, 401));
+  }
+
+  pick = await Pick.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    success: true,
+    data: pick
+  });
+});

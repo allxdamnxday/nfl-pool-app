@@ -1,5 +1,3 @@
-const dotenv = require('dotenv');
-const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -10,9 +8,7 @@ const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const errorHandler = require('./middleware/error');
-
-dotenv.config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`) });
+require('dotenv').config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
 
 const app = express();
 
@@ -43,11 +39,11 @@ const swaggerOptions = {
       {
         url: process.env.NODE_ENV === 'production' 
           ? 'https://your-production-url.com' 
-          : `http://localhost:${process.env.PORT || 5000}`,
+          : 'http://localhost:5000',
       },
     ],
   },
-  apis: ['./routes/*.js'],
+  apis: ['./routes/*.js'], // Path to the API routes folder
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -55,23 +51,24 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // MongoDB connection function
 const connectDB = async () => {
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.error('MONGODB_URI is not defined in environment variables');
-    process.exit(1);
-  }
-
   try {
-    await mongoose.connect(mongoUri, {
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
     });
-    console.log(`Connected to MongoDB: ${mongoUri}`);
+    console.log('Connected to MongoDB');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     process.exit(1);
   }
 };
+
+// Connect to the database if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // Route files
 const auth = require('./routes/auth');
@@ -85,28 +82,21 @@ app.use('/api/v1/pools', pools);
 app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
 
-// Use custom error handler
-app.use(errorHandler);
+const PORT = process.env.PORT || 5000;
 
-const startServer = async () => {
-  await connectDB();
-  const PORT = process.env.PORT || 5000;
-  const server = app.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  });
-
-  // Handle unhandled promise rejections
-  process.on('unhandledRejection', (err) => {
-    console.log(`Error: ${err.message}`);
-    server.close(() => process.exit(1));
-  });
-
-  return server;
-};
-
-// Only start the server if we're not in a test environment
+let server;
 if (process.env.NODE_ENV !== 'test') {
-  startServer();
+  server = app.listen(PORT, () => console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`));
 }
 
-module.exports = { app, connectDB, startServer };
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  if (server) {
+    server.close(() => process.exit(1));
+  } else {
+    process.exit(1);
+  }
+});
+
+module.exports = { app, connectDB }; // Export for testing

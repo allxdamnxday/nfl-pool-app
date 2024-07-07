@@ -1,6 +1,5 @@
 // backend/controllers/pools.js
 const Pool = require('../models/Pool');
-const User = require('../models/User');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 

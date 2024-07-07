@@ -1,26 +1,98 @@
 // backend/routes/auth.js
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/auth');
+const {
+  register,
+  login,
+  logout,
+  getMe,
+  forgotPassword,
+  resetPassword,
+  updateDetails,
+  updatePassword
+} = require('../controllers/auth');
 const { protect } = require('../middleware/auth');
 
-console.log('Auth Controller:', authController);
-console.log('Protect Middleware:', protect);
+/**
+ * @swagger
+ * /api/v1/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - email
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 token:
+ *                   type: string
+ */
+router.post('/register', register);
 
-// Debug each route handler
-const debugRoute = (name, handler) => {
-  console.log(`Setting up ${name} route`);
-  console.log(`${name} handler:`, handler);
-  return typeof handler === 'function' ? handler : (req, res) => res.status(500).json({ error: `${name} not implemented` });
-};
+/**
+ * @swagger
+ * /api/v1/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 token:
+ *                   type: string
+ */
+router.post('/login', login);
 
-router.post('/register', debugRoute('register', authController.register));
-router.post('/login', debugRoute('login', authController.login));
-router.get('/logout', debugRoute('logout', authController.logout));
-router.get('/me', protect, debugRoute('getMe', authController.getMe));
-router.post('/forgotpassword', debugRoute('forgotPassword', authController.forgotPassword));
-router.put('/resetpassword/:resettoken', debugRoute('resetPassword', authController.resetPassword));
-router.put('/updatedetails', protect, debugRoute('updateDetails', authController.updateDetails));
-router.put('/updatepassword', protect, debugRoute('updatePassword', authController.updatePassword));
+// Add Swagger annotations for other routes...
+
+router.get('/logout', logout);
+router.get('/me', protect, getMe);
+router.post('/forgotpassword', forgotPassword);
+router.put('/resetpassword/:resettoken', resetPassword);
+router.put('/updatedetails', protect, updateDetails);
+router.put('/updatepassword', protect, updatePassword);
 
 module.exports = router;
