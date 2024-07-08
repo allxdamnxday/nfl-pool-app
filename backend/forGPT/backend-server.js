@@ -12,15 +12,7 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
 
-// Load environment variables from .env file
-dotenv.config({ path: path.join(__dirname, '.env') });
-
-// Log the environment variables to verify they are loaded correctly
-console.log('Environment Variables:', {
-  MONGODB_URI: process.env.MONGODB_URI,
-  PORT: process.env.PORT,
-  NODE_ENV: process.env.NODE_ENV,
-});
+dotenv.config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`) });
 
 const app = express();
 

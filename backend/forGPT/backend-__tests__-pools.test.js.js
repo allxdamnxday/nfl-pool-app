@@ -113,4 +113,17 @@ describe('Pool Endpoints', () => {
 
     expect(checkRes.statusCode).toEqual(404);
   });
+});._id;
+
+    // Then, get the pool by ID
+    const res = await request(app)
+      .get(`/api/v1/pools/${poolId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    console.log('Get Single Pool Response:', res.body);  // Log response body
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('success', true);
+    expect(res.body.data).toHaveProperty('name', 'Test Pool');
+  });
 });
