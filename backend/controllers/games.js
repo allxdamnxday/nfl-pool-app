@@ -1,4 +1,4 @@
-/ backend/controllers/games.js
+// backend/controllers/games.js
 const Game = require('../models/Game');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
@@ -48,7 +48,7 @@ exports.fetchGames = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/games
 // @access  Private
 exports.getGames = asyncHandler(async (req, res, next) => {
-  const games = await Game.find().sort({ event_date: 1 });
+  const games = await Game.find().sort({ date_event: 1 });
 
   res.status(200).json({
     success: true,
@@ -70,5 +70,23 @@ exports.getGame = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: game
+  });
+});
+
+// @desc    Get games for a specific team
+// @route   GET /api/v1/games/team/:teamId
+// @access  Private
+exports.getGamesByTeam = asyncHandler(async (req, res, next) => {
+  const games = await Game.find({
+    $or: [
+      { 'teams_normalized.0.team_id': parseInt(req.params.teamId) },
+      { 'teams_normalized.1.team_id': parseInt(req.params.teamId) }
+    ]
+  }).sort('date_event');
+
+  res.status(200).json({
+    success: true,
+    count: games.length,
+    data: games
   });
 });

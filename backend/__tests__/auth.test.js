@@ -1,4 +1,4 @@
-//__tests__/auth.test.js
+// backend/__tests__/auth.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
