@@ -1,9 +1,9 @@
 // seasonService.js
 const axios = require('axios');
 const mongoose = require('mongoose');
-const Game = require('../models/Game'); // Adjust the path as necessary|
+const Game = require('../models/Game');
 const Settings = require('../models/Settings');
-const config = require('../config/rundownApi'); // Adjust the path as necessary
+const config = require('../config/rundownApi');
 
 // Initialize axios instance for RundownAPI
 const rundownApi = axios.create({
@@ -19,58 +19,101 @@ const formatDate = (date) => date.toISOString().split('T')[0];
 
 // Helper function to update last sync date in database
 const updateLastSyncDate = async (date) => {
-    await Settings.findOneAndUpdate(
-      { key: 'lastSyncDate' },
-      { key: 'lastSyncDate', value: date },
-      { upsert: true }
-    );
-  };
-  
-  const getStoredSeasonYear = async () => {
-    const setting = await Settings.findOne({ key: 'currentSeasonYear' });
-    return setting ? setting.value : null;
-  };
-  
-  const updateStoredSeasonYear = async (year) => {
-    await Settings.findOneAndUpdate(
-      { key: 'currentSeasonYear' },
-      { key: 'currentSeasonYear', value: year },
-      { upsert: true }
-    );
-  };
-
-// Transform API game data to our Game model structure
-const transformGameData = (apiGame) => ({
-  event_id: apiGame.event_id,
-  event_uuid: apiGame.event_uuid,
-  sport_id: apiGame.sport_id,
-  event_date: new Date(apiGame.event_date),
-  rotation_number_away: apiGame.rotation_number_away,
-  rotation_number_home: apiGame.rotation_number_home,
-  score: apiGame.score,
-  teams_normalized: apiGame.teams_normalized,
-  schedule: apiGame.schedule
-});
-
-// Initialize season data
-const initializeSeasonData = async (seasonYear) => {
-  try {
-    const response = await rundownApi.get(`/sports/${config.SPORT_ID.NFL}/schedule`, {
-      params: { season_year: seasonYear }
-    });
-    
-    const games = response.data.schedules.map(transformGameData);
-    await Game.insertMany(games, { ordered: false });
-    
-    await updateLastSyncDate(new Date());
-    await updateStoredSeasonYear(seasonYear);
-    
-    console.log(`Initialized ${games.length} games for season ${seasonYear}`);
-  } catch (error) {
-    console.error('Error initializing season data:', error);
-    throw error; // Re-throw to be handled by the caller
-  }
+  await Settings.findOneAndUpdate(
+    { key: 'lastSyncDate' },
+    { key: 'lastSyncDate', value: date },
+    { upsert: true }
+  );
 };
+
+const getStoredSeasonYear = async () => {
+  const setting = await Settings.findOne({ key: 'currentSeasonYear' });
+  return setting ? setting.value : null;
+};
+
+const updateStoredSeasonYear = async (year) => {
+  await Settings.findOneAndUpdate(
+    { key: 'currentSeasonYear' },
+    { key: 'currentSeasonYear', value: year },
+    { upsert: true }
+  );
+};
+
+// Function to calculate NFL week number (as a fallback)
+const calculateNFLWeek = (gameDate, seasonYear) => {
+  const seasonStart = new Date(seasonYear, 8, 1); // September 1st
+  seasonStart.setDate(seasonStart.getDate() + (9 - seasonStart.getDay()) % 7); // First Tuesday after first Monday
+
+  const weekDiff = Math.floor((gameDate - seasonStart) / (7 * 24 * 60 * 60 * 1000));
+  return weekDiff + 1;
+};
+
+// Updated transformGameData function with error handling
+const transformGameData = (apiGame) => {
+    if (!apiGame) {
+      console.error('Received undefined or null apiGame');
+      return null;
+    }
+  
+    console.log('Received apiGame:', JSON.stringify(apiGame, null, 2));
+  
+    const gameDate = new Date(apiGame.event_date);
+    const seasonYear = apiGame.schedule?.season_year || new Date(apiGame.event_date).getFullYear();
+  
+    // Use the API-provided week if available, otherwise calculate it
+    const week = apiGame.schedule?.week || calculateNFLWeek(gameDate, seasonYear);
+  
+    return {
+      event_id: apiGame.event_id,
+      event_uuid: apiGame.event_uuid,
+      sport_id: apiGame.sport_id,
+      event_date: gameDate,
+      rotation_number_away: apiGame.rotation_number_away,
+      rotation_number_home: apiGame.rotation_number_home,
+      score: apiGame.score || {},
+      teams_normalized: apiGame.teams_normalized || [],
+      schedule: {
+        ...(apiGame.schedule || {}),
+        season_year: seasonYear,
+        week: week
+      }
+    };
+  };
+  
+  // Updated initializeSeasonData function with error handling
+  const initializeSeasonData = async (seasonYear) => {
+    try {
+      console.log(`Fetching schedule for season ${seasonYear}`);
+      const response = await rundownApi.get(`/sports/${config.SPORT_ID.NFL}/schedule`, {
+        params: { season_year: seasonYear }
+      });
+      
+      console.log('API Response:', JSON.stringify(response.data, null, 2));
+  
+      if (!response.data || !response.data.schedules) {
+        throw new Error('Invalid API response structure');
+      }
+  
+      const games = response.data.schedules
+        .map(transformGameData)
+        .filter(game => game !== null);
+  
+      if (games.length === 0) {
+        throw new Error('No valid games found in the API response');
+      }
+  
+      await Game.insertMany(games, { ordered: false });
+      
+      await updateLastSyncDate(new Date());
+      await updateStoredSeasonYear(seasonYear);
+      
+      console.log(`Initialized ${games.length} games for season ${seasonYear}`);
+    } catch (error) {
+      console.error('Error initializing season data:', error);
+      console.error('Error details:', error.response?.data);
+      throw error;
+    }
+  };
 
 // Update game data for a specific date
 const updateGameData = async (date = new Date()) => {
@@ -120,7 +163,6 @@ const manageSeason = async () => {
 
   if (currentDate >= seasonStartDate && currentDate <= seasonEndDate) {
     // We're in season, ensure daily updates are scheduled
-    // This part depends on how you're handling task scheduling (e.g., cron jobs)
     console.log('In season: Daily updates should be scheduled');
   } else {
     // We're off-season, reduce update frequency
@@ -152,10 +194,26 @@ const updateHistoricalData = async (startDate, endDate) => {
   }
 };
 
+const getGamesByWeek = async (seasonYear, weekNumber) => {
+  try {
+    const games = await Game.find({
+      'schedule.season_year': seasonYear,
+      'schedule.week': weekNumber
+    }).sort('event_date');
+
+    return games;
+  } catch (error) {
+    console.error(`Error fetching games for week ${weekNumber} of season ${seasonYear}:`, error);
+    throw error;
+  }
+};
+
 module.exports = {
   initializeSeasonData,
   updateGameData,
   getDetailedGameInfo,
   manageSeason,
-  updateHistoricalData
+  updateHistoricalData,
+  getGamesByWeek,
+  calculateNFLWeek
 };

@@ -3,6 +3,7 @@ const Game = require('../models/Game');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const rundownApi = require('../services/rundownApiService');
+const { getGamesByWeek } = require('../services/seasonService');
 
 // @desc    Fetch games from The Rundown API and store in database
 // @route   POST /api/v1/games/fetch
@@ -89,4 +90,19 @@ exports.getGamesByTeam = asyncHandler(async (req, res, next) => {
     count: games.length,
     data: games
   });
+  //get games by week
+  exports.getWeekGames = async (req, res, next) => {
+    try {
+      const { seasonYear, weekNumber } = req.params;
+      const games = await getGamesByWeek(parseInt(seasonYear), parseInt(weekNumber));
+  
+      res.status(200).json({
+        success: true,
+        count: games.length,
+        data: games
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 });

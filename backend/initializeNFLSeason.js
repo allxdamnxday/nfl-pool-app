@@ -19,6 +19,9 @@ async function initializeNFL2024Season() {
     console.log('2024 NFL season data initialized successfully');
   } catch (error) {
     console.error('Error initializing 2024 NFL season data:', error);
+    if (error.response) {
+      console.error('API response error:', error.response.data);
+    }
   } finally {
     await mongoose.connection.close();
     console.log('MongoDB connection closed');

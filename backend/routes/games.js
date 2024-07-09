@@ -1,4 +1,3 @@
-// backend/routes/games.js
 const express = require('express');
 const { getGames, getGame, fetchGames, getGamesByTeam } = require('../controllers/games');
 const { protect } = require('../middleware/auth');
