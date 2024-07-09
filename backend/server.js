@@ -58,10 +58,6 @@ const swaggerOptions = {
   apis: ['./routes/*.js'],
 };
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-// MongoDB connection function
 const connectDB = async () => {
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {
@@ -73,6 +69,8 @@ const connectDB = async () => {
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
     });
     console.log(`Connected to MongoDB: ${mongoUri}`);
   } catch (error) {

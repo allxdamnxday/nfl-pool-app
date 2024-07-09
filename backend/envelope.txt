@@ -1,0 +1,5 @@
+
+mongoatlas username = allxdamnxday
+mongoatlas username pass = sI85W7QWxO0nbAcv
+my ip access= 174.65.191.154/32
+cluster connection string = mongodb+srv://allxdamnday:sI85W7QWxO0nbAcv@fbecluster.ofyzkcz.mongodb.net/?retryWrites=true&w=majority&appName=fbecluster
