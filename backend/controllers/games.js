@@ -3,46 +3,55 @@ const Game = require('../models/Game');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const rundownApi = require('../services/rundownApiService');
-const { getGamesByWeek } = require('../services/seasonService');
+const seasonService = require('../services/seasonService');
 
 // @desc    Fetch games from The Rundown API and store in database
 // @route   POST /api/v1/games/fetch
 // @access  Private
 exports.fetchGames = asyncHandler(async (req, res, next) => {
-  const { date } = req.body; // Expect date in YYYY-MM-DD format
+  const { date, limit = 5 } = req.body;
 
-  const response = await rundownApi.get(`/sports/2/events/${date}`, {
-    params: { offset: '0' }
-  });
+  if (!date) {
+    return next(new ErrorResponse('Please provide a date', 400));
+  }
 
-  const games = response.data.events.map(event => ({
-    event_id: event.event_id,
-    event_uuid: event.event_uuid,
-    sport_id: event.sport_id,
-    event_date: new Date(event.event_date),
-    rotation_number_away: event.rotation_number_away,
-    rotation_number_home: event.rotation_number_home,
-    score: event.score,
-    teams_normalized: event.teams_normalized,
-    schedule: event.schedule
-  }));
+  try {
+    console.log(`Fetching games for date: ${date}`);
+    const schedules = await rundownApi.fetchNFLSchedule(date, limit);
+    
+    console.log('API Response:', JSON.stringify(schedules, null, 2));
 
-  // Use updateMany with upsert option to update existing games or insert new ones
-  const updatePromises = games.map(game => 
-    Game.updateOne(
-      { event_id: game.event_id },
-      game,
-      { upsert: true, setDefaultsOnInsert: true }
-    )
-  );
+    if (!schedules || schedules.length === 0) {
+      return res.status(200).json({
+        success: true,
+        count: 0,
+        message: 'No games found for the given date.'
+      });
+    }
 
-  await Promise.all(updatePromises);
+    const games = schedules
+      .map(seasonService.transformGameData)
+      .filter(game => game !== null);
 
-  res.status(200).json({
-    success: true,
-    count: games.length,
-    message: `${games.length} games fetched and stored/updated successfully.`
-  });
+    const updatePromises = games.map(game => 
+      Game.findOneAndUpdate(
+        { event_id: game.event_id },
+        game,
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      )
+    );
+
+    await Promise.all(updatePromises);
+
+    res.status(200).json({
+      success: true,
+      count: games.length,
+      message: `${games.length} games fetched and stored/updated successfully.`
+    });
+  } catch (error) {
+    console.error('Error in fetchGames:', error);
+    return next(new ErrorResponse('Error fetching games from external API', 500));
+  }
 });
 
 // @desc    Get all games
@@ -90,19 +99,47 @@ exports.getGamesByTeam = asyncHandler(async (req, res, next) => {
     count: games.length,
     data: games
   });
-  //get games by week
-  exports.getWeekGames = async (req, res, next) => {
-    try {
-      const { seasonYear, weekNumber } = req.params;
-      const games = await getGamesByWeek(parseInt(seasonYear), parseInt(weekNumber));
+});
+
+exports.getWeekGames = asyncHandler(async (req, res, next) => {
+  const { seasonYear, weekNumber } = req.params;
+  const games = await seasonService.getGamesByWeek(parseInt(seasonYear), parseInt(weekNumber));
+
+  res.status(200).json({
+    success: true,
+    count: games.length,
+    data: games
+  });
+});
+
+exports.filterGames = asyncHandler(async (req, res, next) => {
+  const { season, week } = req.query;
+  let query = {};
+  if (season) query['schedule.season_year'] = parseInt(season);
+  if (week) query['schedule.week'] = parseInt(week);
   
-      res.status(200).json({
-        success: true,
-        count: games.length,
-        data: games
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+  const games = await Game.find(query);
+  
+  res.status(200).json({
+    success: true,
+    count: games.length,
+    data: games
+  });
+});
+
+exports.updateGameStatus = asyncHandler(async (req, res, next) => {
+  const game = await Game.findByIdAndUpdate(
+    req.params.id, 
+    { 'score.event_status': req.body.status },
+    { new: true, runValidators: true }
+  );
+
+  if (!game) {
+    return next(new ErrorResponse(`Game not found with id of ${req.params.id}`, 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: game
+  });
 });

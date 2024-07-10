@@ -50,35 +50,39 @@ const calculateNFLWeek = (gameDate, seasonYear) => {
 
 // Updated transformGameData function with error handling
 const transformGameData = (apiGame) => {
-    if (!apiGame) {
-      console.error('Received undefined or null apiGame');
-      return null;
+  if (!apiGame) {
+    console.error('Received undefined or null apiGame');
+    return null;
+  }
+
+  return {
+    event_id: apiGame.event_id,
+    event_uuid: apiGame.event_uuid,
+    sport_id: apiGame.sport_id,
+    event_date: new Date(apiGame.date_event),
+    season_type: apiGame.season_type,
+    season_year: apiGame.season_year,
+    away_team_id: apiGame.away_team_id,
+    home_team_id: apiGame.home_team_id,
+    away_team: apiGame.away_team,
+    home_team: apiGame.home_team,
+    neutral_site: apiGame.neutral_site,
+    conference_competition: apiGame.conference_competition,
+    away_score: apiGame.away_score,
+    home_score: apiGame.home_score,
+    league_name: apiGame.league_name,
+    event_name: apiGame.event_name,
+    broadcast: apiGame.broadcast,
+    event_location: apiGame.event_location,
+    attendance: apiGame.attendance,
+    updated_at: new Date(apiGame.updated_at),
+    schedule: {
+      season_type: apiGame.season_type,
+      season_year: apiGame.season_year,
+      week: apiGame.week || null // Add this if available in the API response
     }
-  
-    console.log('Received apiGame:', JSON.stringify(apiGame, null, 2));
-  
-    const gameDate = new Date(apiGame.event_date);
-    const seasonYear = apiGame.schedule?.season_year || new Date(apiGame.event_date).getFullYear();
-  
-    // Use the API-provided week if available, otherwise calculate it
-    const week = apiGame.schedule?.week || calculateNFLWeek(gameDate, seasonYear);
-  
-    return {
-      event_id: apiGame.event_id,
-      event_uuid: apiGame.event_uuid,
-      sport_id: apiGame.sport_id,
-      event_date: gameDate,
-      rotation_number_away: apiGame.rotation_number_away,
-      rotation_number_home: apiGame.rotation_number_home,
-      score: apiGame.score || {},
-      teams_normalized: apiGame.teams_normalized || [],
-      schedule: {
-        ...(apiGame.schedule || {}),
-        season_year: seasonYear,
-        week: week
-      }
-    };
   };
+};
   
   // Updated initializeSeasonData function with error handling
   const initializeSeasonData = async (seasonYear) => {
@@ -215,5 +219,6 @@ module.exports = {
   manageSeason,
   updateHistoricalData,
   getGamesByWeek,
+  transformGameData,
   calculateNFLWeek
 };
