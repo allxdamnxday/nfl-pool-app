@@ -114,3 +114,33 @@ exports.updatePick = asyncHandler(async (req, res, next) => {
     data: pick
   });
 });
+
+//submit a pick
+
+exports.submitPick = asyncHandler(async (req, res, next) => {
+  const { poolId, week, teamId, gameId } = req.body;
+
+  // Check if user has already picked this team in this pool
+  const existingPick = await Pick.findOne({
+    user: req.user.id,
+    pool: poolId,
+    team: teamId
+  });
+
+  if (existingPick) {
+    return next(new ErrorResponse(`You've already picked this team in this pool`, 400));
+  }
+
+  const pick = await Pick.create({
+    user: req.user.id,
+    pool: poolId,
+    week,
+    team: teamId,
+    game: gameId
+  });
+
+  res.status(201).json({
+    success: true,
+    data: pick
+  });
+});
