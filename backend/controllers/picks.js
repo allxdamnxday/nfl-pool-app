@@ -53,7 +53,8 @@ exports.addPick = asyncHandler(async (req, res, next) => {
     { 
       $set: { lastPickedWeek: game.week },
       $push: { pickedTeams: req.body.team }
-    }
+    },
+    { upsert: true, new: true }
   );
 
   res.status(201).json({
@@ -92,7 +93,7 @@ exports.getPickForWeek = asyncHandler(async (req, res, next) => {
   const pick = await Pick.findOne({
     pool: req.params.poolId,
     user: req.user.id,
-    week: req.params.week
+    weekNumber: req.params.week
   }).populate('team');
 
   if (!pick) {
@@ -128,5 +129,28 @@ exports.updatePick = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: pick
+  });
+});
+
+// @desc    Delete pick
+// @route   DELETE /api/v1/picks/:id
+// @access  Private
+exports.deletePick = asyncHandler(async (req, res, next) => {
+  const pick = await Pick.findById(req.params.id);
+
+  if (!pick) {
+    return next(new ErrorResponse(`No pick with the id of ${req.params.id}`, 404));
+  }
+
+  // Make sure user is pick owner
+  if (pick.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to delete this pick`, 401));
+  }
+
+  await pick.remove();
+
+  res.status(200).json({
+    success: true,
+    data: {}
   });
 });

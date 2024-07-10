@@ -12,7 +12,15 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
 
-dotenv.config({ path: path.join(__dirname, `.env.${process.env.NODE_ENV}`) });
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Log the environment variables to verify they are loaded correctly
+console.log('Environment Variables:', {
+  MONGODB_URI: process.env.MONGODB_URI,
+  PORT: process.env.PORT,
+  NODE_ENV: process.env.NODE_ENV,
+});
 
 const app = express();
 
@@ -53,7 +61,6 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// MongoDB connection function
 const connectDB = async () => {
   const mongoUri = process.env.MONGODB_URI;
   if (!mongoUri) {
@@ -65,6 +72,8 @@ const connectDB = async () => {
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
     });
     console.log(`Connected to MongoDB: ${mongoUri}`);
   } catch (error) {

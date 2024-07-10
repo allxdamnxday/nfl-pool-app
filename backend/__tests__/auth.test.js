@@ -1,9 +1,11 @@
+// backend/__tests__/auth.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const { app, connectDB } = require('../server');
 const User = require('../models/User');
 
+let server;
 // Mock the sendEmail function
 jest.mock('../utils/sendEmail');
 
