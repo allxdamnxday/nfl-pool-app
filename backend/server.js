@@ -12,6 +12,7 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
 const pickRoutes = require('./routes/picks');
+const gamesRoutes = require('./routes/games');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -32,6 +33,7 @@ app.use(cors());
 app.use(helmet());
 app.use(xss());
 app.use(hpp());
+
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -95,6 +97,7 @@ app.use('/api/v1/pools', pools);
 app.use('/api/v1/pools/:poolId/picks', pickRoutes);
 app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
+app.use('/api/v1/games', gamesRoutes);
 
 
 // Use custom error handler
