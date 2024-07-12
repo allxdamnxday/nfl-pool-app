@@ -11,6 +11,7 @@ const hpp = require('hpp');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
+const pickRoutes = require('./routes/picks');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -91,8 +92,10 @@ const games = require('./routes/games');
 // Mount routers
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/pools', pools);
+app.use('/api/v1/pools/:poolId/picks', pickRoutes);
 app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
+
 
 // Use custom error handler
 app.use(errorHandler);

@@ -50,12 +50,12 @@ exports.updatePool = asyncHandler(async (req, res, next) => {
   let pool = await Pool.findById(req.params.id);
 
   if (!pool) {
-    return next(new ErrorResponse(`Pool not found with id of ${req.params.id}`, 404));
+    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
   }
 
-  // Make sure user is pool creator
+  // Make sure user is pool owner
   if (pool.creator.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this pool`, 401));
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this pool`, 403));
   }
 
   pool = await Pool.findByIdAndUpdate(req.params.id, req.body, {
@@ -76,12 +76,12 @@ exports.deletePool = asyncHandler(async (req, res, next) => {
   const pool = await Pool.findById(req.params.id);
 
   if (!pool) {
-    return next(new ErrorResponse(`Pool not found with id of ${req.params.id}`, 404));
+    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
   }
 
-  // Make sure user is pool creator
+  // Make sure user is pool owner
   if (pool.creator.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(new ErrorResponse(`User ${req.user.id} is not authorized to delete this pool`, 401));
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to delete this pool`, 403));
   }
 
   await pool.remove();
@@ -92,22 +92,24 @@ exports.deletePool = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Join pool
+// @desc    Join a pool
 // @route   POST /api/v1/pools/:id/join
 // @access  Private
 exports.joinPool = asyncHandler(async (req, res, next) => {
   const pool = await Pool.findById(req.params.id);
 
   if (!pool) {
-    return next(new ErrorResponse(`Pool not found with id of ${req.params.id}`, 404));
+    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
   }
 
-  if (pool.participants.includes(req.user.id)) {
-    return next(new ErrorResponse('User already joined this pool', 400));
-  }
-
+  // Check if the pool is full
   if (pool.participants.length >= pool.maxParticipants) {
-    return next(new ErrorResponse('Pool has reached maximum number of participants', 400));
+    return next(new ErrorResponse(`Pool is already full`, 400));
+  }
+
+  // Check if the user is already in the pool
+  if (pool.participants.includes(req.user.id)) {
+    return next(new ErrorResponse(`User is already in this pool`, 400));
   }
 
   pool.participants.push(req.user.id);
@@ -117,4 +119,34 @@ exports.joinPool = asyncHandler(async (req, res, next) => {
     success: true,
     data: pool
   });
+});
+
+// @desc    Leave a pool
+// @route   POST /api/v1/pools/:id/leave
+// @access  Private
+exports.leavePool = asyncHandler(async (req, res, next) => {
+  const pool = await Pool.findById(req.params.id);
+
+  if (!pool) {
+    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
+  }
+
+  // Check if the user is in the pool
+  if (!pool.participants.includes(req.user.id)) {
+    return next(new ErrorResponse(`User is not in this pool`, 400));
+  }
+
+  // Remove the user from the participants array
+  pool.participants = pool.participants.filter(participant => participant.toString() !== req.user.id);
+
+  try {
+    await pool.save();
+    res.status(200).json({
+      success: true,
+      data: pool
+    });
+  } catch (error) {
+    console.error(error);
+    return next(new ErrorResponse(`Error leaving the pool`, 500));
+  }
 });

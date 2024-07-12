@@ -1,4 +1,4 @@
-// /backend/middleware/auth.js
+// middleware/auth.js
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errorResponse');

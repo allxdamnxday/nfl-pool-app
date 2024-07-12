@@ -1,4 +1,4 @@
-// backend/services/dataSyncService.js
+// /services/dataSyncService.js
 const rundownApiService = require('./rundownApiService');
 const Game = require('../models/Game');
 const NFLTeam = require('../models/NFLTeam');

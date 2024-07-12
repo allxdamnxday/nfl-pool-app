@@ -1,4 +1,4 @@
-// backend/services/rundownApiService.js
+// services/rundownApiService.js
 const axios = require('axios');
 const config = require('../config/rundownApi');
 

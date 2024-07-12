@@ -29,33 +29,20 @@ exports.addPick = asyncHandler(async (req, res, next) => {
   const existingPick = await Pick.findOne({
     user: req.user.id,
     pool: req.params.poolId,
-    weekNumber: game.week
+    weekNumber: game.schedule.week
   });
 
   if (existingPick) {
-    return next(new ErrorResponse(`User has already made a pick for week ${game.week}`, 400));
+    return next(new ErrorResponse(`User has already made a pick for week ${game.schedule.week}`, 400));
   }
 
   const pick = await Pick.create({
     user: req.user.id,
     pool: req.params.poolId,
-    weekNumber: game.week,
+    weekNumber: game.schedule.week,
     team: req.body.team,
-    game: req.body.game,
-    market: req.body.market,
-    lineValue: req.body.lineValue,
-    odds: req.body.odds
+    game: req.body.game
   });
-
-  // Update UserPoolStats
-  await UserPoolStats.findOneAndUpdate(
-    { user: req.user.id, pool: req.params.poolId },
-    { 
-      $set: { lastPickedWeek: game.week },
-      $push: { pickedTeams: req.body.team }
-    },
-    { upsert: true, new: true }
-  );
 
   res.status(201).json({
     success: true,

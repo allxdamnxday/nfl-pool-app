@@ -6,15 +6,10 @@ const Game = require('../models/Game');
 const NFLTeam = require('../models/NFLTeam');
 const User = require('../models/User');
 const rundownApi = require('../services/rundownApiService');
-const { fetchGames, getGames, getGame, filterGames } = require('../controllers/games');
 
 
-// Mock dependencies
-jest.mock('../models/Game');
+// Mock the entire rundownApiService module
 jest.mock('../services/rundownApiService');
-
-
-
 
 let token;
 
@@ -36,31 +31,29 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-describe('Game Controller', () => {
-  describe('fetchGames', () => {
-    it('should fetch and store games', async () => {
-      const mockReq = {
-        body: { date: '2024-09-20', limit: 5 }
-      };
-      const mockRes = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn()
-      };
-      const mockNext = jest.fn();
+describe('POST /api/v1/games/fetch', () => {
+  it('should fetch and store games from external API', async () => {
+    const res = await request(app)
+      .post('/api/v1/games/fetch')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ date: '2024-08-10', limit: 5 });
 
-      rundownApi.fetchNFLSchedule.mockResolvedValue([
-        { event_id: 'test1', event_date: '2024-09-20T00:00:00Z' }
-      ]);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('success', true);
+    expect(res.body).toHaveProperty('count');
+    expect(res.body.count).toBeGreaterThan(0);
+    expect(res.body).toHaveProperty('message');
+  });
 
-      await fetchGames(mockReq, mockRes, mockNext);
+  it('should return 400 if date is not provided', async () => {
+    const res = await request(app)
+      .post('/api/v1/games/fetch')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
 
-      expect(rundownApi.fetchNFLSchedule).toHaveBeenCalledWith('2024-09-20', 5);
-      expect(mockRes.status).toHaveBeenCalledWith(200);
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
-        success: true,
-        count: 1
-      }));
-    });
+    expect(res.statusCode).toEqual(400);
+    expect(res.body).toHaveProperty('success', false);
+    expect(res.body).toHaveProperty('error', 'Please provide a date');
   });
 
   it('should handle case when no games are found', async () => {
@@ -104,12 +97,8 @@ describe('Game Routes', () => {
 
       expect(res.statusCode).toEqual(200);
       const games = res.body.data;
-      if (games.length > 0) {
-        for (let i = 1; i < games.length; i++) {
-          expect(new Date(games[i].event_date)).toBeGreaterThanOrEqual(new Date(games[i-1].event_date));
-        }
-      } else {
-        console.log('No games found in the database');
+      for (let i = 1; i < games.length; i++) {
+        expect(new Date(games[i].event_date)).toBeGreaterThanOrEqual(new Date(games[i-1].event_date));
       }
     });
   });

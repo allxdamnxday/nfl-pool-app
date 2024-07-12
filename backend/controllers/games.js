@@ -54,6 +54,18 @@ exports.fetchGames = asyncHandler(async (req, res, next) => {
   }
 });
 
+
+// @desc    Create a new game
+// @route   POST /api/v1/games
+// @access  Private
+exports.createGame = asyncHandler(async (req, res, next) => {
+  const game = await Game.create(req.body);
+  res.status(201).json({
+    success: true,
+    data: game
+  });
+});
+
 // @desc    Get all games
 // @route   GET /api/v1/games
 // @access  Private
@@ -142,4 +154,58 @@ exports.updateGameStatus = asyncHandler(async (req, res, next) => {
     success: true,
     data: game
   });
+
+  // @desc    Join a pool
+// @route   POST /api/v1/pools/:id/join
+// @access  Private
+exports.joinPool = asyncHandler(async (req, res, next) => {
+  const pool = await Pool.findById(req.params.id);
+
+  if (!pool) {
+    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
+  }
+
+  // Check if the pool is full
+  if (pool.participants.length >= pool.maxParticipants) {
+    return next(new ErrorResponse(`Pool is already full`, 400));
+  }
+
+  // Check if the user is already in the pool
+  if (pool.participants.includes(req.user.id)) {
+    return next(new ErrorResponse(`User is already in this pool`, 400));
+  }
+
+  pool.participants.push(req.user.id);
+  await pool.save();
+
+  res.status(200).json({
+    success: true,
+    data: pool
+  });
+});
+
+// @desc    Leave a pool
+// @route   POST /api/v1/pools/:id/leave
+// @access  Private
+exports.leavePool = asyncHandler(async (req, res, next) => {
+  const pool = await Pool.findById(req.params.id);
+
+  if (!pool) {
+    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
+  }
+
+  // Check if the user is in the pool
+  if (!pool.participants.includes(req.user.id)) {
+    return next(new ErrorResponse(`User is not in this pool`, 400));
+  }
+
+  pool.participants = pool.participants.filter(participant => participant.toString() !== req.user.id);
+  await pool.save();
+
+  res.status(200).json({
+    success: true,
+    data: pool
+  });
+});
+
 });

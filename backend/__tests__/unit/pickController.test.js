@@ -233,6 +233,51 @@ describe('Pick Controller', () => {
       });
     });
   });
+
+  // Add these tests to your pickController.test.js file
+
+describe('Error Handling', () => {
+  it('should handle trying to add a pick to a non-existent pool', async () => {
+    const mockReq = {
+      params: { poolId: 'nonexistentpool' },
+      body: { game: 'game123', team: 'team123' },
+      user: { id: 'user123' }
+    };
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+    const mockNext = jest.fn();
+
+    Pool.findById.mockResolvedValue(null);
+
+    await addPick(mockReq, mockRes, mockNext);
+
+    expect(mockNext).toHaveBeenCalledWith(expect.any(ErrorResponse));
+    expect(mockNext.mock.calls[0][0].statusCode).toBe(404);
+  });
+
+  it('should handle trying to add a pick for a non-existent game', async () => {
+    const mockReq = {
+      params: { poolId: 'pool123' },
+      body: { game: 'nonexistentgame', team: 'team123' },
+      user: { id: 'user123' }
+    };
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+    const mockNext = jest.fn();
+
+    Pool.findById.mockResolvedValue({ _id: 'pool123', participants: ['user123'] });
+    Game.findById.mockResolvedValue(null);
+
+    await addPick(mockReq, mockRes, mockNext);
+
+    expect(mockNext).toHaveBeenCalledWith(expect.any(ErrorResponse));
+    expect(mockNext.mock.calls[0][0].statusCode).toBe(404);
+  });
+});
   
   describe('deletePick', () => {
     it('should delete a pick', async () => {

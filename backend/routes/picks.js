@@ -1,27 +1,18 @@
-// backend/routes/picks.js
+// routes/picks.js
 const express = require('express');
-const {
-  addPick,
-  getPicksForPool,
-  getPickForWeek,
-  updatePick,
-  deletePick
-} = require('../controllers/picks');
+const { addPick, getPicksForPool, getPickForWeek, updatePick } = require('../controllers/picks');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router({ mergeParams: true });
 
-const { protect, authorize } = require('../middleware/auth');
-const asyncHandler = require('../middleware/async');
-
 router.route('/')
-  .get(protect, asyncHandler(getPicksForPool))
-  .post(protect, authorize('user', 'admin'), asyncHandler(addPick));
+  .get(protect, getPicksForPool)
+  .post(protect, addPick);
 
 router.route('/:week')
-  .get(protect, asyncHandler(getPickForWeek));
+  .get(protect, getPickForWeek);
 
 router.route('/:id')
-  .put(protect, authorize('user', 'admin'), asyncHandler(updatePick))
-  .delete(protect, authorize('user', 'admin'), asyncHandler(deletePick));
+  .put(protect, updatePick);
 
 module.exports = router;
