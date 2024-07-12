@@ -90,6 +90,7 @@ const auth = require('./routes/auth');
 const pools = require('./routes/pools');
 const picks = require('./routes/picks');
 const games = require('./routes/games');
+const admin = require('./routes/admin');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
@@ -98,6 +99,7 @@ app.use('/api/v1/pools/:poolId/picks', pickRoutes);
 app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
 app.use('/api/v1/games', gamesRoutes);
+app.use('/api/v1/admin', admin);
 
 
 // Use custom error handler
