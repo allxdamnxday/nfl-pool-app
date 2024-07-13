@@ -13,6 +13,8 @@ const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
 const pickRoutes = require('./routes/picks');
 const gamesRoutes = require('./routes/games');
+const requestLogger = require('./middleware/requestLogger');
+const { validateRegister } = require('./middleware/validators');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -33,7 +35,7 @@ app.use(cors());
 app.use(helmet());
 app.use(xss());
 app.use(hpp());
-
+app.use(requestLogger); // Use the request logger middleware
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -101,9 +103,14 @@ app.use('/api/v1/games', games);
 app.use('/api/v1/games', gamesRoutes);
 app.use('/api/v1/admin', admin);
 
-
 // Use custom error handler
 app.use(errorHandler);
+
+// Example route with validation middleware
+app.post('/register', validateRegister, (req, res) => {
+  // Handle registration logic here
+  res.send('User registered successfully');
+});
 
 const startServer = async () => {
   await connectDB();
