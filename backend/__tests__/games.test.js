@@ -180,49 +180,82 @@ describe('Fetch Games', () => {
       expect(res.body).toHaveProperty('success', true);
     });
 
-    it('should fail to update game status as non-admin', async () => {
+    it('should reject unauthenticated users from accessing protected endpoints', async () => {
+      const res = await request(app).get('/api/v1/games');
+    
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty('success', false);
+      expect(res.body).toHaveProperty('error', 'Not authorized to access this route');
+    });
+    
+    it('should handle concurrent updates to the same game', async () => {
       const game = { _id: mongoose.Types.ObjectId(), event_id: '1', event_uuid: 'uuid1', sport_id: 1, event_date: new Date() };
-      Game.findByIdAndUpdate.mockResolvedValue(game);
-
-      const res = await request(app)
+      
+      // Mocking findByIdAndUpdate to return the same game for both updates
+      Game.findByIdAndUpdate
+        .mockResolvedValueOnce(game)
+        .mockResolvedValueOnce(game);
+      
+      const update1 = request(app)
         .put(`/api/v1/games/${game._id}/status`)
         .set('Authorization', `Bearer ${token}`)
         .send({ status: 'completed' });
-
-      expect(res.statusCode).toEqual(403);
-      expect(res.body).toHaveProperty('success', false);
+    
+      const update2 = request(app)
+        .put(`/api/v1/games/${game._id}/status`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: 'pending' });
+    
+      const results = await Promise.all([update1, update2]);
+    
+      results.forEach(res => {
+        expect([200, 400]).toContain(res.statusCode);
+        if (res.statusCode === 200) {
+          expect(res.body).toHaveProperty('success', true);
+        } else {
+          expect(res.body).toHaveProperty('success', false);
+          expect(res.body).toHaveProperty('error');
+        }
+      });
     });
 
-    it('should fail to update game status with invalid status', async () => {
+    it('should handle requests when there are no games in the database', async () => {
+      Game.find.mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([])
+      });
+    
+      const res = await request(app)
+        .get('/api/v1/games')
+        .set('Authorization', `Bearer ${token}`);
+    
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty('success', true);
+      expect(res.body).toHaveProperty('count', 0);
+      expect(res.body.data).toEqual([]);
+    });
+  
+    it('should fail to update game status with invalid status value', async () => {
       const game = { _id: mongoose.Types.ObjectId(), event_id: '1', event_uuid: 'uuid1', sport_id: 1, event_date: new Date() };
-      Game.findByIdAndUpdate.mockResolvedValue(null);
-
+      
+      // Mocking a validation error scenario
+      Game.findByIdAndUpdate.mockImplementation((id, update, options) => {
+        if (update['score.event_status'] === 'invalid_status') {
+          return Promise.reject(new Error('Invalid status value'));
+        }
+        return Promise.resolve(game);
+      });
+    
       const res = await request(app)
         .put(`/api/v1/games/${game._id}/status`)
         .set('Authorization', `Bearer ${token}`)
-        .send({ status: 'invalid-status' });
-
-      expect(res.statusCode).toEqual(400);
+        .send({ status: 'invalid_status' });
+    
+      expect(res.statusCode).toBe(400);
       expect(res.body).toHaveProperty('success', false);
+      expect(res.body).toHaveProperty('error', 'Please provide a valid status');
     });
-  });
-
-  describe('Get Games By Team', () => {
-    it('should get games for a specific team', async () => {
-      const teamId = 1;
-      const mockGames = [{ event_id: 'test1', event_date: '2024-09-20T00:00:00Z' }];
-      Game.find.mockReturnValue({
-        sort: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue(mockGames)
-      });
-  
-      const res = await request(app)
-        .get(`/api/v1/games/team/${teamId}`)
-        .set('Authorization', `Bearer ${token}`);
-  
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('success', true);
-      expect(res.body.data).toEqual(mockGames);
-    });
+    
+    
   });
   

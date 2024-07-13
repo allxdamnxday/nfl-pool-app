@@ -129,7 +129,9 @@ exports.updateGameStatus = asyncHandler(async (req, res, next) => {
   const { status } = req.body;
   console.log(`updateGameStatus called with id: ${req.params.id}, status: ${status}`);
 
-  if (!status) {
+  const validStatuses = ['scheduled', 'completed', 'canceled']; // Example statuses
+
+  if (!status || !validStatuses.includes(status)) {
     console.error('Invalid status provided');
     return next(new ErrorResponse('Please provide a valid status', 400));
   }

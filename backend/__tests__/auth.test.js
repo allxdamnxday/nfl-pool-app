@@ -2,8 +2,10 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { app, connectDB } = require('../server');
 const User = require('../models/User');
+
 
 let server;
 // Mock the sendEmail function
@@ -205,4 +207,97 @@ describe('Auth Endpoints', () => {
     const isMatch = await updatedUser.matchPassword('newpassword123');
     expect(isMatch).toBe(true);
   });
+
+  it('should reject access with a malformed token', async () => {
+    const token = 'malformed.token.string';
+  
+    const response = await request(app)
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${token}`);
+  
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('error', 'Not authorized to access this route');
+  });
+  
+  it('should reject access with a token signed with an incorrect secret', async () => {
+    const user = await User.create({
+      username: 'wrongsecretuser',
+      email: 'wrongsecret@example.com',
+      password: 'password123'
+    });
+  
+    const token = jwt.sign({ id: user._id, role: user.role }, 'incorrectsecret');
+  
+    const response = await request(app)
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${token}`);
+  
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('error', 'Not authorized to access this route');
+  });
+
+  it('should reject access with an expired token', async () => {
+    const user = await User.create({
+      username: 'expiretokenuser',
+      email: 'expiretoken@example.com',
+      password: 'password123'
+    });
+  
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1ms' });
+  
+    const response = await request(app)
+      .get('/api/v1/auth/me')
+      .set('Authorization', `Bearer ${token}`);
+  
+    expect(response.statusCode).toBe(401);
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('error', 'Not authorized to access this route');
+  });
+  
+  it('should deny access to admin route for non-admin user', async () => {
+    const user = await User.create({
+      username: 'regularuser',
+      email: 'user@example.com',
+      password: 'password123',
+      role: 'user'
+    });
+    const token = user.getSignedJwtToken();
+  
+    const response = await request(app)
+      .get('/api/v1/admin/some-protected-route')
+      .set('Authorization', `Bearer ${token}`);
+  
+    expect(response.statusCode).toBe(403);
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('error', 'User role user is not authorized to access this route');
+  });
+
+  it('should not reset password with an expired token', async () => {
+    const user = await User.create({
+      username: 'expiredtokenuser',
+      email: 'expiredtoken@example.com',
+      password: 'password123'
+    });
+  
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    user.resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+    user.resetPasswordExpire = Date.now() - 10 * 60 * 1000; // Expired 10 minutes ago
+    await user.save();
+  
+    const response = await request(app)
+      .put(`/api/v1/auth/resetpassword/${resetToken}`)
+      .send({ password: 'newpassword123' });
+  
+    expect(response.statusCode).toBe(400);
+    expect(response.body).toHaveProperty('success', false);
+    expect(response.body).toHaveProperty('error', 'Invalid token');
+  });
+  
+  
+  
 });
