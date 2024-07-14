@@ -15,6 +15,7 @@ const pickRoutes = require('./routes/picks');
 const gamesRoutes = require('./routes/games');
 const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
+const swaggerSpec = require('./config/swaggerOptions');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -37,55 +38,16 @@ app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
 
+
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 100
 });
 app.use(limiter);
 
-// Swagger configuration
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'NFL Survivor Pool API',
-      version: '1.0.0',
-      description: 'API for NFL Survivor Pool Web App',
-    },
-    servers: [
-      {
-        url: process.env.NODE_ENV === 'production' 
-          ? 'https://your-production-url.com' 
-          : `http://localhost:${process.env.PORT || 5000}`,
-      },
-    ],
-  },
-  apis: ['./routes/*.js'],
-};
+// Swagger UI setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-const connectDB = async () => {
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.error('MONGODB_URI is not defined in environment variables');
-    process.exit(1);
-  }
-
-  try {
-    await mongoose.connect(mongoUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-    });
-    console.log(`Connected to MongoDB: ${mongoUri}`);
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
-};
 
 // Route files
 const auth = require('./routes/auth');
@@ -111,6 +73,20 @@ app.post('/register', validateRegister, (req, res) => {
   // Handle registration logic here
   res.send('User registered successfully');
 });
+
+// Add the connectDB function
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+};
 
 const startServer = async () => {
   await connectDB();
