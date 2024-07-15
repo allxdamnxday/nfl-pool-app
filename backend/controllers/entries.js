@@ -1,5 +1,6 @@
 const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
+const Request = require('../models/Request');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 

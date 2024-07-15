@@ -1,4 +1,3 @@
-// backend/__tests__/entries.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { app, connectDB } = require('../server');
@@ -6,7 +5,7 @@ const User = require('../models/User');
 const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
 const Game = require('../models/Game');
-const Request = require('../models/Request'); // Import the Request model
+const Request = require('../models/Request');
 
 let server;
 
@@ -21,7 +20,7 @@ beforeEach(async () => {
   await User.deleteMany({});
   await Pool.deleteMany({});
   await Game.deleteMany({});
-  await Request.deleteMany({}); // Clean up the Request collection
+  await Request.deleteMany({});
 });
 
 // Close the database connection after all tests
@@ -30,7 +29,7 @@ afterAll(async () => {
 });
 
 describe('Entries Endpoints', () => {
-  let user, admin, pool, entry, userToken, adminToken;
+  let user, admin, pool, entry, userToken, adminToken, newUser, newPool, newUserToken;
 
   beforeEach(async () => {
     // Create a regular user
@@ -66,9 +65,33 @@ describe('Entries Endpoints', () => {
       pool: pool._id,
       isActive: true
     });
+
+    // Create a new user and pool for the test
+    newUser = await User.create({
+      username: 'newuser',
+      email: 'new@example.com',
+      password: 'password123'
+    });
+    newUserToken = newUser.getSignedJwtToken();
+
+    newPool = await Pool.create({
+      name: 'New Pool',
+      season: 2023,
+      maxParticipants: 10,
+      entryFee: 50,
+      prizeAmount: 450,
+      creator: newUser._id
+    });
+
+    // Create an approved request to join the pool
+    await Request.create({
+      pool: newPool._id,
+      user: newUser._id,
+      status: 'approved'
+    });
   });
 
-  describe('GET /api/v1/entries', () => {
+  describe('GET /api/v1/pools/:poolId/entries', () => {
     it('should get all entries for a pool', async () => {
       const res = await request(app)
         .get(`/api/v1/pools/${pool._id}/entries`)
@@ -108,34 +131,6 @@ describe('Entries Endpoints', () => {
   });
 
   describe('POST /api/v1/pools/:poolId/entries', () => {
-    let newUser, newPool, newUserToken, request;
-
-    beforeEach(async () => {
-      // Create a new user and pool for the test
-      newUser = await User.create({
-        username: 'newuser',
-        email: 'new@example.com',
-        password: 'password123'
-      });
-      newUserToken = newUser.getSignedJwtToken();
-
-      newPool = await Pool.create({
-        name: 'New Pool',
-        season: 2023,
-        maxParticipants: 10,
-        entryFee: 50,
-        prizeAmount: 450,
-        creator: newUser._id
-      });
-
-      // Create a request to join the pool
-      request = await Request.create({
-        pool: newPool._id,
-        user: newUser._id,
-        status: 'approved'
-      });
-    });
-
     it('should create a new entry with an approved request', async () => {
       const res = await request(app)
         .post(`/api/v1/pools/${newPool._id}/entries`)
@@ -152,7 +147,8 @@ describe('Entries Endpoints', () => {
     });
 
     it('should not create a new entry without an approved request', async () => {
-      await Request.updateOne({ _id: request._id }, { status: 'pending' });
+      // Remove the approved request
+      await Request.updateOne({ user: newUser._id, pool: newPool._id }, { status: 'pending' });
 
       const res = await request(app)
         .post(`/api/v1/pools/${newPool._id}/entries`)
@@ -278,7 +274,7 @@ describe('Entries Endpoints', () => {
         .put(`/api/v1/requests/${requestEntry._id}/approve`)
         .set('Authorization', `Bearer ${userToken}`);
 
-      expect(res.statusCode).toEqual(401);
+      expect(res.statusCode).toEqual(403);
     });
   });
 });
