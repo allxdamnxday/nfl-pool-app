@@ -1,4 +1,3 @@
-// backend/controllers/pools.js
 const Pool = require('../models/Pool');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
@@ -102,11 +101,6 @@ exports.joinPool = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
   }
 
-  // Check if the pool is full
-  if (pool.participants.length >= pool.maxParticipants) {
-    return next(new ErrorResponse(`Pool is already full`, 400));
-  }
-
   // Check if the user is already in the pool
   if (pool.participants.includes(req.user.id)) {
     return next(new ErrorResponse(`User is already in this pool`, 400));
@@ -136,17 +130,12 @@ exports.leavePool = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`User is not in this pool`, 400));
   }
 
-  // Remove the user from the participants array
+  // Remove user from participants array
   pool.participants = pool.participants.filter(participant => participant.toString() !== req.user.id);
+  await pool.save();
 
-  try {
-    await pool.save();
-    res.status(200).json({
-      success: true,
-      data: pool
-    });
-  } catch (error) {
-    console.error(error);
-    return next(new ErrorResponse(`Error leaving the pool`, 500));
-  }
+  res.status(200).json({
+    success: true,
+    data: pool
+  });
 });

@@ -14,7 +14,7 @@ const EntrySchema = new mongoose.Schema({
   },
   isActive: {
     type: Boolean,
-    default: true
+    default: false
   },
   eliminatedWeek: {
     type: Number,

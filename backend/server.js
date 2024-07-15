@@ -11,8 +11,6 @@ const hpp = require('hpp');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
-const pickRoutes = require('./routes/picks');
-const gamesRoutes = require('./routes/games');
 const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
@@ -38,7 +36,6 @@ app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
 
-
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 100
@@ -48,7 +45,6 @@ app.use(limiter);
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-
 // Route files
 const auth = require('./routes/auth');
 const pools = require('./routes/pools');
@@ -56,17 +52,18 @@ const picks = require('./routes/picks');
 const games = require('./routes/games');
 const admin = require('./routes/admin');
 const entries = require('./routes/entries');
+const requests = require('./routes/requests');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/pools', pools);
-app.use('/api/v1/pools/:poolId/picks', pickRoutes);
+app.use('/api/v1/pools/:poolId/picks', picks);
 app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
-app.use('/api/v1/games', gamesRoutes);
 app.use('/api/v1/admin', admin);
 app.use('/api/v1/entries', entries);
 app.use('/api/v1/pools/:poolId/entries', entries);
+app.use('/api/v1/requests', requests);
 
 // Use custom error handler
 app.use(errorHandler);

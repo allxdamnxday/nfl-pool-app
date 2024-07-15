@@ -1,10 +1,12 @@
+// backend/__tests__/entries.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { app, connectDB } = require('../server');
 const User = require('../models/User');
 const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
-const Game = require('../models/Game'); // Import the Game model
+const Game = require('../models/Game');
+const Request = require('../models/Request'); // Import the Request model
 
 let server;
 
@@ -18,7 +20,8 @@ beforeEach(async () => {
   await Entry.deleteMany({});
   await User.deleteMany({});
   await Pool.deleteMany({});
-  await Game.deleteMany({}); // Clean up the Game collection
+  await Game.deleteMany({});
+  await Request.deleteMany({}); // Clean up the Request collection
 });
 
 // Close the database connection after all tests
@@ -105,7 +108,7 @@ describe('Entries Endpoints', () => {
   });
 
   describe('POST /api/v1/pools/:poolId/entries', () => {
-    let newUser, newPool, newUserToken;
+    let newUser, newPool, newUserToken, request;
 
     beforeEach(async () => {
       // Create a new user and pool for the test
@@ -124,16 +127,16 @@ describe('Entries Endpoints', () => {
         prizeAmount: 450,
         creator: newUser._id
       });
+
+      // Create a request to join the pool
+      request = await Request.create({
+        pool: newPool._id,
+        user: newUser._id,
+        status: 'approved'
+      });
     });
 
-    it('should create a new entry', async () => {
-      // Ensure the user and pool are created
-      const createdUser = await User.findById(newUser._id);
-      const createdPool = await Pool.findById(newPool._id);
-
-      expect(createdUser).not.toBeNull();
-      expect(createdPool).not.toBeNull();
-
+    it('should create a new entry with an approved request', async () => {
       const res = await request(app)
         .post(`/api/v1/pools/${newPool._id}/entries`)
         .set('Authorization', `Bearer ${newUserToken}`)
@@ -146,6 +149,20 @@ describe('Entries Endpoints', () => {
       expect(res.body).toHaveProperty('success', true);
       expect(res.body.data).toHaveProperty('user', newUser._id.toString());
       expect(res.body.data).toHaveProperty('pool', newPool._id.toString());
+    });
+
+    it('should not create a new entry without an approved request', async () => {
+      await Request.updateOne({ _id: request._id }, { status: 'pending' });
+
+      const res = await request(app)
+        .post(`/api/v1/pools/${newPool._id}/entries`)
+        .set('Authorization', `Bearer ${newUserToken}`)
+        .send({
+          user: newUser._id,
+          pool: newPool._id
+        });
+
+      expect(res.statusCode).toEqual(403);
     });
   });
 
@@ -177,12 +194,7 @@ describe('Entries Endpoints', () => {
           week: 1
         }
       });
-  
-      const entry = await Entry.create({
-        user: user._id,
-        pool: pool._id,
-      });
-  
+
       const res = await request(app)
         .put(`/api/v1/entries/${entry._id}`)
         .set('Authorization', `Bearer ${userToken}`)
@@ -191,7 +203,7 @@ describe('Entries Endpoints', () => {
           eliminatedWeek: 5,
           gameId: game._id // Include gameId in the request body
         });
-  
+
       expect(res.statusCode).toEqual(200);
       expect(res.body).toHaveProperty('success', true);
       expect(res.body.data).toHaveProperty('isActive', false);
@@ -223,60 +235,50 @@ describe('Entries Endpoints', () => {
     });
   });
 
-  describe('POST /api/v1/pools/:poolId/request-entry', () => {
-    it('should request entry to a pool', async () => {
+  describe('POST /api/v1/requests', () => {
+    it('should create a new request to join a pool', async () => {
       const res = await request(app)
-        .post(`/api/v1/pools/${pool._id}/request-entry`)
+        .post('/api/v1/requests')
         .set('Authorization', `Bearer ${userToken}`)
-        .send();
+        .send({
+          poolId: pool._id
+        });
 
-      expect(res.status).toBe(201);
-      expect(res.body.success).toBe(true);
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toHaveProperty('success', true);
       expect(res.body.data).toHaveProperty('user', user._id.toString());
       expect(res.body.data).toHaveProperty('pool', pool._id.toString());
-      expect(res.body.data).toHaveProperty('isActive', false);
-    });
-
-    it('should not request entry if user already has an entry', async () => {
-      const res = await request(app)
-        .post(`/api/v1/pools/${pool._id}/request-entry`)
-        .set('Authorization', `Bearer ${userToken}`)
-        .send();
-
-      expect(res.status).toBe(400);
-      expect(res.body.success).toBe(false);
-      expect(res.body.error).toBe('User already requested or has an entry in this pool');
+      expect(res.body.data).toHaveProperty('status', 'pending');
     });
   });
 
-  describe('PUT /api/v1/entries/:id/approve', () => {
-    let entryId;
+  describe('PUT /api/v1/requests/:id/approve', () => {
+    let requestEntry;
 
     beforeEach(async () => {
-      const entry = await Entry.findOne({ user: user._id, pool: pool._id, isActive: false });
-      entryId = entry._id;
+      requestEntry = await Request.create({
+        user: user._id,
+        pool: pool._id,
+        status: 'pending'
+      });
     });
 
-    it('should approve entry request', async () => {
+    it('should approve a request to join a pool', async () => {
       const res = await request(app)
-        .put(`/api/v1/entries/${entryId}/approve`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send();
+        .put(`/api/v1/requests/${requestEntry._id}/approve`)
+        .set('Authorization', `Bearer ${adminToken}`);
 
-      expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data).toHaveProperty('isActive', true);
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('success', true);
+      expect(res.body.data).toHaveProperty('status', 'approved');
     });
 
-    it('should not approve entry request if not admin', async () => {
+    it('should not allow non-admin users to approve a request', async () => {
       const res = await request(app)
-        .put(`/api/v1/entries/${entryId}/approve`)
-        .set('Authorization', `Bearer ${userToken}`)
-        .send();
+        .put(`/api/v1/requests/${requestEntry._id}/approve`)
+        .set('Authorization', `Bearer ${userToken}`);
 
-      expect(res.status).toBe(401);
-      expect(res.body.success).toBe(false);
-      expect(res.body.error).toBe(`User ${user._id} is not authorized to approve this entry`);
+      expect(res.statusCode).toEqual(401);
     });
   });
 });

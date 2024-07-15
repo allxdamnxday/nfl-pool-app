@@ -6,7 +6,9 @@ const {
   createEntry,
   getEntriesForPool,
   updateEntry,
-  deleteEntry
+  deleteEntry,
+  requestEntry,
+  approveEntry
 } = require('../controllers/entries');
 const { protect, authorize } = require('../middleware/auth');
 const checkGameStart = require('../middleware/checkGameStart');
@@ -24,5 +26,11 @@ router.route('/:id')
 
 router.route('/user')
   .get(protect, getUserEntries);
+
+router.route('/:poolId/request-entry')
+  .post(protect, requestEntry);
+
+router.route('/:id/approve')
+  .put(protect, authorize('admin'), approveEntry);
 
 module.exports = router;

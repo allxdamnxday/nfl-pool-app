@@ -2,17 +2,12 @@
 const mongoose = require('mongoose');
 
 const PickSchema = new mongoose.Schema({
-  user: {
+  entry: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
+    ref: 'Entry',
     required: true
   },
-  pool: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Pool',
-    required: true
-  },
-  weekNumber: {
+  week: {
     type: Number,
     required: true
   },
