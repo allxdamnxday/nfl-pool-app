@@ -55,6 +55,7 @@ const pools = require('./routes/pools');
 const picks = require('./routes/picks');
 const games = require('./routes/games');
 const admin = require('./routes/admin');
+const entries = require('./routes/entries');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
@@ -64,6 +65,8 @@ app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
 app.use('/api/v1/games', gamesRoutes);
 app.use('/api/v1/admin', admin);
+app.use('/api/v1/entries', entries);
+app.use('/api/v1/pools/:poolId/entries', entries);
 
 // Use custom error handler
 app.use(errorHandler);

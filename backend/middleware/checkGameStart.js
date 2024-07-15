@@ -1,23 +1,31 @@
-const Game = require('../models/Game'); // Adjust the path to your Game model
+// middleware/checkGameStart.js
+const Game = require('../models/Game');
+const ErrorResponse = require('../utils/errorResponse');
 
 const checkGameStart = async (req, res, next) => {
-  const { gameId } = req.body; // Assuming gameId is sent in the request body
+  const { gameId } = req.body;
+
+  // If no gameId is provided, skip the check
+  if (!gameId) {
+    return next();
+  }
 
   try {
     const game = await Game.findById(gameId);
     if (!game) {
-      return res.status(404).json({ message: 'Game not found' });
+      return next(new ErrorResponse('Game not found', 404));
     }
 
     const currentTime = new Date();
-    if (currentTime >= new Date(game.startTime)) {
-      return res.status(400).json({ message: 'Cannot make a pick after the game has started' });
+    const gameStartTime = new Date(game.event_date);
+    if (currentTime >= gameStartTime) {
+      return next(new ErrorResponse('Cannot make a pick after the game has started', 400));
     }
 
     next();
   } catch (error) {
     console.error('Error checking game start time:', error);
-    res.status(500).json({ message: 'Server error' });
+    return next(new ErrorResponse('Server error', 500));
   }
 };
 
