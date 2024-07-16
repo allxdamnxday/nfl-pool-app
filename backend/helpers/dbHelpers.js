@@ -1,25 +1,27 @@
 // helpers/dbHelpers.js
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
 
-let mongod;
-
-exports.connect = async () => {
-  mongod = await MongoMemoryServer.create();
-  const uri = mongod.getUri();
-  await mongoose.connect(uri);
+exports.connectDB = async () => {
+  await mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 };
 
 exports.closeDatabase = async () => {
-  await mongoose.connection.dropDatabase();
+  try {
+    await mongoose.connection.dropDatabase();
+  } catch (error) {
+    console.warn('Failed to drop database. It might have already been closed:', error.message);
+  }
   await mongoose.connection.close();
-  await mongod.stop();
 };
 
 exports.clearDatabase = async () => {
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    await collection.deleteMany();
+  if (mongoose.connection.readyState !== 0) {
+    const collections = mongoose.connection.collections;
+    for (const key in collections) {
+      await collections[key].deleteMany();
+    }
   }
 };
