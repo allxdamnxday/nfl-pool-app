@@ -1,15 +1,10 @@
-// backend/models/Pick.js
+// models/Pick.js
 const mongoose = require('mongoose');
 
 const PickSchema = new mongoose.Schema({
-  user: {
+  entry: {
     type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  pool: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Pool',
+    ref: 'Entry',
     required: true
   },
   week: {
@@ -17,8 +12,7 @@ const PickSchema = new mongoose.Schema({
     required: true
   },
   team: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'NFLTeam',
+    type: String,
     required: true
   },
   game: {

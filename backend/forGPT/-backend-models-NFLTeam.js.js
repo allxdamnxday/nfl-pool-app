@@ -1,4 +1,4 @@
-// backend/models/NFLTeam.js
+// /backend/models/NFLTeam.js
 const mongoose = require('mongoose');
 
 const NFLTeamSchema = new mongoose.Schema({

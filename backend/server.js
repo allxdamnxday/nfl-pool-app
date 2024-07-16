@@ -11,6 +11,9 @@ const hpp = require('hpp');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const errorHandler = require('./middleware/error');
+const requestLogger = require('./middleware/requestLogger');
+const { validateRegister } = require('./middleware/validators');
+const swaggerSpec = require('./config/swaggerOptions');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -31,6 +34,7 @@ app.use(cors());
 app.use(helmet());
 app.use(xss());
 app.use(hpp());
+app.use(requestLogger); // Use the request logger middleware
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -38,64 +42,51 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Swagger configuration
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'NFL Survivor Pool API',
-      version: '1.0.0',
-      description: 'API for NFL Survivor Pool Web App',
-    },
-    servers: [
-      {
-        url: process.env.NODE_ENV === 'production' 
-          ? 'https://your-production-url.com' 
-          : `http://localhost:${process.env.PORT || 5000}`,
-      },
-    ],
-  },
-  apis: ['./routes/*.js'],
-};
-
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-const connectDB = async () => {
-  const mongoUri = process.env.MONGODB_URI;
-  if (!mongoUri) {
-    console.error('MONGODB_URI is not defined in environment variables');
-    process.exit(1);
-  }
-
-  try {
-    await mongoose.connect(mongoUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false,
-    });
-    console.log(`Connected to MongoDB: ${mongoUri}`);
-  } catch (error) {
-    console.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
-};
+// Swagger UI setup
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Route files
 const auth = require('./routes/auth');
 const pools = require('./routes/pools');
 const picks = require('./routes/picks');
 const games = require('./routes/games');
+const admin = require('./routes/admin');
+const entries = require('./routes/entries');
+const requests = require('./routes/requests');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/pools', pools);
+app.use('/api/v1/pools/:poolId/picks', picks);
 app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
+app.use('/api/v1/admin', admin);
+app.use('/api/v1/entries', entries);
+app.use('/api/v1/pools/:poolId/entries', entries);
+app.use('/api/v1/requests', requests);
 
 // Use custom error handler
 app.use(errorHandler);
+
+// Example route with validation middleware
+app.post('/register', validateRegister, (req, res) => {
+  // Handle registration logic here
+  res.send('User registered successfully');
+});
+
+// Add the connectDB function
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+};
 
 const startServer = async () => {
   await connectDB();

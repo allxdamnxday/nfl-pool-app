@@ -5,7 +5,7 @@ const GameSchema = new mongoose.Schema({
   event_id: { type: String, required: true, unique: true },
   event_uuid: { type: String, required: true },
   sport_id: { type: Number, required: true },
-  event_date: { type: Date, required: true },
+  event_date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/ },
   rotation_number_away: { type: Number },
   rotation_number_home: { type: Number },
   score: {

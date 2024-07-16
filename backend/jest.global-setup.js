@@ -1,9 +1,15 @@
-require('dotenv').config({ path: '.env.test' }); // Load environment variables from .env.test
-
-const { connectDB } = require('./server');
+// backend/jest.global-setup.js
+const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
 module.exports = async () => {
-  // Set up any global configuration or services needed for tests
-  process.env.NODE_ENV = 'test';
-  await connectDB();
+  const mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+
+  process.env.MONGODB_URI = mongoUri;
+
+  await mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 };

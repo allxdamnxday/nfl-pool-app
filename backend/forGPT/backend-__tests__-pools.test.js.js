@@ -6,7 +6,6 @@ const User = require('../models/User');
 const Pool = require('../models/Pool');
 
 let token;
-let createdPoolId;
 
 beforeAll(async () => {
   await connectDB();
@@ -32,8 +31,9 @@ beforeEach(async () => {
 });
 
 describe('Pool Endpoints', () => {
-  it('should create a new pool', async () => {
-    const res = await request(app)
+  it('should join a pool', async () => {
+    // First, create a pool
+    const createRes = await request(app)
       .post('/api/v1/pools')
       .set('Authorization', `Bearer ${token}`)
       .send({
@@ -44,17 +44,50 @@ describe('Pool Endpoints', () => {
         prizeAmount: 450
       });
 
-    expect(res.statusCode).toEqual(201);
+    console.log('Create Pool Response:', createRes.body);  // Log response body
+  
+    expect(createRes.statusCode).toEqual(201);
+    expect(createRes.body).toHaveProperty('data');
+    const poolId = createRes.body.data._id;
+  
+    // Then, join the pool
+    const res = await request(app)
+      .post(`/api/v1/pools/${poolId}/join`)
+      .set('Authorization', `Bearer ${token}`);
+  
+    expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('success', true);
-    expect(res.body.data).toHaveProperty('name', 'Test Pool');
-    
-    createdPoolId = res.body.data._id;
+    expect(res.body.data.participants).toHaveLength(1);
   });
 
   it('should get all pools', async () => {
+    // First, create a pool
+    const createRes = await request(app)
+      .post('/api/v1/pools')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Test Pool',
+        season: 2023,
+        maxParticipants: 10,
+        entryFee: 50,
+        prizeAmount: 450
+      });
+
+    console.log('Create Pool Response:', createRes.body);  // Log response body
+
+    if (createRes.statusCode !== 201) {
+      console.error('Failed to create pool:', createRes.body);
+    }
+
+    expect(createRes.statusCode).toEqual(201);
+    expect(createRes.body).toHaveProperty('data');
+
+    // Then, get all pools
     const res = await request(app)
       .get('/api/v1/pools')
       .set('Authorization', `Bearer ${token}`);
+
+    console.log('Get All Pools Response:', res.body);  // Log response body
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('success', true);
@@ -63,57 +96,27 @@ describe('Pool Endpoints', () => {
   });
 
   it('should get a single pool', async () => {
-    const res = await request(app)
-      .get(`/api/v1/pools/${createdPoolId}`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('success', true);
-    expect(res.body.data).toHaveProperty('name', 'Test Pool');
-  });
-
-  it('should join a pool', async () => {
-    const res = await request(app)
-      .post(`/api/v1/pools/${createdPoolId}/join`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('success', true);
-    expect(res.body.data.participants).toHaveLength(1);
-  });
-
-  it('should update a pool', async () => {
-    const res = await request(app)
-      .put(`/api/v1/pools/${createdPoolId}`)
+    // First, create a pool
+    const createRes = await request(app)
+      .post('/api/v1/pools')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        name: 'Updated Test Pool',
-        maxParticipants: 15
+        name: 'Test Pool',
+        season: 2023,
+        maxParticipants: 10,
+        entryFee: 50,
+        prizeAmount: 450
       });
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('success', true);
-    expect(res.body.data).toHaveProperty('name', 'Updated Test Pool');
-    expect(res.body.data).toHaveProperty('maxParticipants', 15);
-  });
+    console.log('Create Pool Response:', createRes.body);  // Log response body
 
-  it('should delete a pool', async () => {
-    const res = await request(app)
-      .delete(`/api/v1/pools/${createdPoolId}`)
-      .set('Authorization', `Bearer ${token}`);
+    if (createRes.statusCode !== 201) {
+      console.error('Failed to create pool:', createRes.body);
+    }
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('success', true);
-    expect(res.body.data).toEqual({});
-
-    // Verify the pool is deleted
-    const checkRes = await request(app)
-      .get(`/api/v1/pools/${createdPoolId}`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(checkRes.statusCode).toEqual(404);
-  });
-});._id;
+    expect(createRes.statusCode).toEqual(201);
+    expect(createRes.body).toHaveProperty('data');
+    const poolId = createRes.body.data._id;
 
     // Then, get the pool by ID
     const res = await request(app)

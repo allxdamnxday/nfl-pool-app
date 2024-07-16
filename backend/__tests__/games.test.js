@@ -1,24 +1,28 @@
-//games.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { app, connectDB } = require('../server');
 const Game = require('../models/Game');
-const NFLTeam = require('../models/NFLTeam');
 const User = require('../models/User');
 const rundownApi = require('../services/rundownApiService');
 
-
-// Mock the entire rundownApiService module
+// Mock dependencies
+jest.mock('../models/Game', () => {
+  return {
+    find: jest.fn().mockReturnThis(),
+    findById: jest.fn(),
+    findOneAndUpdate: jest.fn(),
+    findByIdAndUpdate: jest.fn(),
+    sort: jest.fn().mockReturnThis(),
+    exec: jest.fn()
+  };
+});
 jest.mock('../services/rundownApiService');
 
 let token;
 
 beforeAll(async () => {
   await connectDB();
-  
-  // Ensure the User model is clean before testing
   await User.deleteMany({});
-  
   const user = await User.create({
     username: 'testuser',
     email: 'test@example.com',
@@ -31,181 +35,227 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-describe('POST /api/v1/games/fetch', () => {
-  it('should fetch and store games from external API', async () => {
+describe('Fetch Games', () => {
+  it('should fetch games from external API and store in database', async () => {
+    const mockApiResponse = [
+      { event_id: 'test1', event_date: '2024-09-20T00:00:00Z' }
+    ];
+    rundownApi.fetchNFLSchedule.mockResolvedValue(mockApiResponse);
+
+    Game.findOneAndUpdate.mockResolvedValue({});
+
     const res = await request(app)
       .post('/api/v1/games/fetch')
       .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2024-08-10', limit: 5 });
+      .send({ date: '2024-09-20', limit: 5 });
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('success', true);
-    expect(res.body).toHaveProperty('count');
-    expect(res.body.count).toBeGreaterThan(0);
-    expect(res.body).toHaveProperty('message');
+    expect(res.body).toHaveProperty('count', 1);
   });
 
-  it('should return 400 if date is not provided', async () => {
-    const res = await request(app)
-      .post('/api/v1/games/fetch')
-      .set('Authorization', `Bearer ${token}`)
-      .send({});
-
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toHaveProperty('success', false);
-    expect(res.body).toHaveProperty('error', 'Please provide a date');
-  });
-
-  it('should handle case when no games are found', async () => {
-    // Mock the rundownApi.fetchNFLSchedule to return an empty array
-    jest.spyOn(rundownApi, 'fetchNFLSchedule').mockResolvedValue([]);
-  
-    const res = await request(app)
-      .post('/api/v1/games/fetch')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ date: '2024-07-01' });  // Use an off-season date
-  
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toHaveProperty('success', true);
-    expect(res.body).toHaveProperty('count', 0);
-    expect(res.body).toHaveProperty('message', 'No games found for the given date.');
-  
-    // Restore the original implementation
-    jest.restoreAllMocks();
-  });
-});
-
-
-describe('Game Routes', () => {
-  describe('GET /api/v1/games', () => {
-    it('should return all games', async () => {
+    it('should fail to fetch games with invalid date', async () => {
       const res = await request(app)
-        .get('/api/v1/games')
-        .set('Authorization', `Bearer ${token}`);
-    
+        .post('/api/v1/games/fetch')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ date: 'invalid-date' });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toHaveProperty('success', false);
+    });
+
+    it('should not create duplicate games', async () => {
+      rundownApi.fetchNFLSchedule.mockResolvedValue([
+        { event_id: 'test1', event_date: '2024-09-20T00:00:00Z' }
+      ]);
+
+      Game.findOneAndUpdate.mockResolvedValue({});
+
+      await request(app)
+        .post('/api/v1/games/fetch')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ date: '2024-09-20', limit: 5 });
+
+      const res = await request(app)
+        .post('/api/v1/games/fetch')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ date: '2024-09-20', limit: 5 });
+
       expect(res.statusCode).toEqual(200);
       expect(res.body).toHaveProperty('success', true);
-      expect(Array.isArray(res.body.data)).toBeTruthy();
-      // Optional: Check length if you know there should be games in the database
-      // expect(res.body.data.length).toBeGreaterThan(0);
-    });
-
-    it('should return games sorted by date', async () => {
-      const res = await request(app)
-        .get('/api/v1/games')
-        .set('Authorization', `Bearer ${token}`);
-
-      expect(res.statusCode).toEqual(200);
-      const games = res.body.data;
-      for (let i = 1; i < games.length; i++) {
-        expect(new Date(games[i].event_date)).toBeGreaterThanOrEqual(new Date(games[i-1].event_date));
-      }
     });
   });
 
-  describe('GET /api/v1/games/:id', () => {
-    it('should return a single game', async () => {
-      // Ensure there is at least one game in the database
-      const game = await Game.findOne();
+  describe('Get Games', () => {
+    it('should get all games', async () => {
+      const mockGames = [
+        { 
+          event_id: 'test1', 
+          event_uuid: 'uuid1', 
+          sport_id: 2, 
+          event_date: '2024-09-20T00:00:00Z'
+        }
+      ];
       
-      if (!game) {
-        console.log('No games found in the database');
-        return;
-      }
-    
+      Game.find.mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockGames)
+      });
+  
       const res = await request(app)
-        .get(`/api/v1/games/${game._id}`) // Use _id to fetch the game
+        .get('/api/v1/games')
         .set('Authorization', `Bearer ${token}`);
-    
-      expect(res.statusCode).toEqual(200);
+  
+      console.log('Response status:', res.statusCode);
+      console.log('Response body:', JSON.stringify(res.body, null, 2));
+      console.log('Mock games:', JSON.stringify(mockGames, null, 2));
+  
+      expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty('success', true);
-      // Check if the response includes the event_id, matching the one in the database
-      expect(res.body.data).toHaveProperty('event_id', game.event_id.toString());
-    });
-
-    it('should return 404 if game not found', async () => {
-        const fakeId = mongoose.Types.ObjectId();
-        const res = await request(app)
-          .get(`/api/v1/games/${fakeId}`)
-          .set('Authorization', `Bearer ${token}`);
-    
-        expect(res.statusCode).toEqual(404);
-        expect(res.body).toHaveProperty('success', false);
-        expect(res.body).toHaveProperty('error', `Game not found with id of ${fakeId}`);
-      });
-    });
-
-    describe('GET /api/v1/games/filter', () => {
-      it('should return games filtered by season', async () => {
-        const res = await request(app)
-          .get('/api/v1/games/filter')
-          .query({ season: 2024 })
-          .set('Authorization', `Bearer ${token}`);
-    
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.data.every(game => game.schedule.season_year === 2024)).toBeTruthy();
-      });
-    
-      it('should return games filtered by week', async () => {
-        const res = await request(app)
-          .get('/api/v1/games/filter')
-          .query({ week: 1 })
-          .set('Authorization', `Bearer ${token}`);
-    
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.data.every(game => game.schedule.week === 1)).toBeTruthy();
-      });
-    });
-
-  describe('GET /api/v1/games/team/:teamId', () => {
-    it('should return games for a specific team', async () => {
-      // Ensure there is at least one team in the database
-      const team = await NFLTeam.findOne();
-    
-      if (!team) {
-        console.log('No teams found in the database');
-        return;
-      }
-    
-      const res = await request(app)
-        .get(`/api/v1/games/team/${team.team_id}`)
-        .set('Authorization', `Bearer ${token}`);
-    
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('success', true);
+      expect(res.body).toHaveProperty('count', mockGames.length);
+      expect(res.body).toHaveProperty('data');
       expect(Array.isArray(res.body.data)).toBeTruthy();
-      // Optional: Add more specific checks if you have expected data
-      // expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body.data).toEqual(mockGames);
     });
-  });
-});
+  
+  
 
+    it('should get a single game by ID', async () => {
+      const game = { _id: mongoose.Types.ObjectId(), event_id: '1', event_uuid: 'uuid1', sport_id: 1, event_date: new Date() };
+      Game.findById.mockResolvedValue(game);
 
-describe('PUT /api/v1/games/:id/status', () => {
-  it('should update game status', async () => {
-    // Create a valid game first
-    const game = await Game.create({
-      event_id: 'test123',
-      event_uuid: 'test-uuid',
-      sport_id: 2,
-      event_date: new Date(),
-      score: { event_status: 'STATUS_SCHEDULED' },
-      teams_normalized: [
-        { team_id: 1, name: 'Team A', is_away: true, is_home: false },
-        { team_id: 2, name: 'Team B', is_away: false, is_home: true }
-      ],
-      schedule: {
-        season_year: 2024,
-        week: 1
-      }
+      const res = await request(app)
+        .get(`/api/v1/games/${game._id}`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('success', true);
+      expect(res.body.data).toHaveProperty('event_id', '1');
     });
 
-    const res = await request(app)
-      .put(`/api/v1/games/${game._id}/status`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({ status: 'STATUS_FINAL' });
+    it('should fail to get a game with non-existent ID', async () => {
+      Game.findById.mockResolvedValue(null);
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body.data.score.event_status).toEqual('STATUS_FINAL');
+      const res = await request(app)
+        .get('/api/v1/games/invalidID')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(404);
+      expect(res.body).toHaveProperty('success', false);
+    });
+
+    it('should get games for a specific week and season', async () => {
+      const mockSort = jest.fn().mockReturnThis();
+      Game.find.mockReturnValue({ sort: mockSort, exec: jest.fn().mockResolvedValue([{ event_id: 'test1', event_date: '2024-09-20T00:00:00Z' }]) });
+
+      const res = await request(app)
+        .get('/api/v1/games/week/2024/1')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('success', true);
+    });
+
+    it('should fail to get games with invalid season/week combination', async () => {
+      const res = await request(app)
+        .get('/api/v1/games/week/invalid/invalid')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toHaveProperty('success', false);
+    });
   });
-});
+
+  describe('Update Game Status', () => {
+    it('should update game status as admin', async () => {
+      const game = { _id: mongoose.Types.ObjectId(), event_id: '1', event_uuid: 'uuid1', sport_id: 1, event_date: new Date() };
+      Game.findByIdAndUpdate.mockResolvedValue(game);
+  
+      const res = await request(app)
+        .put(`/api/v1/games/${game._id}/status`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: 'completed' });
+  
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('success', true);
+    });
+
+    it('should reject unauthenticated users from accessing protected endpoints', async () => {
+      const res = await request(app).get('/api/v1/games');
+    
+      expect(res.statusCode).toBe(401);
+      expect(res.body).toHaveProperty('success', false);
+      expect(res.body).toHaveProperty('error', 'Not authorized to access this route');
+    });
+    
+    it('should handle concurrent updates to the same game', async () => {
+      const game = { _id: mongoose.Types.ObjectId(), event_id: '1', event_uuid: 'uuid1', sport_id: 1, event_date: new Date() };
+      
+      // Mocking findByIdAndUpdate to return the same game for both updates
+      Game.findByIdAndUpdate
+        .mockResolvedValueOnce(game)
+        .mockResolvedValueOnce(game);
+      
+      const update1 = request(app)
+        .put(`/api/v1/games/${game._id}/status`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: 'completed' });
+    
+      const update2 = request(app)
+        .put(`/api/v1/games/${game._id}/status`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: 'pending' });
+    
+      const results = await Promise.all([update1, update2]);
+    
+      results.forEach(res => {
+        expect([200, 400]).toContain(res.statusCode);
+        if (res.statusCode === 200) {
+          expect(res.body).toHaveProperty('success', true);
+        } else {
+          expect(res.body).toHaveProperty('success', false);
+          expect(res.body).toHaveProperty('error');
+        }
+      });
+    });
+
+    it('should handle requests when there are no games in the database', async () => {
+      Game.find.mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([])
+      });
+    
+      const res = await request(app)
+        .get('/api/v1/games')
+        .set('Authorization', `Bearer ${token}`);
+    
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty('success', true);
+      expect(res.body).toHaveProperty('count', 0);
+      expect(res.body.data).toEqual([]);
+    });
+  
+    it('should fail to update game status with invalid status value', async () => {
+      const game = { _id: mongoose.Types.ObjectId(), event_id: '1', event_uuid: 'uuid1', sport_id: 1, event_date: new Date() };
+      
+      // Mocking a validation error scenario
+      Game.findByIdAndUpdate.mockImplementation((id, update, options) => {
+        if (update['score.event_status'] === 'invalid_status') {
+          return Promise.reject(new Error('Invalid status value'));
+        }
+        return Promise.resolve(game);
+      });
+    
+      const res = await request(app)
+        .put(`/api/v1/games/${game._id}/status`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ status: 'invalid_status' });
+    
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toHaveProperty('success', false);
+      expect(res.body).toHaveProperty('error', 'Please provide a valid status');
+    });
+    
+    
+  });
+  

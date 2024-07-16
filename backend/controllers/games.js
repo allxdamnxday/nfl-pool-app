@@ -1,4 +1,3 @@
-// backend/controllers/games.js
 const Game = require('../models/Game');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
@@ -11,26 +10,23 @@ const seasonService = require('../services/seasonService');
 exports.fetchGames = asyncHandler(async (req, res, next) => {
   const { date, limit = 5 } = req.body;
 
-  if (!date) {
-    return next(new ErrorResponse('Please provide a date', 400));
+  console.log(`fetchGames called with date: ${date}, limit: ${limit}`);
+
+  if (!date || isNaN(Date.parse(date))) {
+    console.error('Invalid date provided');
+    return next(new ErrorResponse('Please provide a valid date', 400));
   }
 
   try {
-    console.log(`Fetching games for date: ${date}`);
     const schedules = await rundownApi.fetchNFLSchedule(date, limit);
-    
-    console.log('API Response:', JSON.stringify(schedules, null, 2));
-
-    if (!schedules || schedules.length === 0) {
-      return res.status(200).json({
-        success: true,
-        count: 0,
-        message: 'No games found for the given date.'
-      });
-    }
+    console.log('API Response:', schedules);
 
     const games = schedules
-      .map(seasonService.transformGameData)
+      .map(schedule => ({
+        event_id: schedule.event_id,
+        event_date: schedule.event_date,
+        // Add other necessary fields here
+      }))
       .filter(game => game !== null);
 
     const updatePromises = games.map(game => 
@@ -46,11 +42,11 @@ exports.fetchGames = asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: games.length,
-      message: `${games.length} games fetched and stored/updated successfully.`
+      data: games
     });
   } catch (error) {
-    console.error('Error in fetchGames:', error);
-    return next(new ErrorResponse('Error fetching games from external API', 500));
+    console.error('Error fetching games:', error);
+    return next(new ErrorResponse('Error fetching games', 500));
   }
 });
 
@@ -58,88 +54,181 @@ exports.fetchGames = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/games
 // @access  Private
 exports.getGames = asyncHandler(async (req, res, next) => {
-  const games = await Game.find().sort({ date_event: 1 });
+  console.log('getGames called');
 
-  res.status(200).json({
-    success: true,
-    count: games.length,
-    data: games
-  });
+  try {
+    const games = await Game.find().sort({ event_date: 1 }).exec();
+    console.log('Games found:', games);
+
+    res.status(200).json({
+      success: true,
+      count: games.length,
+      data: games
+    });
+  } catch (error) {
+    console.error('Error getting games:', error);
+    return next(new ErrorResponse('Error getting games', 500));
+  }
 });
 
-// @desc    Get single game
+// @desc    Get a single game by ID
 // @route   GET /api/v1/games/:id
 // @access  Private
 exports.getGame = asyncHandler(async (req, res, next) => {
-  const game = await Game.findById(req.params.id);
+  console.log(`getGame called with id: ${req.params.id}`);
 
-  if (!game) {
-    return next(new ErrorResponse(`Game not found with id of ${req.params.id}`, 404));
+  try {
+    const game = await Game.findById(req.params.id);
+
+    if (!game) {
+      console.error(`Game not found with id of ${req.params.id}`);
+      return next(new ErrorResponse(`Game not found with id of ${req.params.id}`, 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: game
+    });
+  } catch (error) {
+    console.error('Error getting game:', error);
+    return next(new ErrorResponse('Error getting game', 500));
   }
-
-  res.status(200).json({
-    success: true,
-    data: game
-  });
 });
 
-// @desc    Get games for a specific team
-// @route   GET /api/v1/games/team/:teamId
+// @desc    Get games for a specific week
+// @route   GET /api/v1/games/week/:seasonYear/:weekNumber
 // @access  Private
-exports.getGamesByTeam = asyncHandler(async (req, res, next) => {
-  const games = await Game.find({
-    $or: [
-      { 'teams_normalized.0.team_id': parseInt(req.params.teamId) },
-      { 'teams_normalized.1.team_id': parseInt(req.params.teamId) }
-    ]
-  }).sort('date_event');
-
-  res.status(200).json({
-    success: true,
-    count: games.length,
-    data: games
-  });
-});
-
 exports.getWeekGames = asyncHandler(async (req, res, next) => {
   const { seasonYear, weekNumber } = req.params;
-  const games = await seasonService.getGamesByWeek(parseInt(seasonYear), parseInt(weekNumber));
+  console.log(`getWeekGames called with seasonYear: ${seasonYear}, weekNumber: ${weekNumber}`);
 
-  res.status(200).json({
-    success: true,
-    count: games.length,
-    data: games
-  });
+  if (isNaN(seasonYear) || isNaN(weekNumber)) {
+    console.error('Invalid season year or week number');
+    return next(new ErrorResponse('Invalid season year or week number', 400));
+  }
+
+  try {
+    const games = await seasonService.getGamesByWeek(parseInt(seasonYear), parseInt(weekNumber));
+    console.log('Games found for week:', games);
+
+    res.status(200).json({
+      success: true,
+      count: games.length,
+      data: games
+    });
+  } catch (error) {
+    console.error('Error getting games for week:', error);
+    return next(new ErrorResponse('Error getting games for week', 500));
+  }
+});
+
+// @desc    Update game status
+// @route   PUT /api/v1/games/:id/status
+// @access  Private
+exports.updateGameStatus = asyncHandler(async (req, res, next) => {
+  const { status } = req.body;
+  console.log(`updateGameStatus called with id: ${req.params.id}, status: ${status}`);
+
+  const validStatuses = ['scheduled', 'completed', 'canceled']; // Example statuses
+
+  if (!status || !validStatuses.includes(status)) {
+    console.error('Invalid status provided');
+    return next(new ErrorResponse('Please provide a valid status', 400));
+  }
+
+  try {
+    const game = await Game.findByIdAndUpdate(
+      req.params.id, 
+      { 'score.event_status': status },
+      { new: true, runValidators: true }
+    );
+
+    if (!game) {
+      console.error(`Game not found with id of ${req.params.id}`);
+      return next(new ErrorResponse(`Game not found with id of ${req.params.id}`, 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      data: game
+    });
+  } catch (error) {
+    console.error('Error updating game status:', error);
+    return next(new ErrorResponse('Error updating game status', 500));
+  }
 });
 
 exports.filterGames = asyncHandler(async (req, res, next) => {
   const { season, week } = req.query;
-  let query = {};
-  if (season) query['schedule.season_year'] = parseInt(season);
-  if (week) query['schedule.week'] = parseInt(week);
-  
-  const games = await Game.find(query);
-  
-  res.status(200).json({
-    success: true,
-    count: games.length,
-    data: games
-  });
-});
+  console.log(`filterGames called with season: ${season}, week: ${week}`);
 
-exports.updateGameStatus = asyncHandler(async (req, res, next) => {
-  const game = await Game.findByIdAndUpdate(
-    req.params.id, 
-    { 'score.event_status': req.body.status },
-    { new: true, runValidators: true }
-  );
+  const query = {};
+  if (season) query['schedule.season_year'] = season;
+  if (week) query['schedule.week'] = week;
 
-  if (!game) {
-    return next(new ErrorResponse(`Game not found with id of ${req.params.id}`, 404));
+  try {
+    const games = await Game.find(query).sort({ event_date: 1 });
+    console.log('Filtered games found:', games);
+
+    res.status(200).json({
+      success: true,
+      count: games.length,
+      data: games
+    });
+  } catch (error) {
+    console.error('Error filtering games:', error);
+    return next(new ErrorResponse('Error filtering games', 500));
   }
-
-  res.status(200).json({
-    success: true,
-    data: game
-  });
 });
+
+// Add the missing getGamesByTeam function
+exports.getGamesByTeam = asyncHandler(async (req, res, next) => {
+  const { teamId } = req.params;
+  console.log(`getGamesByTeam called with teamId: ${teamId}`);
+
+  try {
+    const games = await Game.find({
+      $or: [
+        { 'teams_normalized.0.team_id': parseInt(teamId) },
+        { 'teams_normalized.1.team_id': parseInt(teamId) }
+      ]
+    }).sort('event_date');
+
+    res.status(200).json({
+      success: true,
+      count: games.length,
+      data: games
+    });
+  } catch (error) {
+    console.error('Error getting games by team:', error);
+    return next(new ErrorResponse('Error getting games by team', 500));
+  }
+});
+
+// Add the missing createGame function
+exports.createGame = asyncHandler(async (req, res, next) => {
+  console.log('createGame called with body:', req.body);
+
+  try {
+    const game = await Game.create(req.body);
+    res.status(201).json({
+      success: true,
+      data: game
+    });
+  } catch (error) {
+    console.error('Error creating game:', error);
+    return next(new ErrorResponse('Error creating game', 500));
+  }
+});
+
+// Update the module exports to include all functions
+module.exports = {
+  fetchGames: exports.fetchGames,
+  getGames: exports.getGames,
+  getGame: exports.getGame,
+  getWeekGames: exports.getWeekGames,
+  updateGameStatus: exports.updateGameStatus,
+  getGamesByTeam: exports.getGamesByTeam,
+  filterGames: exports.filterGames,
+  createGame: exports.createGame
+};

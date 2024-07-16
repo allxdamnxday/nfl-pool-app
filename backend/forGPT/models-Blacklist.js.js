@@ -1,4 +1,4 @@
-// backend/models/Blacklist.js
+// models/Blacklist.js
 const mongoose = require('mongoose');
 
 const BlacklistSchema = new mongoose.Schema({

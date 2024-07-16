@@ -1,4 +1,4 @@
-// backend/middleware/auth.js
+// /backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errorResponse');
@@ -14,21 +14,18 @@ exports.protect = asyncHandler(async (req, res, next) => {
     token = req.cookies.token;
   }
 
-  console.log('Token:', token);
-
   if (!token) {
     return next(new ErrorResponse('Not authorized to access this route', 401));
   }
 
-  // Check if token is blacklisted
-  const blacklisted = await Blacklist.findOne({ token });
-  if (blacklisted) {
-    return next(new ErrorResponse('Token is invalidated', 401));
-  }
-
   try {
+    // Check if token is blacklisted
+    const blacklisted = await Blacklist.findOne({ token });
+    if (blacklisted) {
+      return next(new ErrorResponse('Token is invalidated', 401));
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded:', decoded);
 
     req.user = await User.findById(decoded.id);
     next();

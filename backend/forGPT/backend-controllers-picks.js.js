@@ -113,7 +113,41 @@ exports.updatePick = asyncHandler(async (req, res, next) => {
     success: true,
     data: pick
   });
-});.findById(req.params.id);
+});
+
+//submit a pick
+
+exports.submitPick = asyncHandler(async (req, res, next) => {
+  const { poolId, week, teamId, gameId } = req.body;
+
+  // Check if user has already picked this team in this pool
+  const existingPick = await Pick.findOne({
+    user: req.user.id,
+    pool: poolId,
+    team: teamId
+  });
+
+  if (existingPick) {
+    return next(new ErrorResponse(`You've already picked this team in this pool`, 400));
+  }
+
+  const pick = await Pick.create({
+    user: req.user.id,
+    pool: poolId,
+    week,
+    team: teamId,
+    game: gameId
+  });
+
+  res.status(201).json({
+    success: true,
+    data: pick
+  });
+});
+id
+// @access  Private
+exports.deletePick = asyncHandler(async (req, res, next) => {
+  const pick = await Pick.findById(req.params.id);
 
   if (!pick) {
     return next(new ErrorResponse(`No pick with the id of ${req.params.id}`, 404));
@@ -121,16 +155,13 @@ exports.updatePick = asyncHandler(async (req, res, next) => {
 
   // Make sure user is pick owner
   if (pick.user.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this pick`, 401));
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to delete this pick`, 401));
   }
 
-  pick = await Pick.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  await pick.remove();
 
   res.status(200).json({
     success: true,
-    data: pick
+    data: {}
   });
 });

@@ -1,4 +1,4 @@
-// backend/models/Pool.js
+// models/Pool.js
 const mongoose = require('mongoose');
 
 const PoolSchema = new mongoose.Schema({

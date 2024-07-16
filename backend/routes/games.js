@@ -6,11 +6,13 @@ const {
   getGamesByTeam,
   filterGames,
   updateGameStatus,
-  getWeekGames
+  getWeekGames,
+  createGame
 } = require('../controllers/games');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+
 
 /**
  * @swagger
@@ -371,4 +373,6 @@ module.exports = router;
  *             attendance:
  *               type: string
  */
+router.route('/').post(protect, createGame);
 
+module.exports = router;
