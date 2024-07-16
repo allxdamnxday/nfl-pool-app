@@ -5,7 +5,8 @@ const {
   updateUser,
   deleteUser,
   getAppStats,
-  syncRundownData
+  syncRundownData,
+  grantAdminPrivileges
 } = require('../controllers/admin');
 
 const router = express.Router();
@@ -128,6 +129,31 @@ router.route('/users/:id')
    *                   type: object
    */
   .delete(asyncHandler(deleteUser));
+
+/**
+ * @swagger
+ * /admin/users/{id}/grant-admin:
+ *   put:
+ *     summary: Grant admin privileges to a user
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: User granted admin privileges
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ */
+router.put('/users/:id/grant-admin', asyncHandler(grantAdminPrivileges));
 
 /**
  * @swagger

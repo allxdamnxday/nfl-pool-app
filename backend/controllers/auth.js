@@ -37,12 +37,14 @@ exports.login = asyncHandler(async (req, res, next) => {
   // Check for user
   const user = await User.findOne({ email }).select('+password');
   if (!user) {
+    console.log('User not found');
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
   // Check password
   const isMatch = await user.matchPassword(password);
   if (!isMatch) {
+    console.log('Password does not match');
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 

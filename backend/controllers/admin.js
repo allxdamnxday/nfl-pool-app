@@ -82,3 +82,21 @@ exports.syncRundownData = asyncHandler(async (req, res, next) => {
     data: 'Data synced successfully'
   });
 });
+
+// @desc    Grant admin privileges to a user
+// @route   PUT /api/v1/admin/users/:id/grant-admin
+// @access  Private/Admin
+exports.grantAdminPrivileges = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ErrorResponse(`User not found with id of ${req.params.id}`, 404));
+  }
+
+  user.role = 'admin';
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    data: user
+  });
+});

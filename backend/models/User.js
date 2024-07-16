@@ -7,24 +7,21 @@ const crypto = require('crypto');
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, 'Username is required'],
-    unique: true,
-    trim: true,
-    minlength: [3, 'Username must be at least 3 characters long'],
-    maxlength: [30, 'Username cannot exceed 30 characters']
+    required: [true, 'Please add a username']
   },
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: [true, 'Please add an email'],
     unique: true,
-    trim: true,
-    lowercase: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email address']
+    match: [
+      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+      'Please add a valid email'
+    ]
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [8, 'Password must be at least 8 characters long'],
+    required: [true, 'Please add a password'],
+    minlength: 6,
     select: false
   },
   role: {
@@ -32,32 +29,18 @@ const UserSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
-  activePoolsCount: {
-    type: Number,
-    default: 0
-  },
-  lastLogin: {
-    type: Date
-  },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  entries: [{
-    type: mongoose.Schema.ObjectId,
-    ref: 'Entry'
-  }],
-  verificationToken: String,
   resetPasswordToken: String,
-  resetPasswordExpire: Date
-}, {
-  timestamps: true
+  resetPasswordExpire: Date,
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
   if (!this.isModified('password')) {
-    return next();
+    next();
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -78,7 +61,6 @@ UserSchema.methods.matchPassword = async function(enteredPassword) {
 
 // Generate and hash password token
 UserSchema.methods.getResetPasswordToken = function() {
-  // Generate token
   const resetToken = crypto.randomBytes(20).toString('hex');
 
   // Hash token and set to resetPasswordToken field
@@ -88,7 +70,7 @@ UserSchema.methods.getResetPasswordToken = function() {
     .digest('hex');
 
   // Set expire
-  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000; // 30 minutes
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
   return resetToken;
 };
