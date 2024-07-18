@@ -1,3 +1,4 @@
+//frontend/src/utils/logger.js
 const logger = {
     info: (message, ...args) => {
       console.log(`[INFO] ${message}`, ...args);

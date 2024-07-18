@@ -1,6 +1,6 @@
-// frontend/src/contexts/AuthContext.jsx
 import React, { createContext, useState, useEffect } from 'react';
 import { login as loginService, register as registerService, logout as logoutService, getCurrentUser } from '../services/authService';
+import logger from '../utils/logger';
 
 export const AuthContext = createContext();
 
@@ -13,8 +13,9 @@ export const AuthProvider = ({ children }) => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
+        logger.info('User loaded successfully', currentUser);
       } catch (error) {
-        console.error('Failed to load user:', error);
+        logger.error('Failed to load user:', error);
       } finally {
         setLoading(false);
       }
@@ -24,20 +25,38 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const loggedInUser = await loginService(email, password);
-    setUser(loggedInUser);
-    return loggedInUser;
+    try {
+      const loggedInUser = await loginService(email, password);
+      setUser(loggedInUser);
+      logger.info('User logged in successfully', loggedInUser);
+      return loggedInUser;
+    } catch (error) {
+      logger.error('Login failed:', error);
+      throw error;
+    }
   };
 
   const register = async (username, email, password) => {
-    const registeredUser = await registerService(username, email, password);
-    setUser(registeredUser);
-    return registeredUser;
+    try {
+      const registeredUser = await registerService(username, email, password);
+      setUser(registeredUser);
+      logger.info('User registered successfully', registeredUser);
+      return registeredUser;
+    } catch (error) {
+      logger.error('Registration failed:', error);
+      throw error;
+    }
   };
 
   const logout = async () => {
-    await logoutService();
-    setUser(null);
+    try {
+      await logoutService();
+      setUser(null);
+      logger.info('User logged out successfully');
+    } catch (error) {
+      logger.error('Logout failed:', error);
+      throw error;
+    }
   };
 
   return (

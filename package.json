@@ -1,5 +1,27 @@
 {
+  "name": "nfl-survivor-pool",
+  "version": "1.0.0",
+  "description": "NFL Survivor Pool Web App",
+  "main": "index.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "server": "npx nodemon backend/server.js",
+    "client": "cd frontend && npx vite",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^6.0.12",
+    "dotenv": "^10.0.0",
+    "cors": "^2.8.5"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "nodemon": "^2.0.14",
+    "concurrently": "^6.3.0",
+    "jest": "^27.3.1"
   }
 }
