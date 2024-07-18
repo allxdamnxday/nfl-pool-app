@@ -1,7 +1,7 @@
 // routes/picks.js
 const express = require('express');
 const { addPick, getPicksForPool, getPickForWeek, updatePick } = require('../controllers/picks');
-const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
 const router = express.Router({ mergeParams: true });
 

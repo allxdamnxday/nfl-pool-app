@@ -14,6 +14,26 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Create user
+// @route   POST /api/v1/admin/users
+// @access  Private/Admin
+exports.createUser = asyncHandler(async (req, res, next) => {
+  const { username, email, password } = req.body;
+
+  // Validate input
+  if (!username || !email || !password) {
+    return next(new ErrorResponse('Please provide all required fields', 400));
+  }
+
+  // Create user
+  const user = await User.create({ username, email, password });
+
+  res.status(201).json({
+    success: true,
+    data: user
+  });
+});
+
 // @desc    Get single user
 // @route   GET /api/v1/admin/users/:id
 // @access  Private/Admin
@@ -28,17 +48,31 @@ exports.getUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Update user
-// @route   PUT /api/v1/admin/users/:id
+// @desc    Update user by username or email
+// @route   PUT /api/v1/admin/users
 // @access  Private/Admin
-exports.updateUser = asyncHandler(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+exports.updateUserByQuery = asyncHandler(async (req, res, next) => {
+  const { username, email, ...updateData } = req.body;
+
+  if (!username && !email) {
+    return next(new ErrorResponse('Please provide a username or email to update', 400));
+  }
+
+  const query = username ? { username } : { email };
+  
+  // Ensure updateData includes the fields to be updated
+  if (email && !username) updateData.email = email;
+  if (username && !email) updateData.username = username;
+
+  const user = await User.findOneAndUpdate(query, updateData, {
     new: true,
     runValidators: true
   });
+
   if (!user) {
-    return next(new ErrorResponse(`User not found with id of ${req.params.id}`, 404));
+    return next(new ErrorResponse(`User not found with ${username ? 'username' : 'email'} of ${username || email}`, 404));
   }
+
   res.status(200).json({
     success: true,
     data: user

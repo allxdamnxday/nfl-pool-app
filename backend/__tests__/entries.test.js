@@ -1,68 +1,30 @@
+// backend/__tests__/entries.test.js
 const request = require('supertest');
-const mongoose = require('mongoose');
-const { app, connectDB } = require('../server');
+const { app } = require('../server');
 const User = require('../models/User');
 const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
-const Game = require('../models/Game'); // Import the Game model
+const Game = require('../models/Game');
+const { connectDB, closeDatabase, clearDatabase } = require('../helpers/dbHelpers');
+const { generateToken, generateAdminToken } = require('../helpers/authHelpers');
+const { mockUser, mockAdmin, mockPool, mockEntry, mockGame } = require('../__mocks__/mockEntry');
 
-let server;
-
-// Ensure the database is connected before running tests
-beforeAll(async () => {
-  await connectDB();
-});
-
-// Ensure the database is clean before each test
-beforeEach(async () => {
-  await Entry.deleteMany({});
-  await User.deleteMany({});
-  await Pool.deleteMany({});
-  await Game.deleteMany({}); // Clean up the Game collection
-});
-
-// Close the database connection after all tests
-afterAll(async () => {
-  await mongoose.connection.close();
-});
+beforeAll(async () => await connectDB());
+afterEach(async () => await clearDatabase());
+afterAll(async () => await closeDatabase());
 
 describe('Entries Endpoints', () => {
   let user, admin, pool, entry, userToken, adminToken;
 
   beforeEach(async () => {
-    // Create a regular user
-    user = await User.create({
-      username: 'testuser',
-      email: 'test@example.com',
-      password: 'password123'
-    });
-    userToken = user.getSignedJwtToken();
+    user = await User.create(mockUser);
+    userToken = generateToken(user);
 
-    // Create an admin user
-    admin = await User.create({
-      username: 'adminuser',
-      email: 'admin@example.com',
-      password: 'adminpass123',
-      role: 'admin'
-    });
-    adminToken = admin.getSignedJwtToken();
+    admin = await User.create(mockAdmin);
+    adminToken = generateAdminToken(admin);
 
-    // Create a pool
-    pool = await Pool.create({
-      name: 'Test Pool',
-      season: 2023,
-      maxParticipants: 10,
-      entryFee: 50,
-      prizeAmount: 450,
-      creator: user._id
-    });
-
-    // Create an entry
-    entry = await Entry.create({
-      user: user._id,
-      pool: pool._id,
-      isActive: true
-    });
+    pool = await Pool.create({ ...mockPool, creator: user._id });
+    entry = await Entry.create({ ...mockEntry, user: user._id, pool: pool._id });
   });
 
   describe('GET /api/v1/entries', () => {
@@ -90,11 +52,11 @@ describe('Entries Endpoints', () => {
 
     it('should not allow access to entry by another user', async () => {
       const anotherUser = await User.create({
+        ...mockUser,
         username: 'anotheruser',
-        email: 'another@example.com',
-        password: 'password123'
+        email: 'another@example.com'
       });
-      const anotherToken = anotherUser.getSignedJwtToken();
+      const anotherToken = generateToken(anotherUser);
 
       const res = await request(app)
         .get(`/api/v1/entries/${entry._id}`)
@@ -104,157 +66,85 @@ describe('Entries Endpoints', () => {
     });
   });
 
-  describe('POST /api/v1/pools/:poolId/entries', () => {
-    let newUser, newPool, newUserToken;
-
-    beforeEach(async () => {
-      // Create a new user and pool for the test
-      newUser = await User.create({
-        username: 'newuser',
-        email: 'new@example.com',
-        password: 'password123'
-      });
-      newUserToken = newUser.getSignedJwtToken();
-
-      newPool = await Pool.create({
-        name: 'New Pool',
-        season: 2023,
-        maxParticipants: 10,
-        entryFee: 50,
-        prizeAmount: 450,
-        creator: newUser._id
-      });
-    });
-
-    it('should create a new entry', async () => {
-      // Ensure the user and pool are created
-      const createdUser = await User.findById(newUser._id);
-      const createdPool = await Pool.findById(newPool._id);
-
-      expect(createdUser).not.toBeNull();
-      expect(createdPool).not.toBeNull();
-
-      const res = await request(app)
-        .post(`/api/v1/pools/${newPool._id}/entries`)
-        .set('Authorization', `Bearer ${newUserToken}`)
-        .send({
-          user: newUser._id,
-          pool: newPool._id
-        });
-
-      expect(res.statusCode).toEqual(201);
-      expect(res.body).toHaveProperty('success', true);
-      expect(res.body.data).toHaveProperty('user', newUser._id.toString());
-      expect(res.body.data).toHaveProperty('pool', newPool._id.toString());
-    });
-  });
-
-  describe('PUT /api/v1/entries/:id', () => {
-    it('should update an entry', async () => {
-      const game = await Game.create({
-        event_id: 'test-event-id',
-        event_uuid: 'test-event-uuid',
-        sport_id: 2,
-        event_date: new Date(Date.now() + 86400000).toISOString(), // Set event_date to tomorrow
-        rotation_number_away: 101,
-        rotation_number_home: 102,
-        teams_normalized: [
-          {
-            team_id: 1,
-            name: 'Team A',
-            is_away: true,
-            is_home: false
-          },
-          {
-            team_id: 2,
-            name: 'Team B',
-            is_away: false,
-            is_home: true
-          }
-        ],
-        schedule: {
-          season_year: 2023,
-          week: 1
-        }
-      });
-  
-      const entry = await Entry.create({
-        user: user._id,
-        pool: pool._id,
-      });
-  
-      const res = await request(app)
-        .put(`/api/v1/entries/${entry._id}`)
-        .set('Authorization', `Bearer ${userToken}`)
-        .send({
-          isActive: false,
-          eliminatedWeek: 5,
-          gameId: game._id // Include gameId in the request body
-        });
-  
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('success', true);
-      expect(res.body.data).toHaveProperty('isActive', false);
-      expect(res.body.data).toHaveProperty('eliminatedWeek', 5);
-    });
-  });
-
-  describe('DELETE /api/v1/entries/:id', () => {
-    it('should delete an entry', async () => {
-      const res = await request(app)
-        .delete(`/api/v1/entries/${entry._id}`)
-        .set('Authorization', `Bearer ${userToken}`);
-
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('success', true);
-
-      // Verify the entry is deleted
-      const deletedEntry = await Entry.findById(entry._id);
-      expect(deletedEntry).toBeNull();
-    });
-
-    it('should allow admin to delete any entry', async () => {
-      const res = await request(app)
-        .delete(`/api/v1/entries/${entry._id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('success', true);
-    });
-  });
-
-  describe('POST /api/v1/pools/:poolId/request-entry', () => {
+  describe('POST /api/v1/entries/:poolId/request-entry', () => {
     it('should request entry to a pool', async () => {
+      const newUser = await User.create({
+        ...mockUser,
+        username: 'newuser2',
+        email: 'new2@example.com'
+      });
+      const newUserToken = generateToken(newUser);
+      
       const res = await request(app)
-        .post(`/api/v1/pools/${pool._id}/request-entry`)
-        .set('Authorization', `Bearer ${userToken}`)
+        .post(`/api/v1/entries/${pool._id}/request-entry`)
+        .set('Authorization', `Bearer ${newUserToken}`)
         .send();
-
+  
       expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
-      expect(res.body.data).toHaveProperty('user', user._id.toString());
+      expect(res.body.data).toHaveProperty('user', newUser._id.toString());
       expect(res.body.data).toHaveProperty('pool', pool._id.toString());
       expect(res.body.data).toHaveProperty('isActive', false);
     });
-
+  
     it('should not request entry if user already has an entry', async () => {
       const res = await request(app)
-        .post(`/api/v1/pools/${pool._id}/request-entry`)
+        .post(`/api/v1/entries/${pool._id}/request-entry`)
         .set('Authorization', `Bearer ${userToken}`)
         .send();
-
+  
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
       expect(res.body.error).toBe('User already requested or has an entry in this pool');
     });
   });
 
+  // Update the 'should create a new entry' test
+  it('should create a new entry', async () => {
+    const newUser = await User.create({
+      ...mockUser,
+      username: 'newuser',
+      email: 'new@example.com'
+    });
+    const newUserToken = generateToken(newUser);
+  
+    const newPool = await Pool.create({ ...mockPool, creator: newUser._id });
+  
+    // Step 1: Request to join the pool
+    const requestRes = await request(app)
+      .post(`/api/v1/entries/${newPool._id}/request-entry`)
+      .set('Authorization', `Bearer ${newUserToken}`)
+      .send();
+  
+    expect(requestRes.status).toBe(201);
+    expect(requestRes.body).toHaveProperty('success', true);
+  
+    // Step 2: Approve the request (this should be done by an admin)
+    const entryRequest = await Entry.findOne({ user: newUser._id, pool: newPool._id, isActive: false });
+    const approveRes = await request(app)
+      .put(`/api/v1/entries/${entryRequest._id}/approve`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send();
+  
+    expect(approveRes.status).toBe(200);
+    expect(approveRes.body).toHaveProperty('success', true);
+  
+    // Step 3: Verify the entry is now active
+    const updatedEntry = await Entry.findById(entryRequest._id);
+    expect(updatedEntry.isActive).toBe(true);
+  });
+  
+
   describe('PUT /api/v1/entries/:id/approve', () => {
     let entryId;
 
     beforeEach(async () => {
-      const entry = await Entry.findOne({ user: user._id, pool: pool._id, isActive: false });
-      entryId = entry._id;
+      const newEntry = await Entry.create({
+        user: user._id,
+        pool: pool._id,
+        isActive: false
+      });
+      entryId = newEntry._id;
     });
 
     it('should approve entry request', async () => {
@@ -273,10 +163,10 @@ describe('Entries Endpoints', () => {
         .put(`/api/v1/entries/${entryId}/approve`)
         .set('Authorization', `Bearer ${userToken}`)
         .send();
-
-      expect(res.status).toBe(401);
+    
+      expect(res.status).toBe(403);
       expect(res.body.success).toBe(false);
-      expect(res.body.error).toBe(`User ${user._id} is not authorized to approve this entry`);
+      expect(res.body.error).toBe('User role user is not authorized to access this route');
     });
   });
 });

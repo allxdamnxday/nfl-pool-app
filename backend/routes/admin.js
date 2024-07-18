@@ -2,11 +2,12 @@ const express = require('express');
 const {
   getUsers,
   getUser,
-  updateUser,
+  updateUserByQuery,
   deleteUser,
   getAppStats,
   syncRundownData,
-  grantAdminPrivileges
+  grantAdminPrivileges,
+  createUser
 } = require('../controllers/admin');
 
 const router = express.Router();
@@ -43,7 +44,9 @@ router.use(authorize('admin'));
  *                 $ref: '#/components/schemas/User'
  */
 router.route('/users')
-  .get(asyncHandler(getUsers));
+  .get(asyncHandler(getUsers))
+  .post(asyncHandler(createUser))
+  .put(asyncHandler(updateUserByQuery));
 
 /**
  * @swagger
@@ -99,7 +102,7 @@ router.route('/users/:id')
    *             schema:
    *               $ref: '#/components/schemas/User'
    */
-  .put(asyncHandler(updateUser))
+  .put(asyncHandler(updateUserByQuery))
   /**
    * @swagger
    * /admin/users/{id}:
@@ -200,5 +203,7 @@ router.get('/stats', asyncHandler(getAppStats));
  *                   type: string
  */
 router.post('/sync-rundown', asyncHandler(syncRundownData));
+
+
 
 module.exports = router;

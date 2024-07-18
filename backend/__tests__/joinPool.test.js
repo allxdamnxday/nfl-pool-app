@@ -1,3 +1,4 @@
+// backend/__tests__/joinPool.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { app, connectDB } = require('../server');
@@ -7,14 +8,10 @@ const Pool = require('../models/Pool');
 const Game = require('../models/Game');
 const Request = require('../models/Request');
 
-let server;
-
-// Ensure the database is connected before running tests
 beforeAll(async () => {
   await connectDB();
 });
 
-// Ensure the database is clean before each test
 beforeEach(async () => {
   await Entry.deleteMany({});
   await User.deleteMany({});
@@ -23,7 +20,6 @@ beforeEach(async () => {
   await Request.deleteMany({});
 });
 
-// Close the database connection after all tests
 afterAll(async () => {
   await mongoose.connection.close();
 });
@@ -277,4 +273,40 @@ describe('Entries Endpoints', () => {
       expect(res.statusCode).toEqual(403);
     });
   });
+ // Add a new describe block for the full join pool process
+ describe('Full Join Pool Process', () => {
+  it('should allow user to request entry and admin to approve', async () => {
+    // Step 1: User requests entry
+    const requestRes = await request(app)
+      .post('/api/v1/requests')
+      .set('Authorization', `Bearer ${userToken}`)
+      .send({ poolId: pool._id });
+
+    expect(requestRes.statusCode).toEqual(201);
+    expect(requestRes.body).toHaveProperty('success', true);
+    expect(requestRes.body.data).toHaveProperty('status', 'pending');
+
+    const requestId = requestRes.body.data._id;
+
+    // Step 2: Admin approves request
+    const approveRes = await request(app)
+      .put(`/api/v1/requests/${requestId}/approve`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send();
+
+    expect(approveRes.statusCode).toEqual(200);
+    expect(approveRes.body).toHaveProperty('success', true);
+    expect(approveRes.body.data).toHaveProperty('status', 'approved');
+
+    // Step 3: Verify entry is created
+    const entriesRes = await request(app)
+      .get(`/api/v1/pools/${pool._id}/entries`)
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(entriesRes.statusCode).toEqual(200);
+    expect(entriesRes.body).toHaveProperty('success', true);
+    expect(entriesRes.body.data.some(entry => entry.user.toString() === user._id.toString())).toBeTruthy();
+  });
 });
+});
+

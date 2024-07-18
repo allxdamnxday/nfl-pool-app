@@ -193,4 +193,10 @@ router.route('/:poolId/request-entry')
 router.route('/:id/approve')
   .put(protect, authorize('admin'), approveEntry);
 
+router.route('/:poolId/request-entry')
+.post(protect, requestEntry);
+
+router.route('/:poolId/entries')
+  .post(protect, checkGameStart, createEntry);
+
 module.exports = router;

@@ -4,6 +4,9 @@ const Request = require('../models/Request');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
+
+
+
 // @desc    Get all entries for a user
 // @route   GET /api/v1/users/entries
 // @access  Private
@@ -67,6 +70,7 @@ exports.requestEntry = asyncHandler(async (req, res, next) => {
   });
 });
 
+
 // @desc    Approve entry request
 // @route   PUT /api/v1/entries/:id/approve
 // @access  Private/Admin
@@ -75,6 +79,11 @@ exports.approveEntry = asyncHandler(async (req, res, next) => {
 
   if (!entry) {
     return next(new ErrorResponse(`No entry request found with id of ${req.params.id}`, 404));
+  }
+
+  // Check if user is admin
+  if (req.user.role !== 'admin') {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to approve this entry`, 403));
   }
 
   entry = await Entry.findByIdAndUpdate(
@@ -171,25 +180,24 @@ exports.createEntry = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`No pool found with id of ${poolId}`, 404));
   }
 
-  // Check if user already has an entry in this pool
-  const existingEntry = await Entry.findOne({ user: req.user.id, pool: poolId });
+  // Check if user already has an active entry in this pool
+  const existingEntry = await Entry.findOne({ user: req.user.id, pool: poolId, isActive: true });
   if (existingEntry) {
-    return next(new ErrorResponse('User already has an entry in this pool', 400));
+    return next(new ErrorResponse('User already has an active entry in this pool', 400));
   }
 
   // Check for an approved request
-  const request = await Request.findOne({ pool: poolId, user: req.user.id, status: 'approved' });
-  if (!request) {
+  const approvedRequest = await Entry.findOne({ user: req.user.id, pool: poolId, isActive: false });
+  if (!approvedRequest) {
     return next(new ErrorResponse('User does not have an approved request to join this pool', 403));
   }
 
-  const entry = await Entry.create({
-    user: req.user.id,
-    pool: poolId
-  });
+  // Update the approved request to be an active entry
+  approvedRequest.isActive = true;
+  await approvedRequest.save();
 
   res.status(201).json({
     success: true,
-    data: entry
+    data: approvedRequest
   });
 });
