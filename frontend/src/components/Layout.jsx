@@ -13,28 +13,37 @@ function Layout({ children }) {
     try {
       await logout();
       showToast('Logged out successfully', 'success');
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       showToast('Failed to logout', 'error');
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="bg-blue-600 text-white shadow-md">
-        <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold">NFL Pool App</Link>
-          <div className="space-x-4">
-            {user ? (
+    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+      <header className="bg-gray-800 p-4">
+        <nav className="container mx-auto flex justify-between items-center">
+          <Link to="/" className="text-purple-500 font-bold text-xl">NFL Survivor Pool</Link>
+          {user && (
+            <div className="flex space-x-4">
+              <Link to="/dashboard" className="text-white hover:text-purple-500">My Pools</Link>
+              <Link to="/entries" className="text-white hover:text-purple-500">My Entries</Link>
+              <Link to="/picks" className="text-white hover:text-purple-500">My Picks</Link>
+            </div>
+          )}
+          <div className="flex items-center space-x-4">
+            {user && (
               <>
-                <Link to="/dashboard" className="hover:text-blue-200">Dashboard</Link>
-                <Link to="/pools" className="hover:text-blue-200">Pools</Link>
-                <button onClick={handleLogout} className="hover:text-blue-200">Logout</button>
+                <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Invite Friends</button>
+                <div className="text-green-400">$0.00</div>
+                <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+</button>
+                <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
               </>
-            ) : (
+            )}
+            {!user && (
               <>
-                <Link to="/login" className="hover:text-blue-200">Login</Link>
-                <Link to="/register" className="hover:text-blue-200">Register</Link>
+                <Link to="/login" className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Login</Link>
+                <Link to="/register" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</Link>
               </>
             )}
           </div>

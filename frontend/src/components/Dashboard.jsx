@@ -33,21 +33,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-gray-800 p-4">
-        <nav className="container mx-auto flex justify-between items-center">
-          <div className="text-purple-500 font-bold text-xl">NFL Survivor Pool</div>
-          <div className="flex space-x-4">
-            <Link to="/dashboard" className="text-white hover:text-purple-500">My Pools</Link>
-            <Link to="/entries" className="text-white hover:text-purple-500">My Entries</Link>
-            <Link to="/picks" className="text-white hover:text-purple-500">My Picks</Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Invite Friends</button>
-            <div className="text-green-400">$0.00</div>
-            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+</button>
-          </div>
-        </nav>
-      </header>
+      
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
