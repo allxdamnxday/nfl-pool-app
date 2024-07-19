@@ -2,8 +2,17 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+:root {
+  --primary-color: #8B5CF6; /* Tailwind purple-500 */
+  --secondary-color: #10B981; /* Tailwind green-500 */
+}
+
 body {
-  @apply bg-gray-100 text-gray-900 leading-normal;
+  @apply bg-gray-900 text-white leading-normal;
+}
+
+#root {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
 
 h1 {
@@ -19,11 +28,11 @@ h3 {
 }
 
 button, .button {
-  @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
+  @apply bg-purple-500 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out;
 }
 
 button:hover, .button:hover {
-  @apply bg-blue-600;
+  @apply bg-purple-600;
 }
 
 input[type="text"],
@@ -31,7 +40,7 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 select {
-  @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight;
+  @apply shadow appearance-none bg-gray-800 border border-gray-700 rounded w-full py-2 px-3 text-white leading-tight;
 }
 
 input[type="text"]:focus,
@@ -39,9 +48,69 @@ input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="number"]:focus,
 select:focus {
-  @apply outline-none ring-2 ring-blue-500;
+  @apply outline-none ring-2 ring-purple-500 border-transparent;
 }
 
 .card {
-  @apply bg-white shadow-md rounded-lg p-6;
+  @apply bg-gray-800 shadow-md rounded-lg p-6;
+}
+
+/* Custom utility classes */
+.text-primary {
+  @apply text-purple-500;
+}
+
+.bg-primary {
+  @apply bg-purple-500;
+}
+
+.hover:bg-primary:hover {
+  @apply hover:bg-purple-600;
+}
+
+.text-secondary {
+  @apply text-green-500;
+}
+
+.bg-secondary {
+  @apply bg-green-500;
+}
+
+.hover:bg-secondary:hover {
+  @apply hover:bg-green-600;
+}
+
+/* Maintaining some original styles for compatibility */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #8B5CF6aa);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.read-the-docs {
+  @apply text-gray-400;
 }
