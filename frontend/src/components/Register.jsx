@@ -5,6 +5,8 @@ import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
 
 function Register() {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +17,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await register(username, email, password);
+      await register({ firstName, lastName, username, email, password });
       logger.info('Registration successful');
       showToast('Registration successful', 'success');
       navigate('/dashboard');
@@ -39,6 +41,42 @@ function Register() {
             Sign Up
           </h2>
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-300">
+                FIRST NAME
+              </label>
+              <div className="mt-1">
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  autoComplete="given-name"
+                  required
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-300">
+                LAST NAME
+              </label>
+              <div className="mt-1">
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  autoComplete="family-name"
+                  required
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                />
+              </div>
+            </div>
+
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-300">
                 USERNAME

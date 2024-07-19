@@ -10,15 +10,21 @@ const crypto = require('crypto');
 // @route   POST /api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
-  const { username, email, password } = req.body;
+  const { firstName, lastName, username, email, password } = req.body;
 
   // Validate input
-  if (!username || !email || !password) {
+  if (!firstName || !lastName || !username || !email || !password) {
     return next(new ErrorResponse('Please provide all required fields', 400));
   }
 
+  // Check if the combination of firstName and lastName already exists
+  const existingUser = await User.findOne({ firstName, lastName });
+  if (existingUser) {
+    return next(new ErrorResponse('A user with this first and last name combination already exists', 400));
+  }
+
   // Create user
-  const user = await User.create({ username, email, password });
+  const user = await User.create({ firstName, lastName, username, email, password });
 
   sendTokenResponse(user, 201, res);
 });

@@ -11,8 +11,8 @@ export const login = async (email, password) => {
   return response.data;
 };
 
-export const register = async (username, email, password) => {
-  const response = await axios.post(`${API_URL}/register`, { username, email, password });
+export const register = async ({ firstName, lastName, username, email, password }) => {
+  const response = await axios.post(`${API_URL}/register`, { firstName, lastName, username, email, password });
   if (response.data.token) {
     localStorage.setItem('token', response.data.token);
   }

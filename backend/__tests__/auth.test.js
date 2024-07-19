@@ -31,6 +31,15 @@ describe('Auth Endpoints', () => {
       expect(res.statusCode).toEqual(201);
       expect(res.body).toHaveProperty('token');
     });
+
+    it('should not register a user with the same first and last name', async () => {
+      await User.create(mockUser);
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send(mockUser);
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toHaveProperty('error', 'A user with this first and last name combination already exists');
+    });
   });
 
   describe('POST /api/v1/auth/login', () => {

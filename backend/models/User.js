@@ -5,6 +5,14 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const UserSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: [true, 'Please add a first name']
+  },
+  lastName: {
+    type: String,
+    required: [true, 'Please add a last name']
+  },
   username: {
     type: String,
     required: [true, 'Please add a username']
@@ -36,6 +44,9 @@ const UserSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+// Add compound index for firstName and lastName
+UserSchema.index({ firstName: 1, lastName: 1 }, { unique: true });
 
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
