@@ -32,5 +32,10 @@
     "jest": "^29.7.0",
     "mongodb-memory-server": "^9.4.0",
     "supertest": "^7.0.0"
-  }
+  },
+  "main": "initializeNFLSeason.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
