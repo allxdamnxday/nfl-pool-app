@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Entries from './components/Entries';
 import Picks from './components/Picks';
 import PoolList from './components/PoolList';
+import JoinPool from './components/JoinPool'; // Import JoinPool component
 
 function App() {
   return (
@@ -46,11 +47,19 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
-              <Route 
+               <Route 
                 path="/pools" 
                 element={
                   <ProtectedRoute>
                     <PoolList />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/pools/:poolId/join" 
+                element={
+                  <ProtectedRoute>
+                    <JoinPool />
                   </ProtectedRoute>
                 } 
               />

@@ -21,7 +21,7 @@ const PoolSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'active', 'completed'],
+    enum: ['pending', 'active', 'completed', 'open'],
     default: 'pending'
   },
   maxParticipants: {

@@ -8,18 +8,45 @@ const authHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const getActivePools = async () => {
-  const response = await axios.get(`${API_URL}?status=active`, { headers: authHeader() });
-  return response.data.data;
+export const getAvailablePools = async () => {
+  try {
+    console.log('Fetching available pools from:', `${API_URL}/available`);
+    const response = await axios.get(`${API_URL}/available`, { headers: authHeader() });
+    console.log('Response:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching available pools:', error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
 
-export const getAllPools = async () => {
-  const response = await axios.get(API_URL, { headers: authHeader() });
+export const getUserActivePools = async (userId) => {
+  const response = await axios.get(`${API_URL}/user/${userId}/active`, { headers: authHeader() });
   return response.data.data;
 };
 
 export const getPoolDetails = async (poolId) => {
   const response = await axios.get(`${API_URL}/${poolId}`, { headers: authHeader() });
+  return response.data.data;
+};
+
+export const createJoinRequest = async (poolId, numberOfEntries = 1) => {
+  const response = await axios.post(`${API_URL}/${poolId}/join`, { numberOfEntries }, { headers: authHeader() });
+  return response.data.data;
+};
+
+export const getActivePools = async () => {
+  const response = await axios.get(`${API_URL}?status=active`, { headers: authHeader() });
+  return response.data.data;
+};
+
+export const getActivePool = async () => {
+  const response = await axios.get(`${API_URL}/active`, { headers: authHeader() });
+  return response.data.data;
+};
+
+export const getAllPools = async () => {
+  const response = await axios.get(API_URL, { headers: authHeader() });
   return response.data.data;
 };
 
@@ -35,8 +62,8 @@ export const joinPool = async (poolId) => {
 
 export const getUserPools = async (userId) => {
   try {
-    const response = await api.get(`/pools/user/${userId}`);
-    return response.data;
+    const response = await axios.get(`${API_URL}/user/${userId}`, { headers: authHeader() });
+    return response.data.data;
   } catch (error) {
     console.error('Error fetching user pools:', error);
     throw error;
