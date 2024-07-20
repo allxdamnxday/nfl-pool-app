@@ -8,7 +8,9 @@ const {
   deletePool,
   joinPool,
   leavePool,
-  getPoolStats
+  getPoolStats,
+  getUserActivePools,
+  getUserPools,
 } = require('../controllers/pools');
 
 const Pool = require('../models/Pool');
@@ -277,5 +279,7 @@ router.route('/:id/leave').post(protect, asyncHandler(leavePool));
  *                       type: integer
  */
 router.route('/:id/stats').get(protect, asyncHandler(getPoolStats));
+router.get('/user/:userId', protect, getUserPools);
+router.get('/user/:userId/active', protect, getUserActivePools);
 
 module.exports = router;

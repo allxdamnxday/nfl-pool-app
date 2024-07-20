@@ -1,4 +1,5 @@
 const Pool = require('../models/Pool');
+const mongoose = require('mongoose'); // Ensure mongoose is imported
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -137,5 +138,116 @@ exports.leavePool = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: pool
+  });
+});
+
+// @desc    Get user's active pools
+// @route   GET /api/v1/pools/user/:userId/active
+// @access  Private
+exports.getUserActivePools = asyncHandler(async (req, res, next) => {
+  const userId = req.params.userId;
+
+  // Ensure the requesting user is fetching their own pools or is an admin
+  if (req.user.id !== userId && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`Not authorized to access this route`, 403));
+  }
+
+  console.log(`Fetching active pools for user: ${userId}`);
+
+  const userPools = await Pool.aggregate([
+    {
+      $lookup: {
+        from: 'entries',
+        let: { poolId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$pool', '$$poolId'] },
+                  { $eq: ['$user', mongoose.Types.ObjectId(userId)] },
+                  { $eq: ['$isActive', true] } // Ensure the entry is active
+                ]
+              }
+            }
+          }
+        ],
+        as: 'userEntry'
+      }
+    },
+    {
+      $addFields: {
+        userStatus: {
+          $cond: {
+            if: { $gt: [{ $size: '$userEntry' }, 0] },
+            then: 'active',
+            else: 'inactive'
+          }
+        }
+      }
+    },
+    {
+      $match: {
+        userStatus: 'active'
+      }
+    }
+  ]);
+
+  console.log(`Active pools found: ${userPools.length}`, userPools);
+
+  res.status(200).json({
+    success: true,
+    count: userPools.length,
+    data: userPools
+  });
+});
+
+// @desc    Get user's active pools
+// @route   GET /api/v1/pools/user/:userId/active
+// @access  Private
+exports.getUserPools = asyncHandler(async (req, res, next) => {
+  const userId = req.params.userId;
+
+  if (req.user.id !== userId && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`Not authorized to access this route`, 403));
+  }
+
+  const userPools = await Pool.aggregate([
+    {
+      $lookup: {
+        from: 'entries',
+        let: { poolId: '$_id' },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$pool', '$$poolId'] },
+                  { $eq: ['$user', mongoose.Types.ObjectId(userId)] }
+                ]
+              }
+            }
+          }
+        ],
+        as: 'userEntry'
+      }
+    },
+    {
+      $addFields: {
+        userStatus: {
+          $cond: {
+            if: { $gt: [{ $size: '$userEntry' }, 0] },
+            then: 'active',
+            else: 'inactive'
+          }
+        }
+      }
+    }
+  ]);
+
+  res.status(200).json({
+    success: true,
+    count: userPools.length,
+    data: userPools
   });
 });

@@ -32,3 +32,13 @@ export const joinPool = async (poolId) => {
   const response = await axios.post(`${API_URL}/${poolId}/join`, {}, { headers: authHeader() });
   return response.data.data;
 };
+
+export const getUserPools = async (userId) => {
+  try {
+    const response = await api.get(`/pools/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user pools:', error);
+    throw error;
+  }
+};

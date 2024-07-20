@@ -12,20 +12,24 @@ function Dashboard() {
   const showToast = useToast();
 
   useEffect(() => {
-    const fetchActivePools = async () => {
+    const fetchUserPools = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       try {
-        const pools = await getActivePools();
-        setActivePools(pools);
+        const pools = await getUserPools(user.id);
+        setActivePools(pools.filter(pool => pool.userStatus === 'active'));
       } catch (error) {
-        console.error('Failed to fetch active pools:', error);
-        showToast('Failed to load active pools. Please try again later.', 'error');
+        console.error('Failed to fetch user pools:', error);
+        showToast('Failed to load your pools. Please try again later.', 'error');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchActivePools();
-  }, [showToast]);
+  
+    fetchUserPools();
+  }, [user, showToast]);
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen bg-gray-900 text-white">Loading...</div>;

@@ -3,7 +3,6 @@ import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-
 function Layout({ children }) {
   const { user, logout } = useContext(AuthContext);
   const showToast = useToast();

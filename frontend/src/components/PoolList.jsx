@@ -44,7 +44,6 @@ function PoolList() {
               <p className="text-gray-400">Current Week: {pool.currentWeek}</p>
               <p className="text-gray-400">Participants: {pool.participants.length} / {pool.maxParticipants}</p>
               <p className="text-gray-400">Entry Fee: ${pool.entryFee}</p>
-              <p className="text-gray-400">Prize: ${pool.prizeAmount}</p>
             </li>
           ))}
         </ul>
