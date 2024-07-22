@@ -3,8 +3,10 @@ import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+
 function Layout({ children }) {
   const { user, logout } = useContext(AuthContext);
+  console.log('Current user:', user); // Added console log
   const showToast = useToast();
   const navigate = useNavigate();
 
@@ -28,18 +30,20 @@ function Layout({ children }) {
               <Link to="/dashboard" className="text-white hover:text-purple-500">My Pools</Link>
               <Link to="/entries" className="text-white hover:text-purple-500">My Entries</Link>
               <Link to="/picks" className="text-white hover:text-purple-500">My Picks</Link>
+              {user.role === 'admin' && (
+                <Link to="/admin/requests" className="text-white hover:text-purple-500">Admin</Link>
+              )}
             </div>
           )}
           <div className="flex items-center space-x-4">
-            {user && (
+            {user ? (
               <>
                 <button className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Invite Friends</button>
                 <div className="text-green-400">$0.00</div>
                 <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">+</button>
                 <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</button>
               </>
-            )}
-            {!user && (
+            ) : (
               <>
                 <Link to="/login" className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Login</Link>
                 <Link to="/register" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Register</Link>
@@ -51,7 +55,7 @@ function Layout({ children }) {
       <main className="container mx-auto px-4 py-8 flex-grow">
         {children}
       </main>
-      <footer className="bg-gray-200 text-gray-600 py-4">
+      <footer className="bg-gray-800 text-gray-400 py-4">
         <div className="container mx-auto px-4 text-center">
           &copy; 2023 NFL Pool App. All rights reserved.
         </div>

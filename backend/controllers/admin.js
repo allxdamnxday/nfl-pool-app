@@ -122,12 +122,13 @@ exports.syncRundownData = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 exports.grantAdminPrivileges = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
+
   if (!user) {
     return next(new ErrorResponse(`User not found with id of ${req.params.id}`, 404));
   }
 
   user.role = 'admin';
-  await user.save();
+  await user.save({ validateBeforeSave: false });
 
   res.status(200).json({
     success: true,

@@ -9,9 +9,12 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Entries from './components/Entries';
+import EntryDetail from './components/EntryDetail';
 import Picks from './components/Picks';
 import PoolList from './components/PoolList';
 import JoinPool from './components/JoinPool'; // Import JoinPool component
+import AdminRequests from './components/AdminRequests';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 function App() {
   return (
@@ -40,6 +43,14 @@ function App() {
                 } 
               />
               <Route 
+                path="/entries/:entryId" 
+                element={
+                  <ProtectedRoute>
+                    <EntryDetail />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/picks" 
                 element={
                   <ProtectedRoute>
@@ -61,6 +72,14 @@ function App() {
                   <ProtectedRoute>
                     <JoinPool />
                   </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin/requests" 
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminRequests />
+                  </ProtectedAdminRoute>
                 } 
               />
             </Routes>

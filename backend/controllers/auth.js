@@ -35,26 +35,66 @@ exports.register = asyncHandler(async (req, res, next) => {
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Validate input
+  console.log(`Login attempt for email: ${email}`);
+
+  // Validate email & password
   if (!email || !password) {
+    console.log('Login failed: Email or password not provided');
     return next(new ErrorResponse('Please provide an email and password', 400));
   }
 
   // Check for user
   const user = await User.findOne({ email }).select('+password');
+
   if (!user) {
-    console.log('User not found');
+    console.log(`Login failed: No user found with email ${email}`);
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
-  // Check password
+  console.log(`User found: ${user.email} (Role: ${user.role})`);
+
+  // Check if password matches
   const isMatch = await user.matchPassword(password);
+
+  console.log(`Password match result: ${isMatch}`);
+
   if (!isMatch) {
-    console.log('Password does not match');
+    console.log(`Login failed: Password doesn't match for user ${email}`);
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
-  sendTokenResponse(user, 200, res);
+  console.log(`Login successful for user: ${user.email} (Role: ${user.role})`);
+
+  // Generate token
+  const token = user.getSignedJwtToken();
+  console.log('Generated token:', token);
+
+  const options = {
+    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
+    httpOnly: true
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    options.secure = true;
+  }
+
+  res
+    .status(200)
+    .cookie('token', token, options)
+    .json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  console.log('Login response sent');
 });
 
 // @desc    Log user out / clear cookie
@@ -201,5 +241,16 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie('token', token, options)
-    .json({ success: true, token });
+    .json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
 };

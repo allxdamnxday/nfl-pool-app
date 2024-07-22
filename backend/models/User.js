@@ -67,7 +67,18 @@ UserSchema.methods.getSignedJwtToken = function() {
 
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  console.log(`Comparing passwords for user: ${this.email}`); // Added logging
+  console.log(`Stored hashed password: ${this.password}`); // Added logging
+  console.log(`Entered password: ${enteredPassword}`); // Added logging
+  
+  try {
+    const isMatch = await bcrypt.compare(enteredPassword, this.password);
+    console.log(`bcrypt.compare result: ${isMatch}`); // Added logging
+    return isMatch;
+  } catch (error) {
+    console.error('Error in password comparison:', error); // Added logging
+    return false;
+  }
 };
 
 // Generate and hash password token

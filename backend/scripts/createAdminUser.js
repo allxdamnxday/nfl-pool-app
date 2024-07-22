@@ -1,53 +1,60 @@
 const mongoose = require('mongoose');
-const User = require('../models/User');
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const path = require('path');
+const User = require('../models/User');
+const readline = require('readline');
+require('dotenv').config();
 
-// Load environment variables
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
+const question = (query) => new Promise((resolve) => rl.question(query, resolve));
 
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
-  
-
-// Function to create the first admin user
-const createAdminUser = async () => {
+const createAdmin = async () => {
   try {
-   
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-    // Create a new admin user
-    const user = new User({
-      username: 'nitro',
-      email: 'go@nitro.com',
-      password: 'Plastic4$', // Make sure to hash the password in a real application
+    console.log('Connected to database.');
+
+    const firstName = await question('Enter admin first name: ');
+    const lastName = await question('Enter admin last name: ');
+    const username = await question('Enter admin username: ');
+    const email = await question('Enter admin email: ');
+    const password = await question('Enter admin password: ');
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    console.log('Original password:', password); // Added logging
+    console.log('Hashed password:', hashedPassword); // Added logging
+
+    const adminUser = await User.create({
+      firstName,
+      lastName,
+      username,
+      email,
+      password: hashedPassword,
       role: 'admin'
     });
 
-    // Hash the password before saving
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
-
-    await user.save();
-
-    // Generate a JWT token
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE
-    });
-
-    console.log('Admin user created successfully');
-    console.log('Authorization Token:', token);
-    process.exit();
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
+    console.log('Admin user created successfully:');
+    console.log(`ID: ${adminUser._id}`);
+    console.log(`Name: ${adminUser.firstName} ${adminUser.lastName}`);
+    console.log(`Username: ${adminUser.username}`);
+    console.log(`Email: ${adminUser.email}`);
+    console.log(`Role: ${adminUser.role}`);
+    
+  } catch (error) {
+    console.error('Error creating admin user:', error);
+  } finally {
+    await mongoose.connection.close();
+    rl.close();
   }
 };
 
-// Run the function
-createAdminUser();
+createAdmin();
