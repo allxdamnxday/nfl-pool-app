@@ -3,69 +3,83 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { getActivePools } from '../services/poolService';
+import { getUserPools } from '../services/poolService';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
-  const [activePools, setActivePools] = useState([]);
+  const [userPools, setUserPools] = useState([]);
   const [loading, setLoading] = useState(true);
   const showToast = useToast();
 
   useEffect(() => {
     const fetchUserPools = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
       try {
-        const pools = await getUserPools(user.id);
-        setActivePools(pools.filter(pool => pool.userStatus === 'active'));
+        // Make sure user.id is defined before making the request
+        if (user && user.id) {
+          const pools = await getUserPools(user.id);
+          setUserPools(pools);
+        } else {
+          console.error('User ID is undefined');
+          // Handle the case where user ID is not available
+        }
       } catch (error) {
         console.error('Failed to fetch user pools:', error);
-        showToast('Failed to load your pools. Please try again later.', 'error');
+        showToast('Failed to fetch your pools. Please try again later.', 'error');
       } finally {
         setLoading(false);
       }
     };
-  
-    fetchUserPools();
+
+    if (user) {
+      fetchUserPools();
+    }
   }, [user, showToast]);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-gray-900 text-white">Loading...</div>;
+    return <div className="text-center text-white">Loading your pools...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      
-
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Your Active Pools</h2>
-          {activePools.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {activePools.map((pool) => (
-                <div key={pool._id} className="bg-gray-800 p-4 rounded shadow">
-                  <Link to={`/pools/${pool._id}`} className="text-purple-500 hover:underline font-semibold">
-                    {pool.name}
-                  </Link>
-                  <p className="text-sm text-gray-400">Current Week: {pool.currentWeek}</p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-400">You are not participating in any active pools.</p>
-          )}
-        </div>
-        <div className="flex space-x-4">
-          <Link to="/pools" className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">
-            Browse All Pools
-          </Link>
-          <Link to="/pools/create" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            Create New Pool
-          </Link>
-        </div>
-      </main>
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <Link 
+          to="/pools" 
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+        >
+          Browse Pools
+        </Link>
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Your Pools</h2>
+        {userPools.length === 0 ? (
+          <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+            <p className="mb-4">You're not in any pools yet. Ready to join the action?</p>
+            <Link 
+              to="/pools" 
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+            >
+              Find a Pool to Join
+            </Link>
+          </div>
+        ) : (
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {userPools.map(pool => (
+              <li key={pool._id} className="bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold mb-2">{pool.name}</h3>
+                <p className="text-gray-300">Season: {pool.season}</p>
+                <p className="text-gray-300">Current Week: {pool.currentWeek}</p>
+                <Link 
+                  to={`/pools/${pool._id}`} 
+                  className="mt-4 inline-block bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
+                >
+                  View Pool
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

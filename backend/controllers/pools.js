@@ -121,16 +121,24 @@ exports.getUserActivePools = asyncHandler(async (req, res, next) => {
 
 exports.getUserPools = asyncHandler(async (req, res, next) => {
   const userId = req.params.userId;
-  if (req.user.id !== userId && req.user.role !== 'admin') {
+  console.log('Requested userId:', userId);
+  console.log('Authenticated user:', req.user);
+  
+  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(req.user.id)) {
+    return next(new ErrorResponse(`Invalid user ID`, 400));
+  }
+  
+  if (req.user.id.toString() !== userId) {
     return next(new ErrorResponse(`Not authorized to access this route`, 403));
   }
+  
   const userPools = await Pool.find({ participants: userId });
   res.status(200).json({ success: true, count: userPools.length, data: userPools });
 });
 
 exports.getAvailablePools = asyncHandler(async (req, res, next) => {
   const availablePools = await Pool.find({
-    status: 'open',
+    status: 'active',
     participants: { $ne: req.user.id },
     $expr: { $lt: [{ $size: "$participants" }, "$maxParticipants"] }
   });

@@ -10,6 +10,7 @@ const asyncHandler = require('../middleware/async');
 // @access  Private
 exports.createRequest = asyncHandler(async (req, res, next) => {
   const { poolId, numberOfEntries } = req.body;
+  console.log(`Creating request for pool ${poolId} with ${numberOfEntries} entries`);
 
   if (numberOfEntries < 1 || numberOfEntries > 3) {
     return next(new ErrorResponse('Number of entries must be between 1 and 3', 400));
@@ -18,6 +19,9 @@ exports.createRequest = asyncHandler(async (req, res, next) => {
   // Check existing requests and entries
   const existingRequests = await Request.find({ pool: poolId, user: req.user.id });
   const existingEntries = await Entry.find({ pool: poolId, user: req.user.id });
+
+  console.log('Existing requests:', existingRequests);
+  console.log('Existing entries:', existingEntries);
 
   const totalExisting = existingRequests.length + existingEntries.length;
   const totalRequested = totalExisting + numberOfEntries;
@@ -29,14 +33,17 @@ exports.createRequest = asyncHandler(async (req, res, next) => {
   const request = await Request.create({
     pool: poolId,
     user: req.user.id,
-    numberOfEntries
+    numberOfEntries,
+    status: 'pending'
   });
+
+  console.log('Created request:', request);
 
   res.status(201).json({
     success: true,
     data: {
-      ...request._doc, // Spread the request document to include all fields
-      numberOfEntries // Ensure numberOfEntries is included
+      ...request._doc,
+      numberOfEntries
     }
   });
 });
@@ -105,12 +112,18 @@ exports.approveRequest = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/requests
 // @access  Private/Admin
 exports.getRequests = asyncHandler(async (req, res, next) => {
-  const requests = await Request.find().populate('user', 'username').populate('pool', 'name');
+  console.log('Getting all requests');
+  const pendingRequests = await Request.find({ status: { $ne: 'approved' } }).populate('user', 'username').populate('pool', 'name');
+  const approvedRequests = await Request.find({ status: 'approved' }).populate('user', 'username').populate('pool', 'name');
+  console.log('Retrieved pending requests:', pendingRequests);
+  console.log('Retrieved approved requests:', approvedRequests);
 
   res.status(200).json({
     success: true,
-    count: requests.length,
-    data: requests
+    data: {
+      pending: pendingRequests,
+      approved: approvedRequests
+    }
   });
 });
 

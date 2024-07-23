@@ -4,14 +4,12 @@ const Request = require('../models/Request');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
-
-
-
 // @desc    Get all entries for a user
-// @route   GET /api/v1/users/entries
+// @route   GET /api/v1/entries/user
 // @access  Private
 exports.getUserEntries = asyncHandler(async (req, res, next) => {
-  const entries = await Entry.find({ user: req.user.id }).populate('pool');
+  console.log('User ID:', req.user.id); // Add this line to log the user ID
+  const entries = await Entry.find({ user: req.user.id }).populate('pool', 'name currentWeek');
   res.status(200).json({
     success: true,
     count: entries.length,

@@ -10,8 +10,14 @@ const authHeader = () => {
 };
 
 export const getUserEntries = async () => {
-  const response = await axios.get(`${API_URL}/users/entries`, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await axios.get(`${API_URL}/entries/user`, { headers: authHeader() });
+    console.log('User entries retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user entries:', error.response ? error.response.data : error.message);
+    throw error;
+  }
 };
 
 export const getEntry = async (entryId) => {

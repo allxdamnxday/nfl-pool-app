@@ -30,13 +30,16 @@ exports.protect = asyncHandler(async (req, res, next) => {
     const user = await User.findById(decoded.id);
     
     if (!user) {
-      console.error(`User not found for id: ${decoded.id}`);
-      return next(new ErrorResponse('User not found', 401));
+      return next(new ErrorResponse('No user found with this id', 404));
     }
+
+    console.log('Decoded User ID:', decoded.id); // Add this line to log the decoded user ID
 
     req.user = user;
     // Ensure the role is set on the user object
     req.user.role = decoded.role || user.role;
+
+    console.log('Decoded User ID:', req.user.id); // Add this line to log the user ID
 
     next();
   } catch (err) {
