@@ -64,14 +64,10 @@ exports.approveRequest = asyncHandler(async (req, res, next) => {
   request.status = 'approved';
   await request.save();
 
-  // Update pool status to active if not already
+  // Find the pool without changing its status
   const pool = await Pool.findById(request.pool);
   if (!pool) {
     return next(new ErrorResponse(`No pool found with id of ${request.pool}`, 404));
-  }
-
-  if (pool.status !== 'active') {
-    pool.status = 'active';
   }
 
   // Add user to participants array if not already present
@@ -80,8 +76,6 @@ exports.approveRequest = asyncHandler(async (req, res, next) => {
   }
 
   await pool.save();
-
-  console.log('Pool status updated to active and user added to participants:', pool);
 
   // Create Entries for the user
   const entries = [];

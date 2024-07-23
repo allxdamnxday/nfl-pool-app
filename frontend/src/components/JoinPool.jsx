@@ -7,9 +7,10 @@ import { useToast } from '../contexts/ToastContext';
 
 function JoinPool() {
   const [pool, setPool] = useState(null);
+  const [userEntries, setUserEntries] = useState(0);
+  const [numberOfEntries, setNumberOfEntries] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [numberOfEntries, setNumberOfEntries] = useState(1);
   const { poolId } = useParams();
   const navigate = useNavigate();
   const showToast = useToast();
@@ -19,6 +20,7 @@ function JoinPool() {
       try {
         const poolData = await getPoolDetails(poolId);
         setPool(poolData);
+        setUserEntries(poolData.userEntries || 0);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch pool details. Please try again later.');
@@ -44,23 +46,29 @@ function JoinPool() {
   if (loading) return <div className="text-center text-white">Loading pool details...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
+  const remainingEntries = 3 - userEntries;
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl font-bold mb-6">Join Pool: {pool?.name}</h1>
+      <h1 className="text-3xl font-bold mb-6">
+        {userEntries === 0 ? 'Join Pool' : 'Add Entry'}: {pool?.name}
+      </h1>
       <div className="bg-gray-800 shadow-md rounded-lg p-6 max-w-md mx-auto">
         <p className="text-gray-400 mb-4">Entry Fee: ${pool?.entryFee}</p>
+        <p className="text-gray-400 mb-4">Your Current Entries: {userEntries}</p>
         <form onSubmit={handleJoinRequest}>
           <div className="mb-4">
-            <label htmlFor="numberOfEntries" className="block text-gray-400 mb-2">Number of Entries</label>
+            <label htmlFor="numberOfEntries" className="block text-sm font-medium text-gray-400">
+              Number of New Entries (1-{remainingEntries}):
+            </label>
             <input
               type="number"
               id="numberOfEntries"
               value={numberOfEntries}
-              onChange={(e) => setNumberOfEntries(e.target.value)}
+              onChange={(e) => setNumberOfEntries(Number(e.target.value))}
               min="1"
-              max="3"
-              required
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+              max={remainingEntries}
+              className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             />
           </div>
           <button

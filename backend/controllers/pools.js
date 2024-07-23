@@ -1,4 +1,8 @@
+// backend/controllers/pools.js
+
 const Pool = require('../models/Pool');
+const Entry = require('../models/Entry');
+const Request = require('../models/Request');
 const mongoose = require('mongoose');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
@@ -137,10 +141,48 @@ exports.getUserPools = asyncHandler(async (req, res, next) => {
 });
 
 exports.getAvailablePools = asyncHandler(async (req, res, next) => {
-  const availablePools = await Pool.find({
-    status: 'active',
-    participants: { $ne: req.user.id },
-    $expr: { $lt: [{ $size: "$participants" }, "$maxParticipants"] }
+  // Find all open pools
+  const openPools = await Pool.find({ status: 'open' });
+
+  // For each pool, check the user's entries and requests
+  const availablePools = await Promise.all(openPools.map(async (pool) => {
+    // Count active entries
+    const activeEntries = await Entry.countDocuments({ 
+      pool: pool._id, 
+      user: req.user.id,
+      isActive: true
+    });
+
+    // Count pending requests
+    const pendingRequests = await Request.countDocuments({ 
+      pool: pool._id, 
+      user: req.user.id, 
+      status: 'pending'
+    });
+
+    // Count approved but not yet active entries
+    const approvedEntries = await Entry.countDocuments({ 
+      pool: pool._id, 
+      user: req.user.id,
+      isActive: false
+    });
+
+    const totalEntries = activeEntries + pendingRequests + approvedEntries;
+
+    return {
+      ...pool.toObject(),
+      userEntries: totalEntries,
+      canJoin: totalEntries < 3,
+      activeEntries,
+      pendingRequests,
+      approvedEntries
+    };
+  }));
+
+  // Include all pools, but mark which ones the user can join
+  res.status(200).json({
+    success: true,
+    count: availablePools.length,
+    data: availablePools
   });
-  res.status(200).json({ success: true, count: availablePools.length, data: availablePools });
 });
