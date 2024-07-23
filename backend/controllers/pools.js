@@ -186,3 +186,52 @@ exports.getAvailablePools = asyncHandler(async (req, res, next) => {
     data: availablePools
   });
 });
+
+// Update the status of a pool Admin Route
+exports.updatePoolStatus = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!['open', 'active', 'completed'].includes(status)) {
+    return next(new ErrorResponse('Invalid status. Must be open, active, or completed.', 400));
+  }
+
+  const pool = await Pool.findById(id);
+
+  if (!pool) {
+    return next(new ErrorResponse(`No pool found with id of ${id}`, 404));
+  }
+
+  pool.status = status;
+  await pool.save();
+
+  res.status(200).json({
+    success: true,
+    data: pool
+  });
+});
+
+exports.getUserPoolsWithEntries = asyncHandler(async (req, res, next) => {
+  const pools = await Pool.find({ participants: req.user.id });
+  const entries = await Entry.find({ user: req.user.id, isActive: true });
+  
+  const poolsWithEntries = pools.map(pool => ({
+    ...pool.toObject(),
+    activeEntries: entries.filter(entry => entry.pool.toString() === pool._id.toString()).length,
+    userEntryId: entries.find(entry => entry.pool.toString() === pool._id.toString())?._id
+  }));
+
+  res.status(200).json({
+    success: true,
+    data: poolsWithEntries
+  });
+});
+
+exports.getPoolEntries = asyncHandler(async (req, res, next) => {
+  const entries = await Entry.find({ pool: req.params.id });
+  res.status(200).json({
+    success: true,
+    count: entries.length,
+    data: entries
+  });
+});

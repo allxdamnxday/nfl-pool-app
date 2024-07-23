@@ -7,36 +7,37 @@ import { getUserPools } from '../services/poolService';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
-  const [userPools, setUserPools] = useState([]);
+  const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const showToast = useToast();
 
   useEffect(() => {
     const fetchUserPools = async () => {
+      if (!user) return;
       try {
-        // Make sure user.id is defined before making the request
-        if (user && user.id) {
-          const pools = await getUserPools(user.id);
-          setUserPools(pools);
-        } else {
-          console.error('User ID is undefined');
-          // Handle the case where user ID is not available
-        }
+        setLoading(true);
+        setError(null);
+        const userPools = await getUserPools(user.id);
+        setPools(userPools);
       } catch (error) {
         console.error('Failed to fetch user pools:', error);
-        showToast('Failed to fetch your pools. Please try again later.', 'error');
+        setError('Failed to load your pools. Please try again later.');
+        showToast('Failed to load your pools. Please try again later.', 'error');
       } finally {
         setLoading(false);
       }
     };
 
-    if (user) {
-      fetchUserPools();
-    }
+    fetchUserPools();
   }, [user, showToast]);
 
   if (loading) {
     return <div className="text-center text-white">Loading your pools...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>;
   }
 
   return (
@@ -52,7 +53,7 @@ function Dashboard() {
       </div>
       <div>
         <h2 className="text-2xl font-bold mb-4">Your Pools</h2>
-        {userPools.length === 0 ? (
+        {pools.length === 0 ? (
           <div className="bg-gray-800 p-6 rounded-lg shadow-md">
             <p className="mb-4">You're not in any pools yet. Ready to join the action?</p>
             <Link 
@@ -63,21 +64,22 @@ function Dashboard() {
             </Link>
           </div>
         ) : (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {userPools.map(pool => (
-              <li key={pool._id} className="bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 className="text-xl font-semibold mb-2">{pool.name}</h3>
-                <p className="text-gray-300">Season: {pool.season}</p>
-                <p className="text-gray-300">Current Week: {pool.currentWeek}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pools.map((pool) => (
+              <div key={pool._id} className="bg-gray-800 p-6 rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold text-purple-500 mb-2">{pool.name}</h3>
+                <p className="text-gray-300 mb-1">Season: {pool.season}</p>
+                <p className="text-gray-300 mb-1">Current Week: {pool.currentWeek}</p>
+                <p className="text-gray-300 mb-3">Active Entries: {pool.activeEntries}</p>
                 <Link 
-                  to={`/pools/${pool._id}`} 
+                  to={`/pool-entries/${pool._id}`} 
                   className="mt-4 inline-block bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded transition duration-300"
                 >
-                  View Pool
+                  View Entries
                 </Link>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

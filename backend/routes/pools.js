@@ -10,7 +10,9 @@ const {
   getPoolStats,
   getUserActivePools,
   getUserPools,
-  getAvailablePools
+  getAvailablePools,
+  updatePoolStatus,
+  getPoolEntries
 } = require('../controllers/pools');
 
 const Pool = require('../models/Pool');
@@ -41,5 +43,7 @@ router.delete('/:id', authorize('admin'), deletePool);
 router.post('/:id/join', joinPool);
 router.post('/:id/leave', leavePool);
 router.get('/:id/stats', getPoolStats);
+router.put('/:id/status', protect, authorize('admin'), updatePoolStatus);
+router.get('/:id/entries', protect, getPoolEntries);
 
 module.exports = router;

@@ -15,6 +15,7 @@ import PoolList from './components/PoolList';
 import JoinPool from './components/JoinPool'; // Import JoinPool component
 import AdminRequests from './components/AdminRequests';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+import PoolEntries from './components/PoolEntries';
 
 function App() {
   return (
@@ -65,6 +66,10 @@ function App() {
                     <PoolList />
                   </ProtectedRoute>
                 } 
+              />
+              <Route 
+                path="/pool-entries/:poolId" 
+                element={<PoolEntries />} 
               />
               <Route 
                 path="/pools/:poolId/join" 

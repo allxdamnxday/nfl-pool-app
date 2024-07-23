@@ -39,3 +39,13 @@ export const updateEntry = async (entryId, entryData) => {
   const response = await axios.put(`${API_URL}/entries/${entryId}`, entryData, { headers: authHeader() });
   return response.data.data;
 };
+
+export const getPoolEntries = async (poolId) => {
+  try {
+    const response = await axios.get(`${API_URL}/pools/${poolId}/entries`, { headers: authHeader() });
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching pool entries:', error);
+    throw error;
+  }
+};

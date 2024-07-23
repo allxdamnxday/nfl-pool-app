@@ -66,7 +66,18 @@ export const getUserPools = async (userId) => {
     console.log('Fetching user pools for userId:', userId);
     const response = await axios.get(`${API_URL}/user/${userId}`, { headers: authHeader() });
     console.log('User pools response:', response.data);
-    return response.data.data;
+    
+    const poolsWithEntries = await Promise.all(response.data.data.map(async (pool) => {
+      const entriesResponse = await axios.get(`${API_URL}/${pool._id}/entries`, { headers: authHeader() });
+      const userEntries = entriesResponse.data.data.filter(entry => entry.user === userId && entry.isActive);
+      return {
+        ...pool,
+        activeEntries: userEntries.length,
+        userEntryIds: userEntries.map(entry => entry._id) // Store all entry IDs
+      };
+    }));
+    
+    return poolsWithEntries;
   } catch (error) {
     console.error('Error fetching user pools:', error.response ? error.response.data : error.message);
     console.error('Full error object:', error);
