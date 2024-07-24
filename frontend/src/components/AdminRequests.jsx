@@ -39,15 +39,15 @@ function AdminRequests() {
     <div className="min-h-screen bg-gray-900 text-white p-8">
       <h1 className="text-3xl font-bold mb-6">Admin Requests</h1>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">Pending Requests</h2>
+        <h2 className="text-2xl font-bold mb-4">Manage Requests</h2>
         {pendingRequests.length === 0 ? (
           <p>No pending requests.</p>
         ) : (
           <ul>
             {pendingRequests.map(request => (
               <li key={request._id} className="mb-4">
-                <p>Pool: {request.pool.name}</p>
                 <p>User: {request.user.username}</p>
+                <p>Pool: {request.pool.name}</p>
                 <p>Number of Entries: {request.numberOfEntries}</p>
                 <button
                   onClick={() => handleApprove(request._id)}
@@ -68,8 +68,8 @@ function AdminRequests() {
           <ul>
             {approvedRequests.map(request => (
               <li key={request._id} className="mb-4">
-                <p>Pool: {request.pool.name}</p>
                 <p>User: {request.user.username}</p>
+                <p>Pool: {request.pool.name}</p>
                 <p>Number of Entries: {request.numberOfEntries}</p>
                 <p>Status: {request.status}</p>
               </li>

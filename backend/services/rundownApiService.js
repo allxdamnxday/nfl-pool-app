@@ -6,8 +6,7 @@ const api = axios.create({
   baseURL: config.BASE_URL,
   headers: {
     'x-rapidapi-key': config.RAPID_API_KEY,
-    'x-rapidapi-host': config.RAPID_API_HOST,
-    'X-RapidAPI-Mock-Response': '200' // Remove this in production
+    'x-rapidapi-host': config.RAPID_API_HOST
   }
 });
 
@@ -16,71 +15,59 @@ const rundownApi = {
     ...config,
     SPORT_ID: {
       NFL: 2
-    }
-  },
-
-  fetchNFLTeams: async () => {
-    try {
-      const response = await api.get(`/sports/${rundownApi.config.SPORT_ID.NFL}/teams`);
-      return response.data.teams;
-    } catch (error) {
-      console.error('Error fetching NFL teams:', error);
-      throw error;
-    }
+    },
+    AFFILIATE_ID: 3 // Assuming 3 is the affiliate we want
   },
 
   fetchNFLSchedule: async (fromDate, limit = 100) => {
     try {
       const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/schedule`;
       const response = await api.get(url, {
-        params: { from: fromDate, limit: limit }
-      });
-      
-      if (response.data && response.data.schedules) {
-        return response.data.schedules;
-      } else {
-        console.error('Unexpected API response structure:', response.data);
-        throw new Error('Unexpected API response structure');
-      }
-    } catch (error) {
-      console.error('Error fetching NFL schedule:', error.response ? error.response.data : error.message);
-      throw error;
-    }
-  },
-
-  fetchEventMarkets: async (eventId, participantType, marketIds) => {
-    try {
-      const response = await api.get(`/events/${eventId}/markets`, {
         params: { 
-          participant_type: participantType,
-          market_ids: marketIds.join(',')
+          from: fromDate,
+          limit: limit
         }
       });
-      return response.data;
+      
+      return response.data.schedules;
     } catch (error) {
-      console.error('Error fetching event markets:', error);
+      console.error('Error fetching NFL schedule:', error.message);
       throw error;
     }
   },
 
-  fetchEventDetails: async (eventId, marketIds) => {
+  fetchEventDetails: async (eventId) => {
     try {
       const response = await api.get(`/events/${eventId}`, {
-        params: { market_ids: marketIds.join(',') }
+        params: {
+          include: 'all_periods'
+        }
       });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching event details:', error);
-      throw error;
-    }
-  },
 
-  fetchTeamPlayers: async (teamId) => {
-    try {
-      const response = await api.get(`/teams/${teamId}/players`);
-      return response.data.players;
+      const eventData = response.data;
+      const affiliateLines = eventData.lines[rundownApi.config.AFFILIATE_ID];
+
+      if (!affiliateLines) {
+        console.warn(`No lines found for affiliate ${rundownApi.config.AFFILIATE_ID}`);
+        return null;
+      }
+
+      return {
+        event_id: eventData.event_id,
+        sport_id: eventData.sport_id,
+        event_date: eventData.event_date,
+        away_team: eventData.teams_normalized[0],
+        home_team: eventData.teams_normalized[1],
+        total: affiliateLines.total ? affiliateLines.total.total_over : null,
+        event_status: eventData.score.event_status,
+        score_away: eventData.score.score_away,
+        score_home: eventData.score.score_home,
+        broadcast: eventData.score.broadcast,
+        venue_name: eventData.score.venue_name,
+        venue_location: eventData.score.venue_location
+      };
     } catch (error) {
-      console.error('Error fetching team players:', error);
+      console.error('Error fetching event details:', error.message);
       throw error;
     }
   }

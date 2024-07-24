@@ -8,6 +8,11 @@ const GameSchema = new mongoose.Schema({
   event_date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/ },
   rotation_number_away: { type: Number },
   rotation_number_home: { type: Number },
+  away_team_id: { type: Number, required: true },
+  home_team_id: { type: Number, required: true },
+  away_team: { type: String, required: true },
+  home_team: { type: String, required: true },
+  total: { type: Number },
   score: {
     event_status: String,
     winner_away: Number,

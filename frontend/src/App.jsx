@@ -12,10 +12,12 @@ import Entries from './components/Entries';
 import EntryDetail from './components/EntryDetail';
 import Picks from './components/Picks';
 import PoolList from './components/PoolList';
-import JoinPool from './components/JoinPool'; // Import JoinPool component
+import JoinPool from './components/JoinPool';
 import AdminRequests from './components/AdminRequests';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PoolEntries from './components/PoolEntries';
+import AdminDashboard from './components/AdminDashboard';
+import AdminPanel from './components/AdminPanel';
 
 function App() {
   return (
@@ -80,10 +82,10 @@ function App() {
                 } 
               />
               <Route 
-                path="/admin/requests" 
+                path="/admin/*" 
                 element={
                   <ProtectedAdminRoute>
-                    <AdminRequests />
+                    <AdminPanel />
                   </ProtectedAdminRoute>
                 } 
               />

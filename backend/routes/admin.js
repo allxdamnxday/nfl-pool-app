@@ -7,7 +7,10 @@ const {
   getAppStats,
   syncRundownData,
   grantAdminPrivileges,
-  createUser
+  createUser,
+  syncNFLSchedule,
+  updateGameData,
+  initializeSeasonData
 } = require('../controllers/admin');
 
 const router = express.Router();
@@ -204,6 +207,82 @@ router.get('/stats', asyncHandler(getAppStats));
  */
 router.post('/sync-rundown', asyncHandler(syncRundownData));
 
+/**
+ * @swagger
+ * /admin/sync-schedule:
+ *   post:
+ *     summary: Sync NFL schedule
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: NFL schedule synced successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: string
+ */
+router.post('/sync-schedule', asyncHandler(syncNFLSchedule));
 
+/**
+ * @swagger
+ * /admin/update-game-data:
+ *   post:
+ *     summary: Update game data
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Game data updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: string
+ */
+router.post('/update-game-data', asyncHandler(updateGameData));
+
+/**
+ * @swagger
+ * /admin/initialize-season:
+ *   post:
+ *     summary: Initialize new season
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               year:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Season initialized successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: string
+ */
+router.post('/initialize-season', asyncHandler(initializeSeasonData));
 
 module.exports = router;

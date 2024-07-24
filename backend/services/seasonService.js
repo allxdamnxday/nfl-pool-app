@@ -1,4 +1,4 @@
-// seasonService.js
+// backend/services/seasonService.js
 const axios = require('axios');
 const mongoose = require('mongoose');
 const Game = require('../models/Game');

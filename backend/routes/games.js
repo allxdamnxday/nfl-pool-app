@@ -7,9 +7,11 @@ const {
   filterGames,
   updateGameStatus,
   getWeekGames,
-  createGame
+  createGame,
+  updateGameData,
+  initializeSeasonData
 } = require('../controllers/games');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -46,7 +48,7 @@ const router = express.Router();
  *                   items:
  *                     $ref: '#/components/schemas/Game'
  */
-router.route('/').get(protect, getGames);
+router.route('/').get(getGames);
 
 /**
  * @swagger
@@ -273,6 +275,13 @@ router.route('/:id').get(protect, getGame);
  *         description: Game not found
  */
 router.route('/:id/status').put(protect, updateGameStatus);
+
+// Admin protected routes
+router.use(protect);
+router.use(authorize('admin'));
+
+router.post('/update', updateGameData);
+router.post('/initialize-season', initializeSeasonData);
 
 module.exports = router;
 

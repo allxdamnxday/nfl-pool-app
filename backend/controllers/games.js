@@ -221,6 +221,24 @@ exports.createGame = asyncHandler(async (req, res, next) => {
   }
 });
 
+exports.updateGameData = asyncHandler(async (req, res, next) => {
+  const { date } = req.body;
+  if (!date || isNaN(Date.parse(date))) {
+    return next(new ErrorResponse('Please provide a valid date', 400));
+  }
+  await seasonService.updateGameData(new Date(date));
+  res.status(200).json({ success: true, message: 'Game data updated successfully' });
+});
+
+exports.initializeSeasonData = asyncHandler(async (req, res, next) => {
+  const { year } = req.body;
+  if (!year || isNaN(parseInt(year))) {
+    return next(new ErrorResponse('Please provide a valid year', 400));
+  }
+  await seasonService.initializeSeasonData(parseInt(year));
+  res.status(200).json({ success: true, message: 'Season data initialized successfully' });
+});
+
 // Update the module exports to include all functions
 module.exports = {
   fetchGames: exports.fetchGames,
@@ -230,5 +248,7 @@ module.exports = {
   updateGameStatus: exports.updateGameStatus,
   getGamesByTeam: exports.getGamesByTeam,
   filterGames: exports.filterGames,
-  createGame: exports.createGame
+  createGame: exports.createGame,
+  updateGameData: exports.updateGameData,
+  initializeSeasonData: exports.initializeSeasonData
 };
