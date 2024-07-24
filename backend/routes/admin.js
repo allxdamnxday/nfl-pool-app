@@ -192,6 +192,17 @@ router.get('/stats', asyncHandler(getAppStats));
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               date:
+ *                 type: string
+ *               limit:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Data synced successfully
@@ -202,7 +213,7 @@ router.get('/stats', asyncHandler(getAppStats));
  *               properties:
  *                 success:
  *                   type: boolean
- *                 data:
+ *                 message:
  *                   type: string
  */
 router.post('/sync-rundown', asyncHandler(syncRundownData));
@@ -238,6 +249,15 @@ router.post('/sync-schedule', asyncHandler(syncNFLSchedule));
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               date:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Game data updated successfully
@@ -248,7 +268,7 @@ router.post('/sync-schedule', asyncHandler(syncNFLSchedule));
  *               properties:
  *                 success:
  *                   type: boolean
- *                 data:
+ *                 message:
  *                   type: string
  */
 router.post('/update-game-data', asyncHandler(updateGameData));
@@ -280,7 +300,7 @@ router.post('/update-game-data', asyncHandler(updateGameData));
  *               properties:
  *                 success:
  *                   type: boolean
- *                 data:
+ *                 message:
  *                   type: string
  */
 router.post('/initialize-season', asyncHandler(initializeSeasonData));

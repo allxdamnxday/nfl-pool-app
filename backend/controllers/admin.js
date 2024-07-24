@@ -1,7 +1,9 @@
 // backend/controllers/admin.js
 const User = require('../models/User');
+const Game = require('../models/Game');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
+const seasonService = require('../services/seasonService');
 
 // @desc    Get all users
 // @route   GET /api/v1/admin/users
@@ -106,15 +108,61 @@ exports.getAppStats = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Update game data
+// @route   POST /api/v1/admin/update-game-data
+// @access  Private/Admin
+exports.updateGameData = asyncHandler(async (req, res, next) => {
+  const { date } = req.body;
+  if (!date) {
+    return next(new ErrorResponse('Please provide a date', 400));
+  }
+  
+  let parsedDate;
+  try {
+    parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      throw new Error('Invalid date');
+    }
+  } catch (error) {
+    return next(new ErrorResponse('Please provide a valid date', 400));
+  }
+
+  await seasonService.updateGameData(parsedDate);
+  res.status(200).json({ success: true, message: 'Game data updated successfully' });
+});
+
+// @desc    Initialize season data
+// @route   POST /api/v1/admin/initialize-season
+// @access  Private/Admin
+exports.initializeSeasonData = asyncHandler(async (req, res, next) => {
+  const { year } = req.body;
+  if (!year || isNaN(parseInt(year))) {
+    return next(new ErrorResponse('Please provide a valid year', 400));
+  }
+  try {
+    const initializedGames = await seasonService.initializeSeasonData(parseInt(year));
+    console.log(`Controller: Initialized ${initializedGames.length} games`);
+    res.status(200).json({ 
+      success: true, 
+      message: 'Season data initialized successfully',
+      count: initializedGames.length
+    });
+  } catch (error) {
+    console.error('Controller: Error initializing season data:', error);
+    next(new ErrorResponse('Failed to initialize season data', 500));
+  }
+});
+
 // @desc    Sync rundown data
 // @route   POST /api/v1/admin/sync-rundown
 // @access  Private/Admin
 exports.syncRundownData = asyncHandler(async (req, res, next) => {
-  // Implement your data syncing logic here
-  res.status(200).json({
-    success: true,
-    data: 'Data synced successfully'
-  });
+  const { date, limit } = req.body;
+  if (!date || isNaN(Date.parse(date))) {
+    return next(new ErrorResponse('Please provide a valid date', 400));
+  }
+  await seasonService.fetchGames(new Date(date), limit);
+  res.status(200).json({ success: true, message: 'Rundown data synced successfully' });
 });
 
 // @desc    Grant admin privileges to a user

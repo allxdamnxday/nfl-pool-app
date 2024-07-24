@@ -1,21 +1,13 @@
 // backend/services/seasonService.js
-const axios = require('axios');
-const mongoose = require('mongoose');
 const Game = require('../models/Game');
 const Settings = require('../models/Settings');
-const config = require('../config/rundownApi');
-
-// Initialize axios instance for RundownAPI
-const rundownApi = axios.create({
-  baseURL: config.BASE_URL,
-  headers: {
-    'x-rapidapi-key': config.RAPID_API_KEY,
-    'x-rapidapi-host': config.RAPID_API_HOST
+const rundownApi = require('./rundownApiService');
+const formatDateISO8601 = (date) => {
+  if (typeof date === 'string') {
+    return date;
   }
-});
-
-// Helper function to format date to YYYY-MM-DD
-const formatDate = (date) => date.toISOString().split('T')[0];
+  return date.toISOString();
+};
 
 // Helper function to update last sync date in database
 const updateLastSyncDate = async (date) => {
@@ -84,47 +76,63 @@ const transformGameData = (apiGame) => {
   };
 };
   
-  // Updated initializeSeasonData function with error handling
-  const initializeSeasonData = async (seasonYear) => {
-    try {
-      console.log(`Fetching schedule for season ${seasonYear}`);
-      const response = await rundownApi.get(`/sports/${config.SPORT_ID.NFL}/schedule`, {
-        params: { season_year: seasonYear }
-      });
-      
-      console.log('API Response:', JSON.stringify(response.data, null, 2));
-  
-      if (!response.data || !response.data.schedules) {
-        throw new Error('Invalid API response structure');
-      }
-  
-      const games = response.data.schedules
-        .map(transformGameData)
-        .filter(game => game !== null);
-  
-      if (games.length === 0) {
-        throw new Error('No valid games found in the API response');
-      }
-  
-      await Game.insertMany(games, { ordered: false });
-      
-      await updateLastSyncDate(new Date());
-      await updateStoredSeasonYear(seasonYear);
-      
-      console.log(`Initialized ${games.length} games for season ${seasonYear}`);
-    } catch (error) {
-      console.error('Error initializing season data:', error);
-      console.error('Error details:', error.response?.data);
-      throw error;
-    }
-  };
+// Updated initializeSeasonData function with error handling
+const initializeSeasonData = async (seasonYear) => {
+  try {
+    console.log(`Fetching schedule for season ${seasonYear}`);
+    const schedules = await rundownApi.fetchNFLSchedule(new Date(seasonYear, 0, 1));
+    
+    console.log('API Response:', JSON.stringify(schedules, null, 2));
 
-// Update game data for a specific date
+    if (!schedules || schedules.length === 0) {
+      throw new Error('No schedules found in the API response');
+    }
+
+    const games = schedules
+      .map(transformGameData)
+      .filter(game => game !== null);
+
+    console.log(`Transformed ${games.length} games`);
+    console.log('First transformed game:', JSON.stringify(games[0], null, 2));
+
+    if (games.length === 0) {
+      throw new Error('No valid games found in the API response');
+    }
+
+    console.log('Attempting to insert games into database...');
+    const insertedGames = [];
+    for (const game of games) {
+      try {
+        const newGame = await Game.create(game);
+        insertedGames.push(newGame);
+      } catch (error) {
+        console.error(`Error inserting game ${game.event_id}:`, error.message);
+      }
+    }
+    console.log(`Inserted ${insertedGames.length} games into the database`);
+    
+    await updateLastSyncDate(new Date());
+    await updateStoredSeasonYear(seasonYear);
+    
+    console.log(`Initialized ${insertedGames.length} games for season ${seasonYear}`);
+    return insertedGames;
+  } catch (error) {
+    console.error('Error initializing season data:', error);
+    if (error.writeErrors) {
+      console.error(`${error.writeErrors.length} write errors occurred`);
+      console.error('First write error:', JSON.stringify(error.writeErrors[0], null, 2));
+    }
+    throw error;
+  }
+};
+
+// Updated updateGameData function with error handling
 const updateGameData = async (date = new Date()) => {
   try {
-    const response = await rundownApi.get(`/sports/${config.SPORT_ID.NFL}/events/${formatDate(date)}`);
+    const formattedDate = formatDateISO8601(date);
+    const events = await rundownApi.fetchNFLEvents(formattedDate);
     
-    const updatePromises = response.data.events.map(event => 
+    const updatePromises = events.map(event => 
       Game.findOneAndUpdate(
         { event_id: event.event_id },
         transformGameData(event),
@@ -135,7 +143,7 @@ const updateGameData = async (date = new Date()) => {
     await Promise.all(updatePromises);
     await updateLastSyncDate(date);
     
-    console.log(`Updated games for ${formatDate(date)}`);
+    console.log(`Updated games for ${formattedDate}`);
   } catch (error) {
     console.error('Error updating game data:', error);
     throw error;
@@ -145,8 +153,8 @@ const updateGameData = async (date = new Date()) => {
 // Get detailed game information
 const getDetailedGameInfo = async (eventId) => {
   try {
-    const response = await rundownApi.get(`/events/${eventId}`);
-    const detailedGame = transformGameData(response.data);
+    const eventData = await rundownApi.fetchEventDetails(eventId);
+    const detailedGame = transformGameData(eventData);
     return await Game.findOneAndUpdate(
       { event_id: eventId },
       detailedGame,
@@ -220,5 +228,6 @@ module.exports = {
   updateHistoricalData,
   getGamesByWeek,
   transformGameData,
-  calculateNFLWeek
+  calculateNFLWeek,
+  formatDateISO8601
 };

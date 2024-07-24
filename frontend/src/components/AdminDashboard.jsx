@@ -26,7 +26,8 @@ function AdminDashboard() {
   const handleUpdateGameData = async () => {
     setLoading(true);
     try {
-      await updateGameData();
+      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      await updateGameData(today);
       showToast('Game data updated successfully', 'success');
     } catch (error) {
       showToast('Failed to update game data', 'error');

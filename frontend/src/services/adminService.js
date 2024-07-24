@@ -7,8 +7,8 @@ export const syncNFLSchedule = async () => {
   return response.data;
 };
 
-export const updateGameData = async () => {
-  const response = await api.post('/admin/update-game-data');
+export const updateGameData = async (date) => {
+  const response = await api.post('/admin/update-game-data', { date });
   return response.data;
 };
 

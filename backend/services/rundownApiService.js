@@ -2,6 +2,15 @@
 const axios = require('axios');
 const config = require('../config/rundownApi');
 
+// Add this helper function at the top of the file
+const formatDateISO8601 = (date) => {
+  if (typeof date === 'string') {
+    // If it's already a string, assume it's in the correct format
+    return date;
+  }
+  return date.toISOString();
+};
+
 const api = axios.create({
   baseURL: config.BASE_URL,
   headers: {
@@ -24,7 +33,7 @@ const rundownApi = {
       const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/schedule`;
       const response = await api.get(url, {
         params: { 
-          from: fromDate,
+          from: formatDateISO8601(fromDate),
           limit: limit
         }
       });
@@ -68,6 +77,22 @@ const rundownApi = {
       };
     } catch (error) {
       console.error('Error fetching event details:', error.message);
+      throw error;
+    }
+  },
+
+  fetchNFLEvents: async (date) => {
+    try {
+      const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/events/${formatDateISO8601(date)}`;
+      const response = await api.get(url, {
+        params: {
+          include: 'all_periods'
+        }
+      });
+      
+      return response.data.events;
+    } catch (error) {
+      console.error('Error fetching NFL events:', error.message);
       throw error;
     }
   }
