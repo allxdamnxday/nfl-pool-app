@@ -54,7 +54,7 @@ function App() {
                 } 
               />
               <Route 
-                path="/entries/:entryId/picks" 
+                path="/entries/:entryId/pick" 
                 element={
                   <ProtectedRoute>
                     <Picks />

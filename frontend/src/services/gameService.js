@@ -1,9 +1,9 @@
 // frontend/src/services/gameService.js
 import api from './api';
 
-export const getGamesForWeek = async (date) => {
+export const getGamesForWeek = async (week, season_year) => {
   try {
-    const response = await api.get(`/games/week?date=${date}`);
+    const response = await api.get(`/games/week?week=${week}&season_year=${season_year}`);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching games:', error);

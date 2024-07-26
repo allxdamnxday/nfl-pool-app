@@ -37,7 +37,7 @@ function EntryDetail() {
   }
 
   const handlePickEmClick = () => {
-    navigate(`/entries/${entryId}/picks`);
+    navigate(`/entries/${entryId}/pick`);
   };
 
   return (
