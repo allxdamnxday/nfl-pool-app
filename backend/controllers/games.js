@@ -243,10 +243,14 @@ exports.initializeSeasonData = asyncHandler(async (req, res, next) => {
 // @desc    Get games for the current week
 // @route   GET /api/v1/games/current-week
 // @access  Private
+// backend/controllers/games.js
 exports.getCurrentWeekGames = asyncHandler(async (req, res, next) => {
-  const currentDate = new Date().toISOString().split('T')[0];
-  const games = await gameService.fetchGamesForDate(currentDate);
-  
+  const games = await seasonService.getCurrentWeekGames();
+
+  if (!games || games.length === 0) {
+    return next(new ErrorResponse('No games found for the current week', 404));
+  }
+
   res.status(200).json({
     success: true,
     count: games.length,

@@ -2,6 +2,7 @@
 const Game = require('../models/Game');
 const Settings = require('../models/Settings');
 const rundownApi = require('./rundownApiService');
+const config = require('../config/rundownApi'); // Ensure this line is added to import the config
 const formatDateISO8601 = (date) => {
   if (typeof date === 'string') {
     return date;
@@ -83,48 +84,40 @@ const transformGameData = (apiGame) => {
 const initializeSeasonData = async (seasonYear) => {
   try {
     console.log(`Fetching schedule for season ${seasonYear}`);
-    const schedules = await rundownApi.fetchNFLSchedule(new Date(seasonYear, 0, 1));
+    const schedules = await rundownApi.fetchNFLSchedule(new Date(seasonYear, 0, 1)); // Pass a valid date
     
     console.log('API Response:', JSON.stringify(schedules, null, 2));
 
-    if (!schedules || schedules.length === 0) {
-      throw new Error('No schedules found in the API response');
+    if (!schedules) {
+      throw new Error('Invalid API response structure');
     }
 
     const games = schedules
       .map(transformGameData)
       .filter(game => game !== null);
 
-    console.log(`Transformed ${games.length} games`);
-    console.log('First transformed game:', JSON.stringify(games[0], null, 2));
-
     if (games.length === 0) {
       throw new Error('No valid games found in the API response');
     }
 
-    console.log('Attempting to insert games into database...');
-    const insertedGames = [];
-    for (const game of games) {
-      try {
-        const newGame = await Game.create(game);
-        insertedGames.push(newGame);
-      } catch (error) {
-        console.error(`Error inserting game ${game.event_id}:`, error.message);
+    const bulkOps = games.map(game => ({
+      updateOne: {
+        filter: { event_id: game.event_id },
+        update: { $set: game },
+        upsert: true
       }
-    }
-    console.log(`Inserted ${insertedGames.length} games into the database`);
+    }));
+
+    const result = await Game.bulkWrite(bulkOps);
     
     await updateLastSyncDate(new Date());
     await updateStoredSeasonYear(seasonYear);
     
-    console.log(`Initialized ${insertedGames.length} games for season ${seasonYear}`);
-    return insertedGames;
+    console.log(`Initialized ${result.upsertedCount} new games and updated ${result.modifiedCount} existing games for season ${seasonYear}`);
+    return result;
   } catch (error) {
     console.error('Error initializing season data:', error);
-    if (error.writeErrors) {
-      console.error(`${error.writeErrors.length} write errors occurred`);
-      console.error('First write error:', JSON.stringify(error.writeErrors[0], null, 2));
-    }
+    console.error('Error details:', error.response?.data);
     throw error;
   }
 };
@@ -179,6 +172,7 @@ const manageSeason = async () => {
   if (currentDate >= seasonStartDate && currentDate <= seasonEndDate) {
     // We're in season, ensure daily updates are scheduled
     console.log('In season: Daily updates should be scheduled');
+    await updateWeekNumbers(currentYear);
   } else {
     // We're off-season, reduce update frequency
     console.log('Off season: Weekly updates should be scheduled');
@@ -212,15 +206,54 @@ const updateHistoricalData = async (startDate, endDate) => {
 const getGamesByWeek = async (seasonYear, weekNumber) => {
   try {
     const games = await Game.find({
-      'schedule.season_year': seasonYear,
-      'schedule.week': weekNumber
+      'schedule.season_year': seasonYear
     }).sort('event_date');
 
-    return games;
+    return games.filter(game => {
+      const gameWeek = game.schedule.week || calculateNFLWeek(new Date(game.event_date), seasonYear);
+      return gameWeek === weekNumber;
+    });
   } catch (error) {
     console.error(`Error fetching games for week ${weekNumber} of season ${seasonYear}:`, error);
     throw error;
   }
+};
+
+const getCurrentWeekGames = async () => {
+  try {
+    const currentDate = new Date();
+    const seasonYear = currentDate.getMonth() < 8 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+    const games = await Game.find({
+      'schedule.season_year': seasonYear,
+      event_date: { $gte: currentDate }
+    }).sort('event_date');
+
+    if (games.length === 0) return [];
+
+    const currentWeekNumber = calculateNFLWeek(currentDate, seasonYear);
+    return games.filter(game => {
+      const gameWeek = game.schedule.week || calculateNFLWeek(new Date(game.event_date), seasonYear);
+      return gameWeek === currentWeekNumber;
+    });
+  } catch (error) {
+    console.error('Error fetching current week games:', error);
+    throw error;
+  }
+};
+
+const updateWeekNumbers = async (seasonYear) => {
+  const games = await Game.find({
+    'schedule.season_year': seasonYear,
+    'schedule.week': null
+  });
+
+  for (const game of games) {
+    const weekNumber = calculateNFLWeek(new Date(game.event_date), seasonYear);
+    game.schedule.week = weekNumber;
+    await game.save();
+  }
+
+  console.log(`Updated week numbers for ${games.length} games`);
 };
 
 module.exports = {
@@ -232,5 +265,7 @@ module.exports = {
   getGamesByWeek,
   transformGameData,
   calculateNFLWeek,
-  formatDateISO8601
+  formatDateISO8601,
+  getCurrentWeekGames,
+  updateWeekNumbers
 };
