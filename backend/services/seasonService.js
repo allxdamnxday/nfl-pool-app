@@ -40,12 +40,15 @@ const calculateNFLWeek = (gameDate, seasonYear) => {
   return weekDiff + 1;
 };
 
-// Updated transformGameData function with error handling
+// Updated transformGameData function with week calculation
 const transformGameData = (apiGame) => {
   if (!apiGame) {
     console.error('Received undefined or null apiGame');
     return null;
   }
+
+  const eventDate = new Date(apiGame.date_event);
+  const calculatedWeek = calculateNFLWeek(eventDate, apiGame.season_year);
 
   return {
     event_id: apiGame.event_id,
@@ -71,7 +74,7 @@ const transformGameData = (apiGame) => {
     schedule: {
       season_type: apiGame.season_type,
       season_year: apiGame.season_year,
-      week: apiGame.week || null // Add this if available in the API response
+      week: apiGame.week || calculatedWeek
     }
   };
 };
