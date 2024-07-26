@@ -47,7 +47,7 @@ const GameSchema = new mongoose.Schema({
     conference_competition: Boolean,
     season_type: String,
     season_year: Number,
-    week: Number,
+    week: Number, // Added week field
     week_name: String,
     week_detail: String,
     event_name: String,

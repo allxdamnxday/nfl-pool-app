@@ -9,8 +9,13 @@ const authHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const addPick = async (entryId, pickData) => {
-  const response = await axios.post(`${API_URL}/entries/${entryId}/picks`, pickData, { headers: authHeader() });
+export const addPick = async (entryId, team) => {
+  const response = await axios.post(`${API_URL}/entries/${entryId}/picks`, { team }, { headers: authHeader() });
+  return response.data.data;
+};
+
+export const getGamesForWeek = async () => {
+  const response = await axios.get(`${API_URL}/games/current-week`, { headers: authHeader() });
   return response.data.data;
 };
 

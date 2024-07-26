@@ -1,50 +1,50 @@
 // frontend/src/components/Picks.jsx
 
 import React, { useState, useEffect } from 'react';
-import { getUserEntries } from '../services/entryService';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { getCurrentWeekGames } from '../services/gameService';
 import { addPick } from '../services/pickService';
 import { useToast } from '../contexts/ToastContext';
 
 function Picks() {
-  const [entries, setEntries] = useState([]);
-  const [selectedEntry, setSelectedEntry] = useState('');
+  const [games, setGames] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const { entryId } = useParams();
   const showToast = useToast();
-
-  // This is a placeholder. In a real application, you'd fetch this from your backend.
-  const teams = ['Team A', 'Team B', 'Team C', 'Team D']; 
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEntries = async () => {
+    const fetchGames = async () => {
       try {
-        const fetchedEntries = await getUserEntries();
-        const activeEntries = fetchedEntries.filter(entry => entry.isActive);
-        setEntries(activeEntries);
+        const fetchedGames = await getCurrentWeekGames();
+        setGames(fetchedGames);
         setLoading(false);
       } catch (error) {
-        console.error('Failed to fetch entries:', error);
-        showToast('Failed to load entries. Please try again later.', 'error');
+        console.error('Failed to fetch games:', error);
+        showToast('Failed to load games. Please try again later.', 'error');
         setLoading(false);
       }
     };
 
-    fetchEntries();
+    fetchGames();
   }, [showToast]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedEntry || !selectedTeam) {
-      showToast('Please select an entry and a team', 'error');
+  const handleSubmitPick = async () => {
+    if (!selectedTeam) {
+      showToast('Please select a team', 'error');
       return;
     }
 
+    setShowConfirmation(true);
+  };
+
+  const confirmPick = async () => {
     try {
-      await addPick(selectedEntry, { team: selectedTeam });
-      showToast('Pick successfully submitted', 'success');
-      // Reset form
-      setSelectedEntry('');
-      setSelectedTeam('');
+      await addPick(entryId, selectedTeam);
+      showToast('Pick submitted successfully', 'success');
+      navigate(`/entries/${entryId}`);
     } catch (error) {
       console.error('Failed to submit pick:', error);
       showToast('Failed to submit pick. Please try again.', 'error');
@@ -52,49 +52,86 @@ function Picks() {
   };
 
   if (loading) {
-    return <div className="text-center text-white">Loading...</div>;
+    return <div className="text-center text-white">Loading games...</div>;
   }
 
-  if (entries.length === 0) {
-    return <div className="text-center text-white">You don't have any active entries to make picks for.</div>;
+  if (games.length === 0) {
+    return (
+      <div className="text-center text-white">
+        <p>No games available for picking at this time.</p>
+        <Link to={`/entries/${entryId}`} className="text-blue-400 hover:underline">
+          Return to Entry Details
+        </Link>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl font-bold mb-6">Make a Pick</h1>
-      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-        <div className="mb-4">
-          <label htmlFor="entry" className="block mb-2">Select Entry:</label>
-          <select
-            id="entry"
-            value={selectedEntry}
-            onChange={(e) => setSelectedEntry(e.target.value)}
-            className="w-full p-2 bg-gray-800 rounded"
-          >
-            <option value="">Select an entry</option>
-            {entries.map((entry) => (
-              <option key={entry._id} value={entry._id}>{entry.pool.name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="team" className="block mb-2">Select Team:</label>
-          <select
-            id="team"
-            value={selectedTeam}
-            onChange={(e) => setSelectedTeam(e.target.value)}
-            className="w-full p-2 bg-gray-800 rounded"
-          >
-            <option value="">Select a team</option>
-            {teams.map((team) => (
-              <option key={team} value={team}>{team}</option>
-            ))}
-          </select>
-        </div>
-        <button type="submit" className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600">
+      <h1 className="text-3xl font-bold mb-6">Make Your Pick</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {games.map((game) => (
+          <div key={game._id} className="bg-gray-800 shadow-md rounded-lg p-6">
+            <p className="text-lg font-semibold mb-2">{game.awayTeam} @ {game.homeTeam}</p>
+            <p className="text-sm text-gray-400 mb-2">Date: {new Date(game.date).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-400 mb-4">Kickoff: {new Date(game.date).toLocaleTimeString()}</p>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setSelectedTeam(game.awayTeam)}
+                className={`px-4 py-2 rounded ${
+                  selectedTeam === game.awayTeam ? 'bg-purple-600' : 'bg-gray-600'
+                } hover:bg-purple-500 transition duration-300`}
+              >
+                {game.awayTeam}
+              </button>
+              <button
+                onClick={() => setSelectedTeam(game.homeTeam)}
+                className={`px-4 py-2 rounded ${
+                  selectedTeam === game.homeTeam ? 'bg-purple-600' : 'bg-gray-600'
+                } hover:bg-purple-500 transition duration-300`}
+              >
+                {game.homeTeam}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 flex justify-between">
+        <Link
+          to={`/entries/${entryId}`}
+          className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition duration-300"
+        >
+          Back to Entry
+        </Link>
+        <button
+          onClick={handleSubmitPick}
+          className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-300"
+        >
           Submit Pick
         </button>
-      </form>
+      </div>
+
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-gray-800 p-6 rounded-lg">
+            <p className="mb-4">Are you sure you want to pick {selectedTeam}?</p>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPick}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+              >
+                Confirm Pick
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

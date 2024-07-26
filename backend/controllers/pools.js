@@ -124,20 +124,29 @@ exports.getUserActivePools = asyncHandler(async (req, res, next) => {
 });
 
 exports.getUserPools = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
-  console.log('Requested userId:', userId);
-  console.log('Authenticated user:', req.user);
-  
-  if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(req.user.id)) {
-    return next(new ErrorResponse(`Invalid user ID`, 400));
-  }
-  
-  if (req.user.id.toString() !== userId) {
-    return next(new ErrorResponse(`Not authorized to access this route`, 403));
-  }
-  
+  const userId = req.user.id;
+  console.log('Fetching pools for user:', userId);
+
   const userPools = await Pool.find({ participants: userId });
-  res.status(200).json({ success: true, count: userPools.length, data: userPools });
+  
+  // Calculate active entries for each pool
+  const poolsWithEntries = await Promise.all(userPools.map(async (pool) => {
+    const activeEntries = await Entry.countDocuments({ 
+      pool: pool._id, 
+      user: userId,
+      isActive: true
+    });
+    return {
+      ...pool.toObject(),
+      activeEntries
+    };
+  }));
+
+  res.status(200).json({ 
+    success: true, 
+    count: poolsWithEntries.length, 
+    data: poolsWithEntries 
+  });
 });
 
 exports.getAvailablePools = asyncHandler(async (req, res, next) => {

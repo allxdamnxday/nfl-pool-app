@@ -9,7 +9,9 @@ const {
   getWeekGames,
   createGame,
   updateGameData,
-  initializeSeasonData
+  initializeSeasonData,
+  getCurrentWeekGames,
+  getGamesForWeek
 } = require('../controllers/games');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -282,6 +284,68 @@ router.use(authorize('admin'));
 
 router.post('/update', updateGameData);
 router.post('/initialize-season', initializeSeasonData);
+
+/**
+ * @swagger
+ * /api/v1/games/current-week:
+ *   get:
+ *     summary: Get games for the current week
+ *     tags: [Games]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of games for the current week
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Game'
+ */
+router.route('/current-week').get(protect, getCurrentWeekGames);
+
+/**
+ * @swagger
+ * /api/v1/games/week:
+ *   get:
+ *     summary: Get games for a specific week
+ *     tags: [Games]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Date for which to fetch games
+ *     responses:
+ *       200:
+ *         description: List of games for the specified week
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Game'
+ */
+router.route('/week').get(protect, getGamesForWeek);
 
 module.exports = router;
 

@@ -1,19 +1,22 @@
 // frontend/src/services/gameService.js
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:5000/api/v1/games'; // Update this if your backend URL is different
-
-const authHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+export const getGamesForWeek = async (date) => {
+  try {
+    const response = await api.get(`/games/week?date=${date}`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching games:', error);
+    throw error;
+  }
 };
 
-export const getGames = async () => {
-  const response = await axios.get(API_URL, { headers: authHeader() });
-  return response.data.data;
-};
-
-export const getGameDetails = async (gameId) => {
-  const response = await axios.get(`${API_URL}/${gameId}`, { headers: authHeader() });
-  return response.data.data;
+export const getCurrentWeekGames = async () => {
+  try {
+    const response = await api.get('/games/current-week');
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching current week games:', error);
+    throw error;
+  }
 };

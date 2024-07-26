@@ -3,6 +3,7 @@ const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const rundownApi = require('../services/rundownApiService');
 const seasonService = require('../services/seasonService');
+const gameService = require('../services/gameService');
 
 // @desc    Fetch games from The Rundown API and store in database
 // @route   POST /api/v1/games/fetch
@@ -239,7 +240,39 @@ exports.initializeSeasonData = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, message: 'Season data initialized successfully' });
 });
 
-// Update the module exports to include all functions
+// @desc    Get games for the current week
+// @route   GET /api/v1/games/current-week
+// @access  Private
+exports.getCurrentWeekGames = asyncHandler(async (req, res, next) => {
+  const currentDate = new Date().toISOString().split('T')[0];
+  const games = await gameService.fetchGamesForDate(currentDate);
+  
+  res.status(200).json({
+    success: true,
+    count: games.length,
+    data: games
+  });
+});
+
+// @desc    Get games for a specific week
+// @route   GET /api/v1/games/week
+// @access  Private
+exports.getGamesForWeek = asyncHandler(async (req, res, next) => {
+  const { date } = req.query;
+  
+  if (!date) {
+    return next(new ErrorResponse('Please provide a date', 400));
+  }
+
+  const games = await gameService.fetchGamesForDate(date);
+  
+  res.status(200).json({
+    success: true,
+    count: games.length,
+    data: games
+  });
+});
+
 module.exports = {
   fetchGames: exports.fetchGames,
   getGames: exports.getGames,
@@ -250,5 +283,7 @@ module.exports = {
   filterGames: exports.filterGames,
   createGame: exports.createGame,
   updateGameData: exports.updateGameData,
-  initializeSeasonData: exports.initializeSeasonData
+  initializeSeasonData: exports.initializeSeasonData,
+  getCurrentWeekGames: exports.getCurrentWeekGames,
+  getGamesForWeek: exports.getGamesForWeek
 };

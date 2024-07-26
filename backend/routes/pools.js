@@ -32,7 +32,7 @@ router.use(protect);
 router.get('/available', getAvailablePools);
 
 router.get('/user/:userId/active', getUserActivePools);
-router.get('/user/:userId', getUserPools);
+router.get('/user', getUserPools);
 
 router.post('/', authorize('admin'), createPool);
 
