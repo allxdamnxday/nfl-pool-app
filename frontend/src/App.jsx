@@ -54,7 +54,15 @@ function App() {
                 } 
               />
               <Route 
-                path="/entries/:entryId/pick" 
+                path="/entries/:entryId/picks" 
+                element={
+                  <ProtectedRoute>
+                    <Picks />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/entries/:entryId/picks/:week" 
                 element={
                   <ProtectedRoute>
                     <Picks />

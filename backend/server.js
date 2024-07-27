@@ -46,9 +46,11 @@ app.use(limiter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Route files
+const seasonRoutes = require('./routes/season');
+
 const auth = require('./routes/auth');
 const pools = require('./routes/pools');
-const picks = require('./routes/picks');
+const pickRoutes = require('./routes/picks');
 const games = require('./routes/games');
 const admin = require('./routes/admin');
 const entries = require('./routes/entries');
@@ -56,12 +58,12 @@ const requests = require('./routes/requests');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/season', seasonRoutes);
 app.use('/api/v1/pools', pools);
-app.use('/api/v1/pools/:poolId/picks', picks);
-app.use('/api/v1/picks', picks);
 app.use('/api/v1/games', games);
 app.use('/api/v1/admin', admin);
 app.use('/api/v1/entries', entries);
+app.use('/api/v1/entries/:entryId/picks', pickRoutes); // Use the pickRoutes here
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 

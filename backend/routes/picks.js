@@ -1,38 +1,22 @@
 // routes/picks.js
 const express = require('express');
-const { addPick, getPicksForPool, getPickForWeek, updatePick } = require('../controllers/picks');
+const { 
+  addOrUpdatePick, 
+  getPicksForEntry,  // This should be the correct function name
+  getPickForWeek 
+} = require('../controllers/entries');  // Make sure this path is correct
 const { protect } = require('../middleware/auth');
+const checkGameStart = require('../middleware/checkGameStart');
 
 const router = express.Router({ mergeParams: true });
 
-/**
- * @route GET /picks
- * @desc Get all picks for a pool
- * @access Private
- */
+// Get all picks for an entry
 router.route('/')
-  .get(protect, getPicksForPool)
-  /**
-   * @route POST /picks
-   * @desc Add a new pick
-   * @access Private
-   */
-  .post(protect, addPick);
+  .get(protect, getPicksForEntry)
+  .post(protect, checkGameStart, addOrUpdatePick);
 
-/**
- * @route GET /picks/:week
- * @desc Get pick for a specific week
- * @access Private
- */
+// Get pick for a specific week
 router.route('/:week')
   .get(protect, getPickForWeek);
-
-/**
- * @route PUT /picks/:id
- * @desc Update a pick
- * @access Private
- */
-router.route('/:id')
-  .put(protect, updatePick);
 
 module.exports = router;

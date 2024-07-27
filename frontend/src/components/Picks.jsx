@@ -1,57 +1,75 @@
 // frontend/src/components/Picks.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getGamesForWeek } from '../services/gameService';
-import { addPick } from '../services/pickService';
+import { useParams } from 'react-router-dom';
+import { getGamesForWeek, addOrUpdatePick, getPickForWeek } from '../services/pickService';
+import { getCurrentWeekNumber } from '../services/seasonService';
 import { useToast } from '../contexts/ToastContext';
-import { getCurrentNFLWeek } from '../utils/nflWeekCalculator';
 import { FaCalendarAlt, FaClock } from 'react-icons/fa';
 
 function Picks() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentWeek, setCurrentWeek] = useState(1);
-  const [currentSeason, setCurrentSeason] = useState(2024);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [currentPick, setCurrentPick] = useState(null);
+  const [currentWeek, setCurrentWeek] = useState(null);
+  const [seasonYear, setSeasonYear] = useState(null);
   const { entryId } = useParams();
   const showToast = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const { week, season } = getCurrentNFLWeek();
-    setCurrentWeek(week);
-    setCurrentSeason(season);
-  }, []);
-
-  useEffect(() => {
-    const fetchGames = async () => {
+    const fetchData = async () => {
       try {
-        const fetchedGames = await getGamesForWeek(currentWeek, currentSeason);
-        setGames(fetchedGames);
-        setLoading(false);
+        const { week, seasonYear } = await getCurrentWeekNumber();
+        setCurrentWeek(week);
+        setSeasonYear(seasonYear);
+        const [gamesData, pickData] = await Promise.all([
+          getGamesForWeek(seasonYear, week),
+          getPickForWeek(entryId, week)
+        ]);
+        setGames(gamesData);
+        if (pickData) {
+          setCurrentPick(pickData.team);
+          setSelectedTeam(pickData.team);
+        } else {
+          setCurrentPick(null);
+          setSelectedTeam(null);
+        }
       } catch (error) {
-        console.error('Failed to fetch games:', error);
-        showToast('Failed to load games. Please try again later.', 'error');
+        console.error('Error fetching data:', error);
+        showToast('Failed to load data. Please try again.', 'error');
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchGames();
-  }, [currentWeek, currentSeason, showToast]);
+    fetchData();
+  }, [entryId, showToast]);
 
-  const handleSubmitPick = async (teamId) => {
+  const handlePickClick = (team) => {
+    setSelectedTeam(team);
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmPick = async () => {
     try {
-      await addPick(entryId, teamId, currentWeek);
+      const updatedPick = await addOrUpdatePick(entryId, selectedTeam, currentWeek);
+      setCurrentPick(updatedPick);
       showToast('Pick submitted successfully', 'success');
-      navigate(`/entries/${entryId}`);
+      setShowConfirmation(false);
     } catch (error) {
-      console.error('Failed to submit pick:', error);
+      console.error('Error submitting pick:', error);
       showToast('Failed to submit pick. Please try again.', 'error');
     }
   };
 
   if (loading) {
-    return <div className="text-center text-white">Loading games...</div>;
+    return <div className="text-center text-white">Loading...</div>;
+  }
+
+  if (games.length === 0) {
+    return <div className="text-center text-white">No games scheduled for the current week.</div>;
   }
 
   return (
@@ -76,10 +94,10 @@ function Picks() {
                   <h2 className="text-2xl font-bold mb-2">{game.away_team}</h2>
                   <p className="text-gray-400">{game.away_team_record || '0-0'}</p>
                   <button
-                    onClick={() => handleSubmitPick(game.away_team_id)}
-                    className="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition duration-300"
+                    onClick={() => handlePickClick(game.away_team)}
+                    className={`mt-4 ${currentPick && currentPick === game.away_team ? 'bg-green-600' : 'bg-purple-600'} hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition duration-300`}
                   >
-                    Pick {game.away_team}
+                    {currentPick && currentPick === game.away_team ? 'Current Pick' : `Pick ${game.away_team}`}
                   </button>
                 </div>
                 <div className="text-4xl font-bold">VS</div>
@@ -87,10 +105,10 @@ function Picks() {
                   <h2 className="text-2xl font-bold mb-2">{game.home_team}</h2>
                   <p className="text-gray-400">{game.home_team_record || '0-0'}</p>
                   <button
-                    onClick={() => handleSubmitPick(game.home_team_id)}
-                    className="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition duration-300"
+                    onClick={() => handlePickClick(game.home_team)}
+                    className={`mt-4 ${currentPick && currentPick === game.home_team ? 'bg-green-600' : 'bg-purple-600'} hover:bg-purple-700 text-white font-bold py-3 px-6 rounded transition duration-300`}
                   >
-                    Pick {game.home_team}
+                    {currentPick && currentPick === game.home_team ? 'Current Pick' : `Pick ${game.home_team}`}
                   </button>
                 </div>
               </div>
@@ -98,14 +116,28 @@ function Picks() {
           </div>
         ))}
       </div>
-      {games.length === 0 ? (
-        <div className="text-center">
-          <p>No games available for picking at this time.</p>
-          <Link to={`/entries/${entryId}`} className="text-blue-400 hover:underline">
-            Return to Entry Details
-          </Link>
+
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-gray-800 p-6 rounded-lg">
+            <p className="mb-4">Are you sure you want to pick {selectedTeam}?</p>
+            <div className="flex justify-between">
+              <button
+                onClick={() => setShowConfirmation(false)}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmPick}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300"
+              >
+                Confirm Pick
+              </button>
+            </div>
+          </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

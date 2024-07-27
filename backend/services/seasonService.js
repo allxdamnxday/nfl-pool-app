@@ -33,12 +33,13 @@ const updateStoredSeasonYear = async (year) => {
 };
 
 // Function to calculate NFL week number (as a fallback)
-const calculateNFLWeek = (gameDate, seasonYear) => {
+const calculateNFLWeek = (date, seasonYear) => {
   const seasonStart = new Date(seasonYear, 8, 1); // September 1st
-  seasonStart.setDate(seasonStart.getDate() + (9 - seasonStart.getDay()) % 7); // First Tuesday after first Monday
+  seasonStart.setDate(seasonStart.getDate() + (4 - seasonStart.getDay() + 7) % 7); // First Thursday after September 1st
 
-  const weekDiff = Math.floor((gameDate - seasonStart) / (7 * 24 * 60 * 60 * 1000));
-  return weekDiff + 1;
+  const timeDiff = date.getTime() - seasonStart.getTime();
+  const dayDiff = timeDiff / (1000 * 3600 * 24);
+  return Math.floor(dayDiff / 7) + 1;
 };
 
 // Updated transformGameData function with week calculation
@@ -222,19 +223,39 @@ const getGamesByWeek = async (seasonYear, weekNumber) => {
 const getCurrentWeekGames = async () => {
   try {
     const currentDate = new Date();
-    const seasonYear = currentDate.getMonth() < 8 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+    console.log('Current date:', currentDate);
+
+    // If we're in January or February, it's still the previous year's season
+    const seasonYear = currentDate.getMonth() < 2 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+    console.log('Season year:', seasonYear);
+
     const games = await Game.find({
       'schedule.season_year': seasonYear,
       event_date: { $gte: currentDate }
     }).sort('event_date');
 
-    if (games.length === 0) return [];
+    console.log('Games found:', games.length);
+
+    if (games.length === 0) {
+      console.log('No games found for the current season year and date');
+      return [];
+    }
 
     const currentWeekNumber = calculateNFLWeek(currentDate, seasonYear);
-    return games.filter(game => {
+    console.log('Calculated week number:', currentWeekNumber);
+
+    // If it's before the season starts or the calculated week is negative, use Week 1
+    const weekToUse = currentWeekNumber <= 0 ? 1 : currentWeekNumber;
+    console.log('Week to use:', weekToUse);
+
+    const filteredGames = games.filter(game => {
       const gameWeek = game.schedule.week || calculateNFLWeek(new Date(game.event_date), seasonYear);
-      return gameWeek === currentWeekNumber;
+      return gameWeek === weekToUse;
     });
+
+    console.log('Filtered games:', filteredGames.length);
+
+    return filteredGames;
   } catch (error) {
     console.error('Error fetching current week games:', error);
     throw error;
@@ -256,6 +277,22 @@ const updateWeekNumbers = async (seasonYear) => {
   console.log(`Updated week numbers for ${games.length} games`);
 };
 
+const getCurrentNFLWeek = async () => {
+  const currentDate = new Date();
+  const seasonStartDate = new Date(currentDate.getFullYear(), 8, 1); // September 1st
+  const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+  
+  let week = Math.floor((currentDate - seasonStartDate) / msPerWeek) + 1;
+  
+  // Ensure week is between 1 and 18
+  week = Math.max(1, Math.min(week, 18));
+
+  return {
+    week,
+    seasonYear: currentDate.getFullYear()
+  };
+};
+
 module.exports = {
   initializeSeasonData,
   updateGameData,
@@ -267,5 +304,6 @@ module.exports = {
   calculateNFLWeek,
   formatDateISO8601,
   getCurrentWeekGames,
-  updateWeekNumbers
+  updateWeekNumbers,
+  getCurrentNFLWeek
 };

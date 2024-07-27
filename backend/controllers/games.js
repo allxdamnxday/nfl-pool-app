@@ -7,10 +7,15 @@ const seasonService = require('../services/seasonService');
 // @route   GET /api/v1/games/current-week
 // @access  Private
 exports.getCurrentWeekGames = asyncHandler(async (req, res, next) => {
+  console.log('Fetching current week games...');
   const games = await seasonService.getCurrentWeekGames();
+  console.log('Games fetched:', games);
+  
   if (!games || games.length === 0) {
+    console.log('No games found for the current week');
     return next(new ErrorResponse('No games found for the current week', 404));
   }
+  
   res.status(200).json({
     success: true,
     count: games.length,

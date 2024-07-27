@@ -8,7 +8,11 @@ const {
   updateEntry,
   deleteEntry,
   requestEntry,
-  approveEntry
+  approveEntry,
+  addOrUpdatePick,
+  getPickForWeek,
+  updatePick,
+  deletePick
 } = require('../controllers/entries');
 const { protect, authorize } = require('../middleware/auth');
 const checkGameStart = require('../middleware/checkGameStart');
@@ -199,5 +203,21 @@ router.route('/:id')
  */
 router.route('/:id/approve')
   .put(protect, authorize('admin'), approveEntry);
+
+// Add or update a pick
+router.route('/:entryId/picks')
+  .post(protect, checkGameStart, addOrUpdatePick);
+
+// Update a pick
+router.route('/:entryId/picks/:pickId')
+  .put(protect, checkGameStart, updatePick);
+
+// Delete a pick
+router.route('/:entryId/picks/:pickId')
+  .delete(protect, checkGameStart, deletePick);
+
+// Get a pick for a specific week
+router.route('/:entryId/picks/:week')
+  .get(protect, getPickForWeek);
 
 module.exports = router;

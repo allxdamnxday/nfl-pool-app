@@ -4,49 +4,6 @@ const Game = require('../models/Game');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
-// @desc    Create new pick
-// @route   POST /api/v1/entries/:entryId/picks
-// @access  Private
-exports.addPick = asyncHandler(async (req, res, next) => {
-  const entry = await Entry.findById(req.params.entryId);
-  if (!entry) {
-    return next(new ErrorResponse(`No entry with the id of ${req.params.entryId}`, 404));
-  }
-
-  // Check if the entry is active
-  if (!entry.isActive) {
-    return next(new ErrorResponse(`This entry is not active`, 400));
-  }
-
-  // Check if user is the owner of the entry
-  if (entry.user.toString() !== req.user.id) {
-    return next(new ErrorResponse(`User not authorized to add pick to this entry`, 401));
-  }
-
-  const game = await Game.findById(req.body.game);
-  if (!game) {
-    return next(new ErrorResponse(`No game with the id of ${req.body.game}`, 404));
-  }
-
-  // Check if user has already made a pick for this week in this entry
-  const existingPick = entry.picks.find(pick => pick.weekNumber === game.schedule.week);
-  if (existingPick) {
-    return next(new ErrorResponse(`User has already made a pick for week ${game.schedule.week}`, 400));
-  }
-
-  entry.picks.push({
-    game: req.body.game,
-    team: req.body.team,
-    weekNumber: game.schedule.week
-  });
-
-  await entry.save();
-
-  res.status(201).json({
-    success: true,
-    data: entry
-  });
-});
 
 // @desc    Get picks for a pool
 // @route   GET /api/v1/pools/:poolId/picks
@@ -71,14 +28,17 @@ exports.getPicksForPool = asyncHandler(async (req, res, next) => {
 // @route   GET /api/v1/entries/:entryId/picks/:week
 // @access  Private
 exports.getPickForWeek = asyncHandler(async (req, res, next) => {
-  const entry = await Entry.findById(req.params.entryId);
+  const { entryId, week } = req.params;
+  
+  const entry = await Entry.findById(entryId);
   if (!entry) {
-    return next(new ErrorResponse(`No entry with the id of ${req.params.entryId}`, 404));
+    return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
   }
 
-  const pick = entry.picks.find(pick => pick.weekNumber === parseInt(req.params.week));
+  const pick = entry.picks.find(p => p.weekNumber === parseInt(week));
+  
   if (!pick) {
-    return next(new ErrorResponse(`No pick found for week ${req.params.week}`, 404));
+    return next(new ErrorResponse(`No pick found for week ${week}`, 404));
   }
 
   res.status(200).json({

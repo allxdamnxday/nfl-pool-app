@@ -19,19 +19,21 @@ const EntrySchema = new mongoose.Schema({
   eliminatedWeek: {
     type: Number,
     default: null
-  }
+  },
+  picks: [{
+    week: {
+      type: Number,
+      required: true
+    },
+    team: {
+      type: String,
+      required: true
+    }
+  }]
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
-});
-
-// Virtual for picks
-EntrySchema.virtual('picks', {
-  ref: 'Pick',
-  localField: '_id',
-  foreignField: 'entry',
-  justOne: false
 });
 
 module.exports = mongoose.model('Entry', EntrySchema);

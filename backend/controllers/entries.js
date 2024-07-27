@@ -199,3 +199,128 @@ exports.createEntry = asyncHandler(async (req, res, next) => {
     data: approvedRequest
   });
 });
+
+// @desc    Add or update a pick for an entry
+// @route   POST /api/v1/entries/:entryId/picks
+// @access  Private
+exports.addOrUpdatePick = asyncHandler(async (req, res, next) => {
+  const { entryId } = req.params;
+  const { team, week } = req.body;
+
+  const entry = await Entry.findById(entryId);
+  if (!entry) {
+    return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
+  }
+
+  // Check if a pick for this week already exists
+  let pickIndex = entry.picks.findIndex(p => p.week === parseInt(week));
+  
+  if (pickIndex !== -1) {
+    // Update existing pick
+    entry.picks[pickIndex].team = team;
+  } else {
+    // Add new pick
+    entry.picks.push({ team, week: parseInt(week) });
+  }
+
+  await entry.save();
+
+  res.status(200).json({
+    success: true,
+    data: entry.picks.find(p => p.week === parseInt(week))
+  });
+});
+
+
+// @desc    Get a pick for an entry and week
+// @route   GET /api/v1/entries/:entryId/picks/:week
+// @access  Private
+exports.getPickForWeek = asyncHandler(async (req, res, next) => {
+  const { entryId, week } = req.params;
+  
+  const entry = await Entry.findById(entryId);
+  if (!entry) {
+    return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
+  }
+
+  const pick = entry.picks.find(p => p.week === parseInt(week));
+  
+  if (!pick) {
+    // Instead of throwing an error, return null or an empty object
+    return res.status(200).json({
+      success: true,
+      data: null
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: pick
+  });
+});
+
+// @desc    Update pick
+// @route   PUT /api/v1/entries/:entryId/picks/:pickId
+// @access  Private
+exports.updatePick = asyncHandler(async (req, res, next) => {
+  const { entryId, pickId } = req.params;
+  const { team } = req.body;
+
+  const entry = await Entry.findById(entryId);
+  if (!entry) {
+    return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
+  }
+
+  const pick = entry.picks.id(pickId);
+  if (!pick) {
+    return next(new ErrorResponse(`No pick found with id ${pickId}`, 404));
+  }
+
+  pick.team = team;
+  await entry.save();
+
+  res.status(200).json({
+    success: true,
+    data: pick
+  });
+});
+
+// @desc    Delete pick
+// @route   DELETE /api/v1/entries/:entryId/picks/:pickId
+// @access  Private
+exports.deletePick = asyncHandler(async (req, res, next) => {
+  const { entryId, pickId } = req.params;
+
+  const entry = await Entry.findById(entryId);
+  if (!entry) {
+    return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
+  }
+
+  const pick = entry.picks.id(pickId);
+  if (!pick) { 
+    return next(new ErrorResponse(`No pick found with id ${pickId}`, 404));
+  }
+
+  entry.picks.pull(pickId);
+  await entry.save();
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
+// Get all picks for an entry
+exports.getPicksForEntry = asyncHandler(async (req, res, next) => {
+  const { entryId } = req.params;
+  
+  const entry = await Entry.findById(entryId);
+  if (!entry) {
+    return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    data: entry.picks
+  });
+});
