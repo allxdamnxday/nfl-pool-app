@@ -1,51 +1,73 @@
 // frontend/src/services/entryService.js
-
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/v1';
-
-const authHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+import api from './api';
 
 export const getUserEntries = async () => {
   try {
-    const response = await axios.get(`${API_URL}/entries/user`, { headers: authHeader() });
+    const response = await api.get('/entries/user');
     console.log('User entries retrieved:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching user entries:', error.response ? error.response.data : error.message);
+    console.error('Error fetching user entries:', error);
     throw error;
   }
 };
 
 export const getEntry = async (entryId) => {
-  const response = await axios.get(`${API_URL}/entries/${entryId}`, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.get(`/entries/${entryId}`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching entry:', error);
+    throw error;
+  }
 };
 
 export const requestEntry = async (poolId) => {
-  const response = await axios.post(`${API_URL}/pools/${poolId}/request-entry`, {}, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.post(`/pools/${poolId}/request-entry`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error requesting entry:', error);
+    throw error;
+  }
 };
 
 export const getEntriesForPool = async (poolId) => {
-  const response = await axios.get(`${API_URL}/pools/${poolId}/entries`, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.get(`/pools/${poolId}/entries`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching entries for pool:', error);
+    throw error;
+  }
 };
 
 export const updateEntry = async (entryId, entryData) => {
-  const response = await axios.put(`${API_URL}/entries/${entryId}`, entryData, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.put(`/entries/${entryId}`, entryData);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error updating entry:', error);
+    throw error;
+  }
 };
 
 export const getPoolEntries = async (poolId) => {
   try {
-    const response = await axios.get(`${API_URL}/pools/${poolId}/entries`, { headers: authHeader() });
+    const response = await api.get(`/pools/${poolId}/entries`);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching pool entries:', error);
+    throw error;
+  }
+};
+
+export const getUserEntriesWithPicks = async () => {
+  try {
+    const response = await api.get('/user/entries/with-picks');
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching user entries with picks:', error);
     throw error;
   }
 };

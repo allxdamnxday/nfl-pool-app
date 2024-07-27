@@ -324,3 +324,17 @@ exports.getPicksForEntry = asyncHandler(async (req, res, next) => {
     data: entry.picks
   });
 });
+
+// @desc    Get all entries with picks for a user
+// @route   GET /api/v1/entries/user/with-picks
+// @access  Private
+exports.getUserEntriesWithPicks = asyncHandler(async (req, res, next) => {
+  const entries = await Entry.find({ user: req.user.id })
+    .populate('pool', 'name currentWeek')
+    .populate('picks');
+
+  res.status(200).json({
+    success: true,
+    data: entries
+  });
+});

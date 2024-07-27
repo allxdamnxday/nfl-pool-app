@@ -12,7 +12,8 @@ const {
   addOrUpdatePick,
   getPickForWeek,
   updatePick,
-  deletePick
+  deletePick,
+  getUserEntriesWithPicks
 } = require('../controllers/entries');
 const { protect, authorize } = require('../middleware/auth');
 const checkGameStart = require('../middleware/checkGameStart');
@@ -60,6 +61,11 @@ router.route('/user')
  *       404:
  *         description: Pool not found
  */
+
+// backend/routes/entries.js
+
+router.get('/user/with-picks', protect, getUserEntriesWithPicks);
+
 router.route('/:poolId/request-entry')
   .post(protect, requestEntry);
 

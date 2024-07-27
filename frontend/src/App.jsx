@@ -18,6 +18,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import PoolEntries from './components/PoolEntries';
 import AdminDashboard from './components/AdminDashboard';
 import AdminPanel from './components/AdminPanel';
+import UserEntries from './components/UserEntries';
 
 function App() {
   return (
@@ -97,6 +98,7 @@ function App() {
                   </ProtectedAdminRoute>
                 } 
               />
+              <Route path="/user-entries" element={<ProtectedRoute><UserEntries /></ProtectedRoute>} />
             </Routes>
           </Layout>
         </Router>

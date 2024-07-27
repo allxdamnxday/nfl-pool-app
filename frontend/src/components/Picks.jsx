@@ -1,13 +1,14 @@
 // frontend/src/components/Picks.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getGamesForWeek, addOrUpdatePick, getPickForWeek } from '../services/pickService';
 import { getCurrentWeekNumber } from '../services/seasonService';
 import { useToast } from '../contexts/ToastContext';
 import { FaCalendarAlt, FaClock } from 'react-icons/fa';
 
 function Picks() {
+  const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -58,6 +59,8 @@ function Picks() {
       setCurrentPick(updatedPick);
       showToast('Pick submitted successfully', 'success');
       setShowConfirmation(false);
+      console.log('Attempting to navigate to /user-entries'); // Add this line
+      navigate('/user-entries');
     } catch (error) {
       console.error('Error submitting pick:', error);
       showToast('Failed to submit pick. Please try again.', 'error');

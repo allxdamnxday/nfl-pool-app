@@ -54,6 +54,7 @@ const pickRoutes = require('./routes/picks');
 const games = require('./routes/games');
 const admin = require('./routes/admin');
 const entries = require('./routes/entries');
+const userEntries = require('./routes/userEntries');
 const requests = require('./routes/requests');
 
 // Mount routers
@@ -63,6 +64,7 @@ app.use('/api/v1/pools', pools);
 app.use('/api/v1/games', games);
 app.use('/api/v1/admin', admin);
 app.use('/api/v1/entries', entries);
+app.use('/api/v1/user/entries', userEntries);
 app.use('/api/v1/entries/:entryId/picks', pickRoutes); // Use the pickRoutes here
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
