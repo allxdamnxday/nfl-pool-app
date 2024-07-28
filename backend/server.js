@@ -47,6 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Route files
 const seasonRoutes = require('./routes/season');
+const gameRoutes = require('./routes/games');
 
 const auth = require('./routes/auth');
 const pools = require('./routes/pools');

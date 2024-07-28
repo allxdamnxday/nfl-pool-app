@@ -17,12 +17,17 @@ export const addOrUpdatePick = async (entryId, team, week) => {
   }
 };
 
-export const getGamesForWeek = async () => {
+export const getGamesForWeek = async (seasonYear, week) => {
   try {
-    const response = await api.get(`/games/current-week`, { headers: authHeader() });
+    console.log('Fetching games for:', { seasonYear, week });
+    const url = `/games/week/${seasonYear}/${week}`;
+    console.log('Request URL:', url);
+    const response = await api.get(url);
+    console.log('Response:', response.data);
     return response.data.data;
   } catch (error) {
     console.error('Error fetching games for week:', error);
+    console.error('Error response:', error.response?.data);
     if (error.response && error.response.status === 404) {
       return []; // Return an empty array if no games are found
     }
@@ -30,18 +35,16 @@ export const getGamesForWeek = async () => {
   }
 };
 
-export const getPicksForPool = async (poolId) => {
-  const response = await api.get(`/pools/${poolId}/picks`, { headers: authHeader() });
-  return response.data.data;
-};
-
 export const getPickForWeek = async (entryId, week) => {
   try {
-    const response = await api.get(`/entries/${entryId}/picks/${week}`, { headers: authHeader() });
-    return response.data.data; // This might be null if no pick is found
+    const response = await api.get(`/entries/${entryId}/picks/${week}`);
+    return response.data.data;
   } catch (error) {
-    console.error('Error fetching pick:', error);
-    return null;
+    console.error('Error fetching pick for week:', error);
+    if (error.response && error.response.status === 404) {
+      return null; // Return null if no pick is found
+    }
+    throw error;
   }
 };
 

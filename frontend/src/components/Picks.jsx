@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getGamesForWeek, addOrUpdatePick, getPickForWeek } from '../services/pickService';
-import { getCurrentWeekNumber } from '../services/seasonService';
 import { useToast } from '../contexts/ToastContext';
 import { FaCalendarAlt, FaClock } from 'react-icons/fa';
 
@@ -12,23 +11,23 @@ function Picks() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [currentPick, setCurrentPick] = useState(null);
-  const [currentWeek, setCurrentWeek] = useState(null);
-  const [seasonYear, setSeasonYear] = useState(null);
-  const { entryId } = useParams();
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const { entryId, week } = useParams();
   const showToast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { week, seasonYear } = await getCurrentWeekNumber();
-        setCurrentWeek(week);
-        setSeasonYear(seasonYear);
+        const seasonYear = new Date().getFullYear();
+        const weekNumber = parseInt(week) || 1;
+        console.log('Fetching data for:', { seasonYear, weekNumber, entryId });
         const [gamesData, pickData] = await Promise.all([
-          getGamesForWeek(seasonYear, week),
-          getPickForWeek(entryId, week)
+          getGamesForWeek(seasonYear, weekNumber),
+          getPickForWeek(entryId, weekNumber)
         ]);
+        console.log('Fetched games:', gamesData);
+        console.log('Fetched pick:', pickData);
         setGames(gamesData);
         if (pickData) {
           setCurrentPick(pickData.team);
@@ -46,7 +45,7 @@ function Picks() {
     };
 
     fetchData();
-  }, [entryId, showToast]);
+  }, [entryId, week, showToast]);
 
   const handlePickClick = (team) => {
     setSelectedTeam(team);
@@ -55,11 +54,11 @@ function Picks() {
 
   const handleConfirmPick = async () => {
     try {
-      const updatedPick = await addOrUpdatePick(entryId, selectedTeam, currentWeek);
+      const weekNumber = parseInt(week) || 1;
+      const updatedPick = await addOrUpdatePick(entryId, selectedTeam, weekNumber);
       setCurrentPick(updatedPick);
       showToast('Pick submitted successfully', 'success');
       setShowConfirmation(false);
-      console.log('Attempting to navigate to /user-entries'); // Add this line
       navigate('/user-entries');
     } catch (error) {
       console.error('Error submitting pick:', error);
@@ -77,7 +76,7 @@ function Picks() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Make Your Pick - Week {currentWeek}</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center">Make Your Pick - Week {week || 1}</h1>
       <div className="max-w-3xl mx-auto space-y-6">
         {games.map((game) => (
           <div key={game._id} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">

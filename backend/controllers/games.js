@@ -24,14 +24,27 @@ exports.getCurrentWeekGames = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get games for a specific week
-// @route   GET /api/v1/games/week
+// @route   GET /api/v1/games/week/:seasonYear/:week
 // @access  Private
 exports.getGamesForWeek = asyncHandler(async (req, res, next) => {
-  const { week, season_year } = req.query;
+  const { seasonYear, week } = req.params;
+  console.log('Fetching games for:', { seasonYear, week });
+
   const games = await Game.find({
-    'schedule.week': parseInt(week),
-    'schedule.season_year': parseInt(season_year)
+    'schedule.season_year': parseInt(seasonYear),
+    'schedule.week': parseInt(week)
   }).sort('event_date');
+
+  console.log(`Found ${games.length} games`);
+
+  if (games.length === 0) {
+    console.log(`No games found for season ${seasonYear}, week ${week}`);
+    return res.status(404).json({
+      success: false,
+      message: `No games found for season ${seasonYear}, week ${week}`
+    });
+  }
+
   res.status(200).json({
     success: true,
     count: games.length,
