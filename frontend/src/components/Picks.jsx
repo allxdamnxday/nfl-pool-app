@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getGamesForWeek, addOrUpdatePick, getPickForWeek } from '../services/pickService';
 import { useToast } from '../contexts/ToastContext';
-import { FaCalendarAlt, FaClock } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 function Picks() {
   const navigate = useNavigate();
@@ -15,12 +15,13 @@ function Picks() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { entryId, week } = useParams();
   const showToast = useToast();
+  const [currentWeek, setCurrentWeek] = useState(parseInt(week) || 1);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const seasonYear = new Date().getFullYear();
-        const weekNumber = parseInt(week) || 1;
+        const weekNumber = parseInt(currentWeek) || 1;
         console.log('Fetching data for:', { seasonYear, weekNumber, entryId });
         const [gamesData, pickData] = await Promise.all([
           getGamesForWeek(seasonYear, weekNumber),
@@ -45,7 +46,7 @@ function Picks() {
     };
 
     fetchData();
-  }, [entryId, week, showToast]);
+  }, [entryId, currentWeek, showToast]);
 
   const handlePickClick = (team) => {
     setSelectedTeam(team);
@@ -54,7 +55,7 @@ function Picks() {
 
   const handleConfirmPick = async () => {
     try {
-      const weekNumber = parseInt(week) || 1;
+      const weekNumber = parseInt(currentWeek) || 1;
       const updatedPick = await addOrUpdatePick(entryId, selectedTeam, weekNumber);
       setCurrentPick(updatedPick);
       showToast('Pick submitted successfully', 'success');
@@ -63,6 +64,14 @@ function Picks() {
     } catch (error) {
       console.error('Error submitting pick:', error);
       showToast('Failed to submit pick. Please try again.', 'error');
+    }
+  };
+
+  const handleWeekChange = (direction) => {
+    const newWeek = direction === 'next' ? currentWeek + 1 : currentWeek - 1;
+    if (newWeek >= 1 && newWeek <= 18) {  // Assuming NFL season has 18 weeks
+      setCurrentWeek(newWeek);
+      navigate(`/entries/${entryId}/picks/${newWeek}`);
     }
   };
 
@@ -76,7 +85,23 @@ function Picks() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Make Your Pick - Week {week || 1}</h1>
+      <div className="flex justify-between items-center mb-8">
+        <button 
+          onClick={() => handleWeekChange('prev')} 
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full flex items-center"
+          disabled={currentWeek === 1}
+        >
+          <FaArrowLeft className="mr-2" /> Previous Week
+        </button>
+        <h1 className="text-4xl font-bold text-center">Make Your Pick - Week {currentWeek}</h1>
+        <button 
+          onClick={() => handleWeekChange('next')} 
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full flex items-center"
+          disabled={currentWeek === 18}
+        >
+          Next Week <FaArrowRight className="ml-2" />
+        </button>
+      </div>
       <div className="max-w-3xl mx-auto space-y-6">
         {games.map((game) => (
           <div key={game._id} className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
