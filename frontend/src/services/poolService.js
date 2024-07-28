@@ -1,77 +1,90 @@
 // frontend/src/services/poolService.js
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5000/api/v1/pools';
-
-const authHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+import api from './api';
 
 export const getAvailablePools = async () => {
   try {
-    console.log('Fetching available pools from:', `${API_URL}/available`);
-    const response = await axios.get(`${API_URL}/available`, { headers: authHeader() });
-    console.log('Response:', response.data);
-    return response.data.data;
+    const response = await api.get('/pools/available');
+    console.log('Available pools retrieved:', response.data);
+    return response.data.data; // Assuming the API returns { data: [...pools] }
   } catch (error) {
-    console.error('Error fetching available pools:', error.response ? error.response.data : error.message);
-    console.error('Full error object:', error);
+    console.error('Error fetching available pools:', error);
     throw error;
   }
 };
 
-export const getUserActivePools = async (userId) => {
-  const response = await axios.get(`${API_URL}/user/${userId}/active`, { headers: authHeader() });
-  return response.data.data;
+export const getUserActivePools = async () => {
+  try {
+    const response = await api.get('/pools/user/active');
+    console.log('User active pools retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user active pools:', error);
+    throw error;
+  }
 };
 
 export const getPoolDetails = async (poolId) => {
-  const response = await axios.get(`${API_URL}/${poolId}`, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.get(`/pools/${poolId}`);
+    console.log('Pool details retrieved:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching pool details:', error);
+    throw error;
+  }
 };
 
 export const createJoinRequest = async (poolId, numberOfEntries = 1) => {
-  const response = await axios.post(`${API_URL}/${poolId}/join`, { numberOfEntries }, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.post(`/pools/${poolId}/join`, { numberOfEntries });
+    console.log('Join request created:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error creating join request:', error);
+    throw error;
+  }
 };
 
 export const getActivePools = async () => {
-  const response = await axios.get(`${API_URL}?status=active`, { headers: authHeader() });
-  return response.data.data;
-};
-
-export const getActivePool = async () => {
-  const response = await axios.get(`${API_URL}/active`, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.get('/pools?status=active');
+    console.log('Active pools retrieved:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching active pools:', error);
+    throw error;
+  }
 };
 
 export const getAllPools = async () => {
-  const response = await axios.get(API_URL, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.get('/pools');
+    console.log('All pools retrieved:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching all pools:', error);
+    throw error;
+  }
 };
 
 export const createPool = async (poolData) => {
-  const response = await axios.post(API_URL, poolData, { headers: authHeader() });
-  return response.data.data;
-};
-
-export const joinPool = async (poolId) => {
-  const response = await axios.post(`${API_URL}/${poolId}/join`, {}, { headers: authHeader() });
-  return response.data.data;
+  try {
+    const response = await api.post('/pools', poolData);
+    console.log('Pool created:', response.data);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error creating pool:', error);
+    throw error;
+  }
 };
 
 export const getUserPools = async () => {
   try {
-    console.log('Fetching user pools');
-    const response = await axios.get(`${API_URL}/user`, { headers: authHeader() });
-    console.log('User pools response:', response.data);
-    
-    // The backend should now return pools with the correct activeEntries count
+    const response = await api.get('/pools/user');
+    console.log('User pools retrieved:', response.data);
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching user pools:', error.response ? error.response.data : error.message);
-    console.error('Full error object:', error);
+    console.error('Error fetching user pools:', error);
     throw error;
   }
 };

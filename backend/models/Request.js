@@ -17,8 +17,20 @@ const RequestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'payment_pending', 'payment_received', 'approved', 'rejected'],
     default: 'pending'
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['paypal', 'venmo', 'zelle'],
+    required: function() { return this.status === 'payment_pending' || this.status === 'payment_received'; }
+  },
+  paymentAmount: {
+    type: Number,
+    required: function() { return this.status === 'payment_pending' || this.status === 'payment_received'; }
+  },
+  paymentConfirmation: {
+    type: String
   },
   createdAt: {
     type: Date,

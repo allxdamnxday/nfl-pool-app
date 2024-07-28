@@ -4,6 +4,7 @@ const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
 const ErrorResponse = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
+const mongoose = require('mongoose');
 
 // @desc    Create request to join pool
 // @route   POST /api/v1/requests
@@ -48,6 +49,36 @@ exports.createRequest = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Confirm payment for a request
+// @route   PUT /api/v1/requests/:id/confirm-payment
+// @access  Private
+exports.confirmPayment = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const { paymentMethod, paymentAmount, paymentConfirmation } = req.body;
+
+  const request = await Request.findById(id);
+
+  if (!request) {
+    return next(new ErrorResponse(`No request found with id of ${id}`, 404));
+  }
+
+  if (request.user.toString() !== req.user.id) {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to confirm payment for this request`, 401));
+  }
+
+  request.status = 'payment_pending';
+  request.paymentMethod = paymentMethod;
+  request.paymentAmount = paymentAmount;
+  request.paymentConfirmation = paymentConfirmation;
+
+  await request.save();
+
+  res.status(200).json({
+    success: true,
+    data: request
+  });
+});
+
 // @desc    Approve request to join pool
 // @route   PUT /api/v1/requests/:id/approve
 // @access  Private/Admin
@@ -61,45 +92,66 @@ exports.approveRequest = asyncHandler(async (req, res, next) => {
 
   console.log('Request found:', request);
 
-  request.status = 'approved';
-  await request.save();
+  if (request.status !== 'payment_pending') {
+    return next(new ErrorResponse(`Request ${req.params.id} is not ready for approval`, 400));
+  }
 
-  // Find the pool without changing its status
+  // Find the pool
   const pool = await Pool.findById(request.pool);
   if (!pool) {
     return next(new ErrorResponse(`No pool found with id of ${request.pool}`, 404));
   }
 
-  // Add user to participants array if not already present
-  if (!pool.participants.includes(request.user)) {
-    pool.participants.push(request.user);
+  // Check if there's enough space in the pool
+  const currentEntries = await Entry.countDocuments({ pool: pool._id });
+  if (currentEntries + request.numberOfEntries > pool.maxParticipants) {
+    return next(new ErrorResponse(`Not enough space in the pool for ${request.numberOfEntries} new entries`, 400));
   }
 
-  await pool.save();
+  // Start a transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  // Create Entries for the user
-  const entries = [];
-  for (let i = 0; i < request.numberOfEntries; i++) {
-    try {
+  try {
+    // Update request status
+    request.status = 'approved';
+    await request.save({ session });
+
+    // Add user to participants array if not already present
+    if (!pool.participants.includes(request.user)) {
+      pool.participants.push(request.user);
+      await pool.save({ session });
+    }
+
+    // Create Entries for the user
+    const entries = [];
+    for (let i = 0; i < request.numberOfEntries; i++) {
       console.log(`Creating entry ${i + 1} for user ${request.user} in pool ${request.pool}`);
-      const entry = await Entry.create({
+      const entry = await Entry.create([{
         user: request.user,
         pool: request.pool,
         isActive: true
-      });
-      entries.push(entry);
-      console.log(`Entry ${i + 1} created:`, entry);
-    } catch (error) {
-      console.error(`Failed to create entry ${i + 1}:`, error);
+      }], { session });
+      entries.push(entry[0]);
     }
+
+    // Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    console.log('Entries created:', entries);
+
+    res.status(200).json({
+      success: true,
+      data: { request, entries }
+    });
+  } catch (error) {
+    // If an error occurred, abort the transaction and roll back any changes
+    await session.abortTransaction();
+    session.endSession();
+    console.error('Error in approveRequest:', error);
+    return next(new ErrorResponse('Failed to approve request', 500));
   }
-
-  console.log('Entries created:', entries);
-
-  res.status(200).json({
-    success: true,
-    data: { request, entries }
-  });
 });
 
 // @desc    Get all requests

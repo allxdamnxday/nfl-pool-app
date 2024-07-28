@@ -19,6 +19,7 @@ import PoolEntries from './components/PoolEntries';
 import AdminDashboard from './components/AdminDashboard';
 import AdminPanel from './components/AdminPanel';
 import UserEntries from './components/UserEntries';
+import PaymentPage from './components/PaymentPage';
 
 function App() {
   return (
@@ -87,6 +88,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <JoinPool />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/payment" 
+                element={
+                  <ProtectedRoute>
+                    <PaymentPage />
                   </ProtectedRoute>
                 } 
               />

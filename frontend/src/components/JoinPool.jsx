@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPoolDetails } from '../services/poolService';
-import { createRequest } from '../services/requestService';
 import { useToast } from '../contexts/ToastContext';
+import logger from '../utils/logger'; // Add this import
 
 function JoinPool() {
   const [pool, setPool] = useState(null);
@@ -32,16 +32,20 @@ function JoinPool() {
     fetchPoolDetails();
   }, [poolId, showToast]);
 
-  const handleJoinRequest = async (e) => {
+  
+  const handleJoinRequest = (e) => {
     e.preventDefault();
-    try {
-      await createRequest(poolId, numberOfEntries);
-      showToast('Join request submitted successfully!', 'success');
-      navigate('/dashboard');
-    } catch (err) {
-      showToast('Failed to submit join request. Please try again.', 'error');
-    }
+    logger.info(`Initiating join request for pool ${poolId} with ${numberOfEntries} entries`);
+    navigate('/payment', { 
+      state: { 
+        poolId, 
+        numberOfEntries, 
+        entryFee: pool?.entryFee, 
+        totalAmount: numberOfEntries * (pool?.entryFee || 0) 
+      } 
+    });
   };
+
 
   if (loading) return <div className="text-center text-white">Loading pool details...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;

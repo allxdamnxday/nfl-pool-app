@@ -6,7 +6,8 @@ const {
   approveRequest, 
   getRequests, 
   getPoolRequests, 
-  getUserRequests 
+  getUserRequests,
+  confirmPayment
 } = require('../controllers/requests');
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.put('/:id/approve', protect, authorize('admin'), approveRequest);
 router.get('/', protect, authorize('admin'), getRequests);
 router.get('/pool/:poolId', protect, authorize('admin'), getPoolRequests);
 router.get('/user', protect, getUserRequests);
+router.put('/:id/confirm-payment', protect, confirmPayment);
 
 module.exports = router;

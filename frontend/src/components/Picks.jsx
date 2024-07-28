@@ -58,7 +58,11 @@ function Picks() {
       navigate('/user-entries');
     } catch (error) {
       console.error('Error submitting pick:', error);
-      showToast('Failed to submit pick. Please try again.', 'error');
+      if (error.response && error.response.data && error.response.data.error) {
+        showToast(error.response.data.error, 'error');
+      } else {
+        showToast('Failed to submit pick. Please try again.', 'error');
+      }
     }
   };
 
@@ -86,7 +90,7 @@ function Picks() {
           className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded flex items-center transition-colors duration-200"
           disabled={currentWeek === 1}
         >
-          <FaArrowLeft className="mr-2" /> Previous Week
+          <FaArrowLeft className="mr-2" /> Previous Week-
         </button>
         <h1 className="text-4xl font-bold text-center text-purple-400 shadow-text">Make Your Pick - Week {currentWeek}</h1>
         <button 

@@ -207,14 +207,30 @@ exports.addOrUpdatePick = asyncHandler(async (req, res, next) => {
   const { entryId } = req.params;
   const { team, week } = req.body;
 
-  const entry = await Entry.findById(entryId);
+  const entry = await Entry.findById(entryId).populate('pool');
   if (!entry) {
     return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
+  }
+
+  // Make sure user owns entry
+  if (entry.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this entry`, 401));
+  }
+
+  // Check if the week is valid for the current season
+  if (week < 1 || week > entry.pool.numberOfWeeks) {
+    return next(new ErrorResponse(`Invalid week number`, 400));
   }
 
   // Check if a pick for this week already exists
   let pickIndex = entry.picks.findIndex(p => p.week === parseInt(week));
   
+  // Check if the team has already been picked this season
+  const teamAlreadyPicked = entry.picks.some(p => p.team === team && p.week !== parseInt(week));
+  if (teamAlreadyPicked) {
+    return next(new ErrorResponse(`You already have a ${team} pick this season, please choose another team`, 400));
+  }
+
   if (pickIndex !== -1) {
     // Update existing pick
     entry.picks[pickIndex].team = team;
@@ -271,9 +287,20 @@ exports.updatePick = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`No entry found with id ${entryId}`, 404));
   }
 
+  // Make sure user owns entry
+  if (entry.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this entry`, 401));
+  }
+
   const pick = entry.picks.id(pickId);
   if (!pick) {
     return next(new ErrorResponse(`No pick found with id ${pickId}`, 404));
+  }
+
+  // Check if the team has already been picked this season
+  const teamAlreadyPicked = entry.picks.some(p => p.team === team && p._id.toString() !== pickId);
+  if (teamAlreadyPicked) {
+    return next(new ErrorResponse(`You already have a ${team} pick this season, please choose another team`, 400));
   }
 
   pick.team = team;

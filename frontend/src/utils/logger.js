@@ -1,19 +1,9 @@
 //frontend/src/utils/logger.js
 const logger = {
-    info: (message, ...args) => {
-      console.log(`[INFO] ${message}`, ...args);
-    },
-    error: (message, ...args) => {
-      console.error(`[ERROR] ${message}`, ...args);
-    },
-    warn: (message, ...args) => {
-      console.warn(`[WARN] ${message}`, ...args);
-    },
-    debug: (message, ...args) => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.debug(`[DEBUG] ${message}`, ...args);
-      }
-    }
-  };
-  
-  export default logger;
+  debug: (message, data) => console.debug(message, data),
+  info: (message, data) => console.info(message, data),
+  warn: (message, data) => console.warn(message, data),
+  error: (message, data) => console.error(message, data),
+};
+
+export default logger;
