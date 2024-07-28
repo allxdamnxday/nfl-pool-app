@@ -330,11 +330,18 @@ exports.getPicksForEntry = asyncHandler(async (req, res, next) => {
 // @access  Private
 exports.getUserEntriesWithPicks = asyncHandler(async (req, res, next) => {
   const entries = await Entry.find({ user: req.user.id })
-    .populate('pool', 'name currentWeek')
-    .populate('picks');
+    .populate('pool')
+    .populate({
+      path: 'picks',
+      populate: {
+        path: 'game',
+        select: 'away_team home_team event_date schedule.week'
+      }
+    });
 
   res.status(200).json({
     success: true,
+    count: entries.length,
     data: entries
   });
 });

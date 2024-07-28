@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --primary-color: #8B5CF6; /* Tailwind purple-500 */
@@ -8,7 +8,7 @@
 }
 
 body {
-  @apply bg-gray-900 text-white leading-normal;
+  @apply bg-gradient-to-b from-gray-900 to-gray-800 text-white leading-normal min-h-screen;
 }
 
 #root {
@@ -16,23 +16,27 @@ body {
 }
 
 h1 {
-  @apply text-4xl font-bold mb-4;
+  @apply text-5xl font-bold mb-8 text-purple-400 shadow-text;
 }
 
 h2 {
-  @apply text-3xl font-semibold mb-3;
+  @apply text-4xl font-semibold mb-6 text-purple-400;
 }
 
 h3 {
-  @apply text-2xl font-semibold mb-2;
+  @apply text-2xl font-semibold mb-3 text-yellow-400;
+}
+
+.shadow-text {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 button, .button {
-  @apply bg-purple-500 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out;
+  @apply bg-blue-500 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200;
 }
 
 button:hover, .button:hover {
-  @apply bg-purple-600;
+  @apply bg-blue-600;
 }
 
 input[type="text"],
@@ -40,7 +44,7 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 select {
-  @apply shadow appearance-none bg-gray-800 border border-gray-700 rounded w-full py-2 px-3 text-white leading-tight;
+  @apply shadow appearance-none bg-gray-700 border border-gray-600 rounded-lg w-full py-3 px-4 text-white leading-tight;
 }
 
 input[type="text"]:focus,
@@ -52,12 +56,16 @@ select:focus {
 }
 
 .card {
-  @apply bg-gray-800 shadow-md rounded-lg p-6;
+  @apply bg-gradient-to-br from-gray-700 to-gray-600 shadow-lg rounded-xl p-6 transform transition-transform duration-200;
+}
+
+.card:hover {
+  @apply scale-105;
 }
 
 /* Custom utility classes */
 .text-primary {
-  @apply text-purple-500;
+  @apply text-purple-400;
 }
 
 .bg-primary {
@@ -69,7 +77,7 @@ select:focus {
 }
 
 .text-secondary {
-  @apply text-green-500;
+  @apply text-green-400;
 }
 
 .bg-secondary {
@@ -78,6 +86,28 @@ select:focus {
 
 .hover:bg-secondary:hover {
   @apply hover:bg-green-600;
+}
+
+/* Button variations */
+.btn {
+  @apply font-bold py-2 px-4 rounded transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-purple-600 hover:bg-purple-700 text-white;
+}
+
+.btn-secondary {
+  @apply bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200;
+}
+
+.btn-yellow {
+  @apply bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-full transition-colors duration-200;
+}
+
+/* Grid layouts */
+.grid-layout {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
 }
 
 /* Maintaining some original styles for compatibility */

@@ -28,7 +28,7 @@ const rundownApi = {
     AFFILIATE_ID: 3 // Assuming 3 is the affiliate we want
   },
 
-  fetchNFLSchedule: async (fromDate, limit = 100) => {
+  fetchNFLSchedule: async (fromDate, limit = 400) => {
     try {
       const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/schedule`;
       const response = await api.get(url, {

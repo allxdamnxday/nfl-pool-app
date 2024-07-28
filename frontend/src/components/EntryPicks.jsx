@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getEntriesForUser } from '../services/entryService';
 import { getCurrentNFLWeek } from '../services/seasonService';
+import { FaFootballBall, FaCalendarAlt } from 'react-icons/fa';
 
 function EntryPicks() {
   const [entries, setEntries] = useState([]);
@@ -25,28 +26,36 @@ function EntryPicks() {
   }, [userId]);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Your Picks</h1>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
+      <h1 className="text-5xl font-bold mb-12 text-purple-400 shadow-text text-center">Your Picks</h1>
       {entries.map((entry) => (
-        <div key={entry._id} className="mb-8 bg-gray-800 rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">{entry.pool.name}</h2>
+        <div key={entry._id} className="mb-8 bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg p-6 shadow-lg">
+          <h2 className="text-3xl font-bold mb-6 text-purple-300">
+            <FaFootballBall className="inline-block mr-2 text-purple-400" />
+            {entry.pool.name}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 18 }, (_, i) => i + 1).map((week) => {
               const pick = entry.picks.find(p => p.week === week);
               return (
-                <div key={week} className="bg-gray-700 rounded-lg p-4">
-                  <h3 className="text-xl font-semibold mb-2">Week {week}</h3>
+                <div key={week} className="bg-gray-700 rounded-lg p-4 shadow transition-transform duration-200 hover:scale-105">
+                  <h3 className="text-xl font-semibold mb-2 text-purple-300">
+                    <FaCalendarAlt className="inline-block mr-2 text-yellow-400" />
+                    Week {week}
+                  </h3>
                   {pick ? (
-                    <p>{pick.team}</p>
+                    <p className="text-lg font-medium">{pick.team}</p>
                   ) : (
                     <Link 
                       to={`/entries/${entry._id}/picks/${week}`}
-                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                      className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200 inline-block mt-2"
                     >
                       Pick 'Em
                     </Link>
                   )}
-                  {week === currentWeek && <span className="text-yellow-400 ml-2">(Current Week)</span>}
+                  {week === currentWeek && (
+                    <span className="text-yellow-400 ml-2 font-semibold">(Current Week)</span>
+                  )}
                 </div>
               );
             })}
