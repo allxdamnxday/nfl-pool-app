@@ -20,6 +20,8 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminPanel from './components/AdminPanel';
 import UserEntries from './components/UserEntries';
 import PaymentPage from './components/PaymentPage';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   return (
@@ -108,6 +110,8 @@ function App() {
                 } 
               />
               <Route path="/user-entries" element={<ProtectedRoute><UserEntries /></ProtectedRoute>} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:resettoken" element={<ResetPassword />} />
             </Routes>
           </Layout>
         </Router>

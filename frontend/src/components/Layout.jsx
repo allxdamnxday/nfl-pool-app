@@ -26,7 +26,7 @@ function Layout({ children }) {
         <nav className="container mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="text-xl sm:text-2xl font-bold text-purple-500 flex items-center">
-              <FaFootballBall className="mr-2" />
+              <img src="/img/Logo_FBE@2x.png" alt="NFL Survivor Pool" className="h-8 w-auto mr-2" />
               <span className="hidden sm:inline">NFL Survivor Pool</span>
               <span className="sm:hidden">NFL Pool</span>
             </Link>
@@ -107,7 +107,7 @@ function Layout({ children }) {
       </main>
       <footer className="bg-gray-800 text-gray-400 py-4 mt-auto">
         <div className="container mx-auto px-4 text-center text-sm">
-          &copy; 2023 NFL Pool App. All rights reserved.
+          &copy; 2024 FootballEliminator.com All rights reserved.
         </div>
       </footer>
     </div>
