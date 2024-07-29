@@ -50,12 +50,21 @@ UserSchema.index({ firstName: 1, lastName: 1 }, { unique: true });
 
 // Encrypt password using bcrypt
 UserSchema.pre('save', async function(next) {
+  // Only run this function if password was modified (not on other update functions)
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
+  // If $skipPasswordHashing is set, skip hashing
+  if (this.$skipPasswordHashing === true) {
+    return next();
+  }
+
+  // Generate salt
   const salt = await bcrypt.genSalt(10);
+  // Hash password
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // Sign JWT and return
