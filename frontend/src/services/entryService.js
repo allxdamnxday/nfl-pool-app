@@ -64,7 +64,7 @@ export const getPoolEntries = async (poolId) => {
 
 export const getUserEntriesWithPicks = async () => {
   try {
-    const response = await api.get('/user/entries/with-picks');
+    const response = await api.get('/entries/user/with-picks?populate=picks.game');
     return response.data.data;
   } catch (error) {
     console.error('Error fetching user entries with picks:', error);
