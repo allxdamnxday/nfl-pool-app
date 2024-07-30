@@ -4,13 +4,12 @@
   "description": "NFL Survivor Pool Web App",
   "main": "index.js",
   "scripts": {
-    "start": "npm run dev",
-    "server": "npx nodemon backend/server.js",
-    "client": "cd frontend && npx vite",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "test": "jest",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend"
-  },
+  "start": "node backend/server.js",
+  "dev": "concurrently \"npm run server\" \"npm run client\"",
+  "server": "nodemon backend/server.js",
+  "client": "cd frontend && npm run dev",
+  "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend"
+}
   "keywords": [],
   "author": "",
   "license": "ISC",
