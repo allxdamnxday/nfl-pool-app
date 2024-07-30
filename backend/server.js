@@ -116,4 +116,17 @@ if (process.env.NODE_ENV !== 'test') {
   startServer();
 }
 
+// Enable CORS for development
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors());
+}
+
+// Serve static files from the React frontend app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Anything that doesn't match the above, send back index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 module.exports = { app, connectDB, startServer };
