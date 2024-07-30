@@ -8,35 +8,35 @@
 }
 
 body {
-  @apply bg-gradient-to-b from-gray-900 to-gray-800 text-white leading-normal min-h-screen;
+  @apply bg-gray-900 text-white leading-normal min-h-screen;
 }
 
 #root {
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 }
+.stadium-background {
+  background-image: 
+  linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+  url('/img/stadium2.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
 
 h1 {
-  @apply text-5xl font-bold mb-8 text-purple-400 shadow-text;
+  @apply text-5xl font-bold mb-8 text-nfl-white;
 }
 
 h2 {
-  @apply text-4xl font-semibold mb-6 text-purple-400;
+  @apply text-4xl font-semibold mb-6 text-nfl-light-blue;
 }
 
 h3 {
-  @apply text-2xl font-semibold mb-3 text-yellow-400;
-}
-
-.shadow-text {
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  @apply text-2xl font-semibold mb-3 text-nfl-blue;
 }
 
 button, .button {
-  @apply bg-blue-500 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200;
-}
-
-button:hover, .button:hover {
-  @apply bg-blue-600;
+  @apply bg-nfl-blue text-nfl-white font-bold py-2 px-4 rounded transition-colors duration-300 ease-in-out hover:bg-nfl-light-blue;
 }
 
 input[type="text"],
@@ -44,7 +44,7 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 select {
-  @apply shadow appearance-none bg-gray-700 border border-gray-600 rounded-lg w-full py-3 px-4 text-white leading-tight;
+  @apply shadow appearance-none bg-nfl-white bg-opacity-10 backdrop-filter backdrop-blur-lg border border-nfl-blue rounded-lg w-full py-3 px-4 text-nfl-blue leading-tight;
 }
 
 input[type="text"]:focus,
@@ -52,40 +52,40 @@ input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="number"]:focus,
 select:focus {
-  @apply outline-none ring-2 ring-purple-500 border-transparent;
+  @apply outline-none ring-2 ring-nfl-blue border-transparent;
 }
 
 .card {
-  @apply bg-gradient-to-br from-gray-700 to-gray-600 shadow-lg rounded-xl p-6 transform transition-transform duration-200;
+  @apply bg-nfl-white bg-opacity-10 backdrop-filter backdrop-blur-lg shadow-card rounded-xl p-6 transform transition-all duration-300 ease-in-out;
 }
 
 .card:hover {
-  @apply scale-105;
+  @apply scale-105 shadow-lg;
 }
 
 /* Custom utility classes */
 .text-primary {
-  @apply text-purple-400;
+  @apply text-nfl-blue;
 }
 
 .bg-primary {
-  @apply bg-purple-500;
+  @apply bg-nfl-blue;
 }
 
 .hover:bg-primary:hover {
-  @apply hover:bg-purple-600;
+  @apply hover:bg-nfl-light-blue;
 }
 
 .text-secondary {
-  @apply text-green-400;
+  @apply text-nfl-red;
 }
 
 .bg-secondary {
-  @apply bg-green-500;
+  @apply bg-nfl-red;
 }
 
 .hover:bg-secondary:hover {
-  @apply hover:bg-green-600;
+  @apply hover:bg-red-700;
 }
 
 /* Button variations */
@@ -94,11 +94,11 @@ select:focus {
 }
 
 .btn-primary {
-  @apply bg-purple-600 hover:bg-purple-700 text-white;
+  @apply bg-nfl-blue hover:bg-nfl-light-blue text-nfl-white;
 }
 
 .btn-secondary {
-  @apply bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200;
+  @apply bg-nfl-red hover:bg-red-700 text-nfl-white font-bold py-2 px-4 rounded-full transition-colors duration-200;
 }
 
 .btn-yellow {
@@ -135,6 +135,15 @@ select:focus {
   }
 }
 
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.hover-bounce:hover {
+  animation: subtle-bounce 0.5s ease infinite;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
@@ -143,4 +152,34 @@ select:focus {
 
 .read-the-docs {
   @apply text-gray-400;
+}
+
+/* Animated Transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: scale(0.9);
+}
+.page-transition-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+.page-transition-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+.page-transition-exit-active {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Micro-interactions */
+@keyframes subtle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.hover-bounce:hover {
+  animation: subtle-bounce 0.5s ease infinite;
 }

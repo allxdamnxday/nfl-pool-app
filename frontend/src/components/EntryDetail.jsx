@@ -5,6 +5,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getEntry } from '../services/entryService';
 import { useToast } from '../contexts/ToastContext';
 import { FaFootballBall, FaCalendarAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { LogoSpinner } from './CustomComponents';
 
 function EntryDetail() {
   const [entry, setEntry] = useState(null);
@@ -30,7 +31,11 @@ function EntryDetail() {
   }, [entryId, showToast]);
 
   if (loading) {
-    return <div className="text-center text-white text-2xl mt-12">Loading entry details...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LogoSpinner size={20} />
+      </div>
+    );
   }
 
   if (!entry) {

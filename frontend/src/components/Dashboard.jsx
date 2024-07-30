@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { getUserPools } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek } from 'react-icons/fa';
+import { LogoSpinner } from './CustomComponents';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -34,7 +35,7 @@ function Dashboard() {
   }, [user, showToast]);
 
   if (loading) {
-    return <div className="text-center text-white text-2xl mt-12">Loading your pools...</div>;
+    return <LogoSpinner size={128} />;
   }
 
   if (error) {

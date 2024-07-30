@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { getUserEntriesWithPicks } from '../services/entryService';
 import { useToast } from '../contexts/ToastContext';
 import { FaFootballBall, FaCheckCircle, FaTimesCircle, FaCalendarAlt } from 'react-icons/fa';
+import { LogoSpinner } from './CustomComponents';
 
 function UserEntries() {
   const [entries, setEntries] = useState([]);
@@ -31,7 +32,11 @@ function UserEntries() {
   }, [showToast]);
 
   if (loading) {
-    return <div className="text-center text-white text-2xl mt-12">Loading entries...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LogoSpinner size={20} />
+      </div>
+    );
   }
 
   if (error) {

@@ -24,6 +24,7 @@ export const getGamesForWeek = async (seasonYear, week) => {
     console.log('Request URL:', url);
     const response = await api.get(url);
     console.log('Response:', response.data);
+    
     return response.data.data;
   } catch (error) {
     console.error('Error fetching games for week:', error);

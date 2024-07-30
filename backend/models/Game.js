@@ -35,6 +35,7 @@ const GameSchema = new mongoose.Schema({
     name: String,
     mascot: String,
     abbreviation: String,
+    logo: String, // Added logo field
     conference_id: Number,
     division_id: Number,
     ranking: Number,
