@@ -94,7 +94,7 @@ function Picks() {
   }
 
   if (games.length === 0) {
-    return <div className="text-center text-white text-2xl mt-12">No games scheduled for the current week.</div>;
+    return <div className="text-center text-gray-800 text-2xl mt-12">No games scheduled for the current week.</div>;
   }
 
   return (
@@ -102,75 +102,67 @@ function Picks() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-4 md:p-8 relative overflow-hidden"
+      className="min-h-screen bg-gray-50 text-gray-800 p-4 md:p-8 relative overflow-hidden"
     >
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-purple-600 rounded-full filter blur-3xl opacity-10"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-600 rounded-full filter blur-3xl opacity-10"></div>
-      </div>
-
-      <h1 className="text-5xl font-bold mb-8 text-center text-purple-400 relative z-10">Make Your Pick</h1>
-      
-      <WeekSelector 
-        currentWeek={currentWeek} 
-        totalWeeks={totalWeeks} 
-        onWeekChange={handleWeekChange} 
-      />
-
-      <AnimatePresence>
-        {games.map((game) => (
-          <GameCard 
-            key={game._id}
-            game={game}
-            currentPick={currentPick}
-            onPickClick={handlePickClick}
-          />
-        ))}
-      </AnimatePresence>
-
-      {showConfirmation && (
-        <ConfirmationModal 
-          selectedTeam={selectedTeam}
-          onConfirm={handleConfirmPick}
-          onCancel={() => setShowConfirmation(false)}
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8 text-center text-purple-400">Make Your Pick</h1>
+        
+        <WeekSelector 
+          currentWeek={currentWeek} 
+          totalWeeks={totalWeeks} 
+          onWeekChange={handleWeekChange} 
         />
-      )}
 
-      <PickStatus currentPick={currentPick} />
+        <div className="grid grid-cols-1 gap-6 md:gap-8">
+          {games.map((game) => (
+            <GameCard 
+              key={game._id}
+              game={game}
+              currentPick={currentPick}
+              onPickClick={handlePickClick}
+            />
+          ))}
+        </div>
+        
+        {showConfirmation && (
+          <ConfirmationModal 
+            selectedTeam={selectedTeam}
+            onConfirm={handleConfirmPick}
+            onCancel={() => setShowConfirmation(false)}
+          />
+        )}
+
+        <PickStatus currentPick={currentPick} />
+      </div>
     </motion.div>
   );
 }
 
 function WeekSelector({ currentWeek, totalWeeks, onWeekChange }) {
   return (
-    <motion.div 
-      className="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-lg shadow-lg"
-      initial={{ y: -50, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.2 }}
-    >
+    <div className="flex justify-between items-center mb-8 bg-white p-4 rounded-lg shadow-sm">
       <motion.button 
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => onWeekChange('prev')} 
-        className="bg-purple-600 p-3 rounded-full text-white shadow-lg transition-all duration-300"
+        className="bg-purple-600 p-3 rounded-full text-white shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={currentWeek === 1}
       >
         <FaChevronLeft />
       </motion.button>
-      <span className="text-3xl font-bold bg-purple-600 px-8 py-3 rounded-full shadow-inner">
+      <span className="text-2xl font-bold text-gray-800">
         Week {currentWeek}
       </span>
       <motion.button 
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={() => onWeekChange('next')} 
-        className="bg-purple-600 p-3 rounded-full text-white shadow-lg transition-all duration-300"
+        className="bg-purple-600 p-3 rounded-full text-white shadow-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={currentWeek === totalWeeks}
       >
         <FaChevronRight />
       </motion.button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -182,20 +174,20 @@ function GameCard({ game, currentPick, onPickClick }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg shadow-lg p-6 mb-6 hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+      className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-all duration-300 relative overflow-hidden"
     >
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-blue-500"></div>
-      <div className="flex justify-between items-center mb-4 text-gray-300">
-        <div className="flex items-center text-sm">
-          <FaCalendarAlt className="mr-2 text-purple-400" />
+      <div className="flex justify-between items-center mb-4 text-gray-600 text-xs sm:text-sm">
+        <div className="flex items-center">
+          <FaCalendarAlt className="mr-1 sm:mr-2 text-purple-400" />
           <span>{new Date(game.event_date).toLocaleDateString()}</span>
         </div>
-        <div className="flex items-center text-sm">
-          <FaClock className="mr-2 text-purple-400" />
+        <div className="flex items-center">
+          <FaClock className="mr-1 sm:mr-2 text-purple-400" />
           <span>{new Date(game.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
         <TeamButton
           team={game.away_team}
           record={game.teams_normalized.find(t => t.is_away)?.record || '0-0'}
@@ -203,9 +195,9 @@ function GameCard({ game, currentPick, onPickClick }) {
           onClick={() => onPickClick(game.away_team)}
         />
         <div className="flex flex-col items-center">
-          <span className="text-3xl font-bold text-purple-400 mb-2">VS</span>
+          <span className="text-2xl sm:text-3xl font-bold text-purple-400 mb-2">VS</span>
           <motion.div 
-            className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl"
+            className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl"
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           >
@@ -229,18 +221,20 @@ function TeamButton({ team, record, isSelected, onClick }) {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`flex flex-col items-center space-y-2 p-4 rounded-lg transition-all duration-300 ${
-        isSelected ? 'bg-purple-600 text-white shadow-lg' : 'bg-gray-600 text-gray-200 hover:bg-gray-500'
+      className={`flex flex-col items-center justify-between p-2 sm:p-4 rounded-lg transition-all duration-300 h-36 sm:h-48 w-32 sm:w-40 ${
+        isSelected ? 'bg-purple-600 text-white shadow-md' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
       }`}
     >
       <img
         src={`/img/nfl_logos/${team.split(' ')[0].substring(0, 3).toUpperCase()}.png`}
         alt={`${team} logo`}
-        className="w-20 h-20 object-contain"
-        onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}
+        className="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-1 sm:mb-2"
+        onError={(e) => { e.target.onerror = null; e.target.src = '/img/nfl_logos/default-team-logo.png'; }}
       />
-      <span className="font-bold text-lg">{team}</span>
-      <span className="text-sm bg-gray-800 px-3 py-1 rounded-full">{record}</span>
+      <span className="font-bold text-xs sm:text-sm mb-1 text-center">{team}</span>
+      <span className={`text-xs px-2 py-1 rounded-full ${isSelected ? 'bg-white text-purple-600' : 'bg-gray-800 text-white'}`}>
+        {record}
+      </span>
     </motion.button>
   );
 }
@@ -251,29 +245,33 @@ function ConfirmationModal({ selectedTeam, onConfirm, onCancel }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <motion.div 
         initial={{ scale: 0.9 }}
         animate={{ scale: 1 }}
         exit={{ scale: 0.9 }}
-        className="bg-gradient-to-br from-gray-800 to-gray-700 p-8 rounded-lg shadow-2xl"
+        className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full"
       >
-        <h2 className="text-2xl font-bold mb-4">Confirm Your Pick</h2>
-        <p className="mb-6 text-lg">Are you sure you want to pick <span className="font-bold text-purple-400">{selectedTeam}</span>?</p>
-        <div className="flex justify-between">
-          <button
+        <h2 className="text-2xl font-bold mb-4 text-gray-900">Confirm Your Pick</h2>
+        <p className="mb-6 text-gray-700">Are you sure you want to pick <span className="font-bold text-purple-600">{selectedTeam}</span>?</p>
+        <div className="flex justify-end space-x-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onCancel}
-            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded transition-colors duration-200"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-full transition-colors duration-200"
           >
             Cancel
-          </button>
-          <button
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={onConfirm}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded transition-colors duration-200"
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200"
           >
             Confirm Pick
-          </button>
+          </motion.button>
         </div>
       </motion.div>
     </motion.div>
@@ -284,12 +282,7 @@ function PickStatus({ currentPick }) {
   const isString = (value) => typeof value === 'string';
 
   return (
-    <motion.div 
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="fixed bottom-0 left-0 right-0 bg-gray-800 p-4 shadow-lg"
-    >
+    <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-sm border-t border-gray-200">
       <div className="flex justify-between items-center max-w-3xl mx-auto">
         <span className="text-gray-300 flex items-center">
           <FaFootballBall className="mr-2 text-purple-400" />
@@ -308,7 +301,7 @@ function PickStatus({ currentPick }) {
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 

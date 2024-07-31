@@ -3,7 +3,7 @@ import Header from './Header';  // Import the Header component
 
 function Layout({ children }) {
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-800 p-8">
       <Header />  {/* Use the Header component here */}
       <main className="container mx-auto px-4 py-8 flex-grow">
         {children}

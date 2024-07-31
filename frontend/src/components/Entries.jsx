@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getUserEntries } from '../services/entryService';
 import { useToast } from '../contexts/ToastContext';
-import { FaFootballBall, FaCalendarAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaFootballBall, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaUsers } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 
 function Entries() {
@@ -48,40 +48,48 @@ function Entries() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
-      <h1 className="text-5xl font-bold mb-12 text-purple-400 shadow-text text-center">My Entries</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-8 text-gray-900">My Entries</h1>
       {entries.length === 0 ? (
-        <p className="text-center text-xl text-gray-400">You don't have any entries yet.</p>
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <p className="text-xl text-gray-600 mb-6">You don't have any entries yet.</p>
+          <Link 
+            to="/pools" 
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200 inline-block"
+          >
+            Browse Pools
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {entries.map((entry) => (
-            <div key={entry._id} className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg p-6 shadow-lg transform transition duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-              <h2 className="text-2xl font-semibold text-purple-300 mb-4">
-                <FaFootballBall className="inline-block mr-2 text-purple-400" />
+            <div key={entry._id} className="bg-white rounded-lg shadow-md p-6 transition duration-300 ease-in-out hover:shadow-lg hover:scale-105">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                <FaFootballBall className="text-purple-500 mr-2" />
                 {entry.pool?.name || 'Unknown Pool'}
               </h2>
-              <p className="text-gray-300 mb-2">
-                <FaCheckCircle className={`inline-block mr-2 ${entry.isActive ? 'text-green-400' : 'text-red-400'}`} />
+              <p className="text-gray-600 mb-2 flex items-center">
+                <FaCheckCircle className={`mr-2 ${entry.isActive ? 'text-green-500' : 'text-red-500'}`} />
                 Status: {entry.isActive ? 'Active' : 'Inactive'}
               </p>
-              <p className="text-gray-300 mb-2">
-                <FaCalendarAlt className="inline-block mr-2 text-blue-400" />
+              <p className="text-gray-600 mb-2 flex items-center">
+                <FaCalendarAlt className="text-blue-500 mr-2" />
                 Picks Made: {entry.picks?.length || 0}
               </p>
-              <p className="text-gray-300 mb-2">
-                <FaCalendarAlt className="inline-block mr-2 text-yellow-400" />
+              <p className="text-gray-600 mb-2 flex items-center">
+                <FaCalendarAlt className="text-yellow-500 mr-2" />
                 Current Week: {entry.pool?.currentWeek || 'N/A'}
               </p>
-              <p className="text-gray-300 mb-4">
+              <p className="text-gray-600 mb-4 flex items-center">
                 {entry.isEliminated ? 
-                  <FaTimesCircle className="inline-block mr-2 text-red-400" /> : 
-                  <FaCheckCircle className="inline-block mr-2 text-green-400" />
+                  <FaTimesCircle className="text-red-500 mr-2" /> : 
+                  <FaCheckCircle className="text-green-500 mr-2" />
                 }
                 Status: {entry.isEliminated ? 'Eliminated' : 'Still In'}
               </p>
               <Link 
                 to={`/entries/${entry._id}`} 
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200 block text-center"
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 inline-block w-full text-center"
               >
                 View Details
               </Link>

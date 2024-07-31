@@ -43,55 +43,61 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
-      <div className="flex justify-between items-center mb-12">
-        <h1 className="text-5xl font-bold text-purple-400 shadow-text">Dashboard</h1>
-        <Link 
-          to="/pools" 
-          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Browse Pools
-        </Link>
-      </div>
-      <div>
-        <h2 className="text-4xl font-semibold mb-8 text-purple-400">Your Pools</h2>
-        {pools.length === 0 ? (
-          <div className="bg-gray-800 rounded-lg p-6">
-            <p className="mb-6 text-xl">You're not in any pools yet. Ready to join the action?</p>
-            <Link 
-              to="/pools" 
-              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-            >
-              Find a Pool to Join
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {pools.map((pool) => (
-              <div key={pool._id} className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg p-6 shadow-lg transform transition duration-300 ease-in-out hover:scale-105 hover:shadow-xl">
-                <h3 className="text-xl font-semibold text-purple-300 mb-4 break-words">
-                  <FaFootballBall className="inline-block mr-2 text-purple-400" />
-                  {pool.name}
-                </h3>
-                <p className="text-gray-300 mb-2">
-                  <FaCalendarAlt className="inline-block mr-2 text-blue-400" /> Season: {pool.season}
-                </p>
-                <p className="text-gray-300 mb-2">
-                  <FaCalendarWeek className="inline-block mr-2 text-yellow-400" /> Current Week: {pool.currentWeek}
-                </p>
-                <p className="text-gray-300 mb-4">
-                  <FaUsers className="inline-block mr-2 text-green-400" /> Active Entries: {pool.activeEntries}
-                </p>
-                <Link 
-                  to={`/pool-entries/${pool._id}`} 
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded block text-center transition duration-300 ease-in-out"
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-800 p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12">
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-4 sm:mb-0">Dashboard</h1>
+          <Link 
+            to="/pools" 
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full text-base sm:text-lg transition duration-300 ease-in-out mt-2 sm:mt-0"
+          >
+            Browse Pools
+          </Link>
+        </div>
+
+        <div>
+          <h2 className="text-3xl sm:text-4xl font-semibold mb-6 sm:mb-8 text-gray-800">Your Pools</h2>
+          {pools.length === 0 ? (
+            <div className="bg-white rounded-lg p-8 shadow-sm text-center border border-gray-100">
+              <p className="mb-6 text-2xl text-gray-600">You're not in any pools yet. Ready to join the action?</p>
+              <Link 
+                to="/pools" 
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 ease-in-out inline-block"
+              >
+                Find a Pool to Join
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {pools.map((pool) => (
+                <div 
+                  key={pool._id} 
+                  className="bg-white rounded-lg p-6 shadow-md border border-gray-200 transition duration-300 ease-in-out hover:shadow-lg hover:scale-105"
                 >
-                  View Entries
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-4 break-words">
+                    <FaFootballBall className="inline-block mr-2 text-purple-500" />
+                    {pool.name}
+                  </h3>
+                  <p className="text-gray-600 mb-3">
+                    <FaCalendarAlt className="inline-block mr-2 text-blue-500" /> Season: {pool.season}
+                  </p>
+                  <p className="text-gray-600 mb-3">
+                    <FaCalendarWeek className="inline-block mr-2 text-yellow-500" /> Current Week: {pool.currentWeek}
+                  </p>
+                  <p className="text-gray-600 mb-5">
+                    <FaUsers className="inline-block mr-2 text-green-500" /> Active Entries: {pool.activeEntries}
+                  </p>
+                  <Link 
+                    to={`/pool-entries/${pool._id}`} 
+                    className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-full block text-center transition duration-300 ease-in-out"
+                  >
+                    View Entries
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

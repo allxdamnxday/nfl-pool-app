@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { getPoolDetails } from '../services/poolService';
 import { getUserEntries } from '../services/entryService';
-import { FaFootballBall, FaCalendarAlt, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaFootballBall, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaArrowLeft } from 'react-icons/fa';
+import { LogoSpinner } from './CustomComponents';
 
 function PoolEntries() {
   const { poolId } = useParams();
@@ -24,20 +25,16 @@ function PoolEntries() {
       }
 
       try {
-        console.log('Fetching pool and entries for poolId:', poolId);
         setLoading(true);
         const [poolData, userEntriesData] = await Promise.all([
           getPoolDetails(poolId),
           getUserEntries()
         ]);
-        console.log('Pool Data:', poolData);
-        console.log('User Entries Data:', userEntriesData);
         
         setPool(poolData);
         
         // Filter entries for the current pool
         const poolEntries = userEntriesData.data.filter(entry => entry.pool._id === poolId);
-        console.log('Pool Entries:', poolEntries);
         
         setEntries(poolEntries);
       } catch (err) {
@@ -51,57 +48,88 @@ function PoolEntries() {
     fetchPoolAndEntries();
   }, [poolId, user, authLoading]);
 
-  if (authLoading || loading) return <div className="text-center text-white text-2xl mt-12">Loading entries...</div>;
+  if (authLoading || loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LogoSpinner size={20} />
+      </div>
+    );
+  }
+  
   if (error) return <div className="text-center text-red-500 text-2xl mt-12">{error}</div>;
-  if (!user) return <div className="text-center text-white text-2xl mt-12">Please log in to view entries.</div>;
+  if (!user) return <div className="text-center text-gray-800 text-2xl mt-12">Please log in to view entries.</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">
-      <h1 className="text-5xl font-bold mb-12 text-center text-purple-400 shadow-text">{pool?.name || 'Pool'} - Your Entries</h1>
+    <div className="container mx-auto px-4 py-8">
+      <Link to="/pools" className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6 transition-colors duration-200">
+        <FaArrowLeft className="mr-2" />
+        Back to Pools
+      </Link>
+      <h1 className="text-4xl font-bold mb-8 text-gray-900">{pool?.name || 'Pool'} - Your Entries</h1>
       {entries.length === 0 ? (
-        <p className="text-center text-xl text-gray-400">You have no entries in this pool.</p>
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <p className="text-xl text-gray-600 mb-6">You have no entries in this pool.</p>
+          <Link 
+            to={`/pools/${poolId}`}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-200 inline-block"
+          >
+            Join Pool
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {entries.map((entry) => (
-            <div key={entry._id} className="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300">
-              <h3 className="text-2xl font-semibold text-purple-400 mb-4 flex items-center">
-                <FaFootballBall className="mr-2 text-purple-500" />
-                {pool?.name}
-              </h3>
-              <p className="text-gray-300 mb-2 flex items-center">
-                {entry.isActive ? (
-                  <FaCheckCircle className="mr-2 text-green-500" />
-                ) : (
-                  <FaTimesCircle className="mr-2 text-red-500" />
-                )}
-                Status: {entry.isActive ? 'Active' : 'Inactive'}
-              </p>
-              <p className="text-gray-300 mb-2 flex items-center">
-                <FaFootballBall className="mr-2 text-blue-400" />
-                Picks Made: {entry.picks?.length || 0}
-              </p>
-              <p className="text-gray-300 mb-2 flex items-center">
-                <FaCalendarAlt className="mr-2 text-yellow-400" />
-                Current Week: {pool?.currentWeek}
-              </p>
-              <p className="text-gray-300 mb-4 flex items-center">
-                {entry.eliminated ? (
-                  <FaTimesCircle className="mr-2 text-red-500" />
-                ) : (
-                  <FaCheckCircle className="mr-2 text-green-500" />
-                )}
-                Status: {entry.eliminated ? 'Eliminated' : 'Still In'}
-              </p>
-              <Link 
-                to={`/entries/${entry._id}`}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200 w-full block text-center"
-              >
-                View Details
-              </Link>
-            </div>
+            <EntryCard key={entry._id} entry={entry} pool={pool} />
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function EntryCard({ entry, pool }) {
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 transition duration-300 ease-in-out hover:shadow-lg">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">Entry #{entry.entryNumber}</h3>
+        <StatusBadge isActive={entry.isActive} />
+      </div>
+      <div className="space-y-2 mb-4">
+        <InfoItem icon={FaFootballBall} label="Picks Made" value={entry.picks?.length || 0} />
+        <InfoItem icon={FaCalendarAlt} label="Current Week" value={pool?.currentWeek} />
+        <InfoItem 
+          icon={entry.eliminated ? FaTimesCircle : FaCheckCircle} 
+          label="Status" 
+          value={entry.eliminated ? 'Eliminated' : 'Still In'}
+          valueColor={entry.eliminated ? 'text-red-500' : 'text-green-500'}
+        />
+      </div>
+      <Link 
+        to={`/entries/${entry._id}`}
+        className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 inline-block w-full text-center"
+      >
+        View Details
+      </Link>
+    </div>
+  );
+}
+
+function StatusBadge({ isActive }) {
+  return (
+    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+      isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+    }`}>
+      {isActive ? 'Active' : 'Inactive'}
+    </span>
+  );
+}
+
+function InfoItem({ icon: Icon, label, value, valueColor = 'text-gray-800' }) {
+  return (
+    <div className="flex items-center">
+      <Icon className="text-purple-500 mr-2" />
+      <span className="text-gray-600">{label}:</span>
+      <span className={`font-semibold ml-1 ${valueColor}`}>{value}</span>
     </div>
   );
 }
