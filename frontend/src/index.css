@@ -44,7 +44,15 @@ input[type="email"],
 input[type="password"],
 input[type="number"],
 select {
-  @apply shadow appearance-none bg-nfl-white bg-opacity-10 backdrop-filter backdrop-blur-lg border border-nfl-blue rounded-lg w-full py-3 px-4 text-nfl-blue leading-tight;
+  @apply shadow appearance-none bg-nfl-white bg-opacity-10 backdrop-filter backdrop-blur-lg border border-nfl-blue rounded-lg w-full py-3 px-4 text-gray-200 leading-tight;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="number"]::placeholder,
+select::placeholder {
+  @apply text-gray-400;
 }
 
 input[type="text"]:focus,
@@ -52,7 +60,7 @@ input[type="email"]:focus,
 input[type="password"]:focus,
 input[type="number"]:focus,
 select:focus {
-  @apply outline-none ring-2 ring-nfl-blue border-transparent;
+  @apply outline-none ring-2 ring-purple-500 border-transparent text-white;
 }
 
 .card {
