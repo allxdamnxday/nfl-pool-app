@@ -14,6 +14,7 @@ const errorHandler = require('./middleware/error');
 const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
+const apiLimiter = require('./middleware/rateLimiter');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -35,12 +36,7 @@ app.use(helmet());
 app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
-
-const limiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  max: 100
-});
-app.use(limiter);
+app.use(apiLimiter);
 
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -59,6 +55,9 @@ const userEntries = require('./routes/userEntries');
 const requests = require('./routes/requests');
 
 // Mount routers
+
+// Apply stricter rate limiting to auth routes etc if necessary
+//app.use('/api/v1/auth', authLimiter);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/season', seasonRoutes);
 app.use('/api/v1/pools', pools);
