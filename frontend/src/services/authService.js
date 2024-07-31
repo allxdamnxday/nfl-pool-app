@@ -41,14 +41,21 @@ export const logout = () => {
 };
 
 export const getCurrentUser = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return null;
+  }
+
   try {
     const response = await api.get(`${AUTH_URL}/me`);
-    localStorage.setItem('user', JSON.stringify(response.data.data));
-    console.log('User data from server:', response.data.data);
-    return response.data.data;
+    const userData = response.data.data;
+    localStorage.setItem('user', JSON.stringify(userData));
+    return userData;
   } catch (error) {
     console.error('Failed to get current user:', error);
-    return null;
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    throw error;
   }
 };
 

@@ -10,14 +10,22 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const loadUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
         logger.info('User loaded successfully', currentUser);
-        console.log('User loaded:', currentUser); // Added console log
+        console.log('User loaded:', currentUser);
       } catch (error) {
         logger.error('Failed to load user:', error);
-        console.log('Failed to load user:', error); // Added console log
+        console.log('Failed to load user:', error);
+        // Clear invalid token
+        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -31,11 +39,11 @@ export const AuthProvider = ({ children }) => {
       const loggedInUser = await loginService(email, password);
       setUser(loggedInUser);
       logger.info('User logged in successfully', loggedInUser);
-      console.log('User logged in:', loggedInUser); // Added console log
+      console.log('User logged in:', loggedInUser);
       return loggedInUser;
     } catch (error) {
       logger.error('Login failed:', error);
-      console.log('Login failed:', error); // Added console log
+      console.log('Login failed:', error);
       throw error;
     }
   };
@@ -45,11 +53,11 @@ export const AuthProvider = ({ children }) => {
       const registeredUser = await registerService({ firstName, lastName, username, email, password });
       setUser(registeredUser);
       logger.info('User registered successfully', registeredUser);
-      console.log('User registered:', registeredUser); // Added console log
+      console.log('User registered:', registeredUser);
       return registeredUser;
     } catch (error) {
       logger.error('Registration failed:', error);
-      console.log('Registration failed:', error); // Added console log
+      console.log('Registration failed:', error);
       throw error;
     }
   };
@@ -59,10 +67,10 @@ export const AuthProvider = ({ children }) => {
       await logoutService();
       setUser(null);
       logger.info('User logged out successfully');
-      console.log('User logged out'); // Added console log
+      console.log('User logged out');
     } catch (error) {
       logger.error('Logout failed:', error);
-      console.log('Logout failed:', error); // Added console log
+      console.log('Logout failed:', error);
       throw error;
     }
   };
