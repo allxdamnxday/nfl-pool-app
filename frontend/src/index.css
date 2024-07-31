@@ -123,3 +123,17 @@ select::placeholder {
   transform: scale(0.9);
   transition: opacity 300ms, transform 300ms;
 }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+select {
+  @apply shadow appearance-none bg-white border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent;
+  padding-left: 2.5rem; /* Add this line to create space for the icon */
+}
+
+/* Add a new style for inputs with icons */
+.input-with-icon {
+  @apply pl-10;
+}
