@@ -41,16 +41,10 @@ export const logout = () => {
 };
 
 export const getCurrentUser = async () => {
-  const user = localStorage.getItem('user');
-  if (user) {
-    console.log('User role from localStorage:', JSON.parse(user).role);
-    return JSON.parse(user);
-  }
-
   try {
     const response = await api.get(`${AUTH_URL}/me`);
     localStorage.setItem('user', JSON.stringify(response.data.data));
-    console.log('User role after fetching current user:', response.data.data.role);
+    console.log('User data from server:', response.data.data);
     return response.data.data;
   } catch (error) {
     console.error('Failed to get current user:', error);
