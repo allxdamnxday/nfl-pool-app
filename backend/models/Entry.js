@@ -2,6 +2,10 @@
 const mongoose = require('mongoose');
 
 const EntrySchema = new mongoose.Schema({
+  entryNumber: {
+    type: Number,
+    required: true
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -35,5 +39,7 @@ const EntrySchema = new mongoose.Schema({
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
+
+EntrySchema.index({ pool: 1, entryNumber: 1 }, { unique: true });
 
 module.exports = mongoose.model('Entry', EntrySchema);

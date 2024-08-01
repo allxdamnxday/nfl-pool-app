@@ -123,6 +123,14 @@ exports.approveRequest = asyncHandler(async (req, res, next) => {
       await pool.save({ session });
     }
 
+    // Get the next available entry number for this pool
+    const highestEntry = await Entry.findOne({ pool: pool._id })
+      .sort('-entryNumber')
+      .limit(1)
+      .session(session);
+    
+    let nextEntryNumber = (highestEntry?.entryNumber || 0) + 1;
+
     // Create Entries for the user
     const entries = [];
     for (let i = 0; i < request.numberOfEntries; i++) {
@@ -130,7 +138,8 @@ exports.approveRequest = asyncHandler(async (req, res, next) => {
       const entry = await Entry.create([{
         user: request.user,
         pool: request.pool,
-        isActive: true
+        isActive: true,
+        entryNumber: nextEntryNumber++
       }], { session });
       entries.push(entry[0]);
     }
