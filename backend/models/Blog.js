@@ -10,7 +10,13 @@ const BlogSchema = new mongoose.Schema({
   content: {
     type: String,
     required: [true, 'Please add content'],
-    trim: true
+    trim: true,
+    maxlength: [10000, 'Content cannot be more than 10000 characters']
+  },
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
   imageUrl: {
     type: String,
@@ -21,10 +27,21 @@ const BlogSchema = new mongoose.Schema({
       message: props => `${props.value} is not a valid URL!`
     }
   },
-  author: {
+  views: {
+    type: Number,
+    default: 0
+  },
+  likes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
+  }],
+  comments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment'
+  }],
+  featured: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,

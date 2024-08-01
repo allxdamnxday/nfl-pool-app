@@ -6,6 +6,7 @@ export const getBlogPosts = async () => {
 };
 
 export const getBlogPost = async (id) => {
+  console.log('getBlogPost called with id:', id); // Add this line
   const response = await api.get(`/blogs/${id}`);
   return response.data;
 };

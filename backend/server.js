@@ -16,6 +16,7 @@ const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
 const blogs = require('./routes/blogs');
+const commentRoutes = require('./routes/commentRoutes');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -70,6 +71,7 @@ app.use('/api/v1/entries/:entryId/picks', pickRoutes); // Use the pickRoutes her
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
+app.use('/api/v1/comments', commentRoutes);
 
 // Use custom error handler
 app.use(errorHandler);
