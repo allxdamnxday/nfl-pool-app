@@ -25,6 +25,9 @@ import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import Header from './components/Header';
 import { FootballButton, FieldGoal } from './components/CustomComponents';
+import BlogPostList from './components/BlogPostList';
+import BlogPostDetail from './components/BlogPostDetail';
+import BlogPostCreate from './components/BlogPostCreate';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -115,6 +118,16 @@ const AnimatedRoutes = () => {
           <Route path="/user-entries" element={<ProtectedRoute><UserEntries /></ProtectedRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:resettoken" element={<ResetPassword />} />
+          <Route path="/blogs" element={<BlogPostList />} />
+          <Route path="/blog/:id" element={<BlogPostDetail />} />
+          <Route
+            path="/admin/blog/create"
+            element={
+              <ProtectedAdminRoute>
+                <BlogPostCreate />
+              </ProtectedAdminRoute>
+            }
+          />
         </Routes>
       </CSSTransition>
     </TransitionGroup>
