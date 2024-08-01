@@ -29,91 +29,76 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-600 to-indigo-700 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-4xl font-extrabold text-white mb-6">
-          FOOTBALL ELIMINATOR
-        </h2>
-        <h3 className="text-center text-2xl font-bold text-white">
-          Create Your Account
-        </h3>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <InputField
-              id="firstName"
-              label="First Name"
-              type="text"
-              value={firstName}
-              onChange={setFirstName}
-              icon={FaUser}
-            />
-            <InputField
-              id="lastName"
-              label="Last Name"
-              type="text"
-              value={lastName}
-              onChange={setLastName}
-              icon={FaUser}
-            />
-            <InputField
-              id="username"
-              label="Username"
-              type="text"
-              value={username}
-              onChange={setUsername}
-              icon={FaUser}
-            />
-            <InputField
-              id="email"
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              icon={FaEnvelope}
-            />
-            <InputField
-              id="password"
-              label="Password"
-              type="password"
-              value={password}
-              onChange={setPassword}
-              icon={FaLock}
-            />
-
-            <div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-extrabold text-white mb-2">
+            ELIMINATOR HUB
+          </h1>
+          <h2 className="text-xl font-semibold text-purple-200">
+            Create Your Account
+          </h2>
+        </div>
+        
+        <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-xl overflow-hidden">
+          <div className="px-6 py-8 sm:px-10">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <InputField
+                id="firstName"
+                label="First Name"
+                type="text"
+                value={firstName}
+                onChange={setFirstName}
+                icon={FaUser}
+              />
+              <InputField
+                id="lastName"
+                label="Last Name"
+                type="text"
+                value={lastName}
+                onChange={setLastName}
+                icon={FaUser}
+              />
+              <InputField
+                id="username"
+                label="Username"
+                type="text"
+                value={username}
+                onChange={setUsername}
+                icon={FaUser}
+              />
+              <InputField
+                id="email"
+                label="Email"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                icon={FaEnvelope}
+              />
+              <InputField
+                id="password"
+                label="Password"
+                type="password"
+                value={password}
+                onChange={setPassword}
+                icon={FaLock}
+              />
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out"
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-300 ease-in-out transform hover:scale-105"
               >
                 <FaUserPlus className="mr-2" />
                 Sign Up
               </button>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Already have an account?
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                to="/login"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-purple-600 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out"
-              >
-                Log In
+            </form>
+          </div>
+          <div className="px-6 py-4 bg-purple-800 bg-opacity-50 sm:px-10">
+            <p className="text-xs text-center text-purple-200">
+              Already have an account?{' '}
+              <Link to="/login" className="font-medium text-white hover:text-purple-300 transition-colors">
+                Log in here
               </Link>
-            </div>
+            </p>
           </div>
         </div>
       </div>
@@ -123,20 +108,20 @@ function Register() {
 
 function InputField({ id, label, type, value, onChange, icon: Icon }) {
   return (
-    <div className="mb-4 relative">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-purple-200 mb-1">
         {label}
       </label>
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <Icon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+      <div className="mt-1 relative rounded-md shadow-sm">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon className="h-5 w-5 text-purple-400" aria-hidden="true" />
         </div>
         <input
           id={id}
           name={id}
           type={type}
           required
-          className="input-with-icon w-full" // Use the new class
+          className="block w-full pl-10 pr-3 py-2 border border-purple-300 rounded-md leading-5 bg-white bg-opacity-10 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm text-white"
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
