@@ -331,7 +331,7 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
   });
 
   if (!user) {
-    return res.redirect(`${process.env.FRONTEND_URL}/auth/verify-email?status=error`);
+    return next(new ErrorResponse('Invalid or expired token', 400));
   }
 
   // Update user
@@ -340,7 +340,10 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
   user.verificationTokenExpire = undefined;
   await user.save();
 
-  res.redirect(`${process.env.FRONTEND_URL}/auth/verify-email?status=success`);
+  res.status(200).json({
+    success: true,
+    message: 'Email verified successfully'
+  });
 });
 
 // @desc    Resend verification email

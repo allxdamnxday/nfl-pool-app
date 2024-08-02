@@ -75,7 +75,7 @@ router.post('/register', register);
  *               properties:
  *                 success:
  *                   type: boolean
- *                 token:
+ *                 message:
  *                   type: string
  */
 router.get('/verify-email/:token', verifyEmail);

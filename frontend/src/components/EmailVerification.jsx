@@ -45,7 +45,9 @@ function EmailVerification() {
       }
     };
 
-    verifyEmail();
+    if (token) {
+      verifyEmail();
+    }
   }, [token, location, showToast, navigate]);
 
   return (
