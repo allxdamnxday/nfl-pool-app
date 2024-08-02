@@ -17,7 +17,7 @@ function EmailVerification() {
         const response = await api.get(`/auth/verify-email/${token}`);
         if (response.data.success) {
           setVerificationStatus('success');
-          showToast('Email verified successfully!', 'success');
+          showToast(response.data.message, 'success');
           setTimeout(() => navigate('/login'), 3000);
         } else {
           setVerificationStatus('error');
@@ -49,7 +49,7 @@ function EmailVerification() {
           )}
           {verificationStatus === 'success' && (
             <div className="text-center">
-              <p className="text-green-400 mb-4">Your email has been successfully verified!</p>
+              <p className="text-green-400 mb-4">{verificationStatus === 'success' ? verificationStatus : 'Email already verified'}</p>
               <p className="text-white mb-4">You will be redirected to the login page shortly.</p>
               <Link
                 to="/login"
