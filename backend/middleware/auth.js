@@ -33,6 +33,10 @@ exports.protect = asyncHandler(async (req, res, next) => {
       return next(new ErrorResponse('No user found with this id', 404));
     }
 
+    if (!user.isEmailVerified) {
+      return next(new ErrorResponse('Please verify your email before accessing this route', 403));
+    }
+
     req.userId = user._id; // Ensure userId is set
 
     console.log('Decoded User ID:', decoded.id); // Add this line to log the decoded user ID

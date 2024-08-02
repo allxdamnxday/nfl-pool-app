@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       logger.error('Login failed:', error);
       console.log('Login failed:', error);
-      throw error;
+      throw error; // Make sure to re-throw the error so it can be caught in the Login component
     }
   };
 
