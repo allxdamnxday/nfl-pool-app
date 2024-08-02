@@ -14,29 +14,14 @@ function EmailVerification() {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        if (token) {
-          // If there's a token in the URL, verify it
-          const response = await api.get(`/auth/verify-email/${token}`);
-          if (response.data.success) {
-            setVerificationStatus('success');
-            showToast('Email verified successfully!', 'success');
-            setTimeout(() => navigate('/login'), 3000);
-          } else {
-            setVerificationStatus('error');
-            showToast('Email verification failed.', 'error');
-          }
+        const response = await api.get(`/auth/verify-email/${token}`);
+        if (response.data.success) {
+          setVerificationStatus('success');
+          showToast('Email verified successfully!', 'success');
+          setTimeout(() => navigate('/login'), 3000);
         } else {
-          // If there's no token, check for status in query params
-          const params = new URLSearchParams(location.search);
-          const status = params.get('status');
-          if (status === 'success') {
-            setVerificationStatus('success');
-            showToast('Email verified successfully!', 'success');
-            setTimeout(() => navigate('/login'), 3000);
-          } else if (status === 'error') {
-            setVerificationStatus('error');
-            showToast('Email verification failed. Please try again.', 'error');
-          }
+          setVerificationStatus('error');
+          showToast('Email verification failed.', 'error');
         }
       } catch (error) {
         logger.error('Email verification error:', error);

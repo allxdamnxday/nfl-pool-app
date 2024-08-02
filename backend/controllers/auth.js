@@ -38,7 +38,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   });
 
   // Create verification URL
-  const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/verify-email/${verificationToken}`;
+  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${verificationToken}`;
 
   // Create HTML email template
   const htmlMessage = `
@@ -54,7 +54,11 @@ exports.register = asyncHandler(async (req, res, next) => {
       html: htmlMessage
     });
 
-    res.status(200).json({ success: true, message: 'Verification email sent' });
+    // Send response without token
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully. Please check your email to verify your account.'
+    });
   } catch (err) {
     console.error('Email sending error:', err);
     user.verificationToken = undefined;
@@ -123,7 +127,7 @@ exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Create verification URL
-  const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${verificationToken}`;
 
   // Create HTML email template
   const htmlMessage = `
@@ -370,7 +374,7 @@ exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Create verification URL
-  const verificationUrl = `${req.protocol}://${req.get('host')}/api/v1/auth/verify-email/${verificationToken}`;
+  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${verificationToken}`;
 
   // Create HTML email template
   const htmlMessage = `
