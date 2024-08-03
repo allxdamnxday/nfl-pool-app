@@ -4,10 +4,13 @@ import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
 import { FaEnvelope, FaLock, FaSignInAlt } from 'react-icons/fa';
+import api from '../services/api';
+import { login as loginService, resendVerificationEmail } from '../services/authService';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showResendVerification, setShowResendVerification] = useState(false);
   const { login } = useContext(AuthContext);
   const showToast = useToast();
   const navigate = useNavigate();
@@ -21,7 +24,23 @@ function Login() {
       navigate('/dashboard');
     } catch (error) {
       logger.error('Login failed:', error);
-      showToast('Login failed. Please check your credentials.', 'error');
+      if (error.message === 'Email not verified') {
+        setShowResendVerification(true);
+        showToast('Please verify your email before logging in. You can request a new verification link below.', 'warning');
+      } else {
+        showToast(error.message || 'Login failed. Please check your credentials.', 'error');
+      }
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      await resendVerificationEmail(email);
+      showToast('Verification email sent. Please check your inbox.', 'success');
+      setShowResendVerification(false);
+    } catch (error) {
+      logger.error('Failed to resend verification email:', error);
+      showToast(error.message || 'Failed to resend verification email. Please try again.', 'error');
     }
   };
 
@@ -56,24 +75,6 @@ function Login() {
                 onChange={setPassword}
                 icon={FaLock}
               />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-white">
-                    Remember me
-                  </label>
-                </div>
-                <div className="text-sm">
-                  <Link to="/forgot-password" className="font-medium text-purple-300 hover:text-white transition-colors">
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
               <button
                 type="submit"
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-300 ease-in-out transform hover:scale-105"
@@ -81,6 +82,20 @@ function Login() {
                 Sign In
               </button>
             </form>
+            
+            {showResendVerification && (
+              <div className="mt-4">
+                <p className="text-sm text-purple-200 mb-2">
+                  Your email is not verified. Need a new verification link?
+                </p>
+                <button
+                  onClick={handleResendVerification}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-300 ease-in-out"
+                >
+                  Resend Verification Email
+                </button>
+              </div>
+            )}
           </div>
           <div className="px-6 py-4 bg-purple-800 bg-opacity-50 sm:px-10">
             <p className="text-xs text-center text-purple-200">

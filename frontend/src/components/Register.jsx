@@ -20,11 +20,11 @@ function Register() {
     try {
       await register({ firstName, lastName, username, email, password });
       logger.info('Registration successful');
-      showToast('Registration successful', 'success');
-      navigate('/dashboard');
+      showToast('Registration successful. Please check your email to verify your account.', 'success');
+      navigate('/login');
     } catch (error) {
       logger.error('Registration failed:', error);
-      showToast('Registration failed. Please try again.', 'error');
+      showToast(error.response?.data?.message || 'Registration failed. Please try again.', 'error');
     }
   };
 

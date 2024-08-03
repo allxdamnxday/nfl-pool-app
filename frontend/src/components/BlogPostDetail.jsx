@@ -1,4 +1,4 @@
-//frontend/src/components/BlogPostDetail.jsx
+// frontend/src/components/BlogPostDetail.jsx
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';

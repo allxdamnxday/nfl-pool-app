@@ -9,7 +9,9 @@ const {
   forgotPassword,
   resetPassword,
   updateDetails,
-  updatePassword
+  updatePassword,
+  verifyEmail,
+  resendVerificationEmail
 } = require('../controllers/auth');
 const { protect } = require('../middleware/auth');
 
@@ -53,6 +55,33 @@ router.post('/register', register);
 
 /**
  * @swagger
+ * /api/v1/auth/verify-email/{token}:
+ *   get:
+ *     summary: Verify user email
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ */
+router.get('/verify-email/:token', verifyEmail);
+
+/**
+ * @swagger
  * /api/v1/auth/login:
  *   post:
  *     summary: Login user
@@ -85,6 +114,38 @@ router.post('/register', register);
  *                   type: string
  */
 router.post('/login', login);
+
+/**
+ * @swagger
+ * /api/v1/auth/resend-verification:
+ *   post:
+ *     summary: Resend verification email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Verification email sent
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ */
+router.post('/resend-verification', resendVerificationEmail);
 
 /**
  * @swagger
@@ -270,5 +331,7 @@ router.put('/updatedetails', protect, updateDetails);
  *                   type: string
  */
 router.put('/updatepassword', protect, updatePassword);
+
+
 
 module.exports = router;

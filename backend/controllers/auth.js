@@ -23,10 +23,53 @@ exports.register = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('A user with this first and last name combination already exists', 400));
   }
 
-  // Create user
-  const user = await User.create({ firstName, lastName, username, email, password });
+  // Generate verification token
+  const verificationToken = crypto.randomBytes(20).toString('hex');
 
-  sendTokenResponse(user, 201, res);
+  // Create user
+  const user = await User.create({
+    firstName,
+    lastName,
+    username,
+    email,
+    password,
+    verificationToken,
+    verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+  });
+
+  // Create verification URL
+  const frontendUrl = process.env.FRONTEND_URL || 'https://nfl-pool-app-54b97bcc2195.herokuapp.com';
+  const verificationUrl = `${frontendUrl}/auth/verify-email/${verificationToken}`;
+
+  console.log('Verification URL:', verificationUrl); // Add this log
+
+  // Create HTML email template
+  const htmlMessage = `
+    <h1>Verify Your Email</h1>
+    <p>Please click the link below to verify your email address:</p>
+    <a href="${verificationUrl}">${verificationUrl}</a>
+  `;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Email Verification - Football Eliminator',
+      html: htmlMessage
+    });
+
+    // Send response without token
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully. Please check your email to verify your account.'
+    });
+  } catch (err) {
+    console.error('Email sending error:', err);
+    user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse('Email could not be sent', 500));
+  }
 });
 
 // @desc    Login user
@@ -35,11 +78,8 @@ exports.register = asyncHandler(async (req, res, next) => {
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log(`Login attempt for email: ${email}`);
-
   // Validate email & password
   if (!email || !password) {
-    console.log('Login failed: Email or password not provided');
     return next(new ErrorResponse('Please provide an email and password', 400));
   }
 
@@ -47,54 +87,74 @@ exports.login = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    console.log(`Login failed: No user found with email ${email}`);
     return next(new ErrorResponse('Invalid credentials', 401));
   }
-
-  console.log(`User found: ${user.email} (Role: ${user.role})`);
 
   // Check if password matches
   const isMatch = await user.matchPassword(password);
 
-  console.log(`Password match result: ${isMatch}`);
-
   if (!isMatch) {
-    console.log(`Login failed: Password doesn't match for user ${email}`);
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
-  console.log(`Login successful for user: ${user.email} (Role: ${user.role})`);
-
-  // Generate token
-  const token = user.getSignedJwtToken();
-  console.log('Generated token:', token);
-
-  const options = {
-    expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000),
-    httpOnly: true
-  };
-
-  if (process.env.NODE_ENV === 'production') {
-    options.secure = true;
+  // Check if email is verified
+  if (!user.isEmailVerified) {
+    return next(new ErrorResponse('Please verify your email before logging in', 403));
   }
 
-  res
-    .status(200)
-    .cookie('token', token, options)
-    .json({
-      success: true,
-      token,
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        email: user.email,
-        role: user.role
-      }
+  // If we reach here, it means the login is successful
+  console.log(`Login successful for user: ${user.email} (Role: ${user.role})`);
+
+  sendTokenResponse(user, 200, res);
+});
+
+// Update the resendVerificationEmail function
+exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorResponse('There is no user with that email', 404));
+  }
+
+  if (user.isEmailVerified) {
+    return next(new ErrorResponse('This email is already verified', 400));
+  }
+
+  // Generate new verification token
+  const verificationToken = crypto.randomBytes(20).toString('hex');
+  user.verificationToken = verificationToken;
+  user.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+  await user.save({ validateBeforeSave: false });
+
+  // Create verification URL
+  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${verificationToken}`;
+
+  // Create HTML email template
+  const htmlMessage = `
+    <h1>Verify Your Email</h1>
+    <p>Please click the link below to verify your email address:</p>
+    <a href="${verificationUrl}">${verificationUrl}</a>
+  `;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Email Verification - Football Eliminator',
+      html: htmlMessage
     });
 
-  console.log('Login response sent');
+    res.status(200).json({ success: true, message: 'Verification email sent' });
+  } catch (err) {
+    console.error('Email sending error:', err);
+    user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse('Email could not be sent', 500));
+  }
 });
 
 // @desc    Log user out / clear cookie
@@ -265,6 +325,95 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
+// @desc    Verify email
+// @route   GET /api/v1/auth/verify-email/:token
+// @access  Public
+exports.verifyEmail = asyncHandler(async (req, res, next) => {
+  const { token } = req.params;
+
+  // Find user by verification token and check if it's expired
+  const user = await User.findOne({
+    $or: [
+      { verificationToken: token },
+      { verificationToken: undefined, isEmailVerified: true }
+    ],
+    verificationTokenExpire: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid or expired token', 400));
+  }
+
+  if (user.isEmailVerified) {
+    return res.status(200).json({
+      success: true,
+      message: 'Email already verified'
+    });
+  }
+
+  // Update user
+  user.isEmailVerified = true;
+  user.verificationToken = undefined;
+  user.verificationTokenExpire = undefined;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Email verified successfully'
+  });
+});
+
+// @desc    Resend verification email
+// @route   POST /api/v1/auth/resend-verification
+// @access  Public
+exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorResponse('There is no user with that email', 404));
+  }
+
+  if (user.isEmailVerified) {
+    return next(new ErrorResponse('This email is already verified', 400));
+  }
+
+  // Generate new verification token
+  const verificationToken = crypto.randomBytes(20).toString('hex');
+  user.verificationToken = verificationToken;
+  user.verificationTokenExpire = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+  await user.save({ validateBeforeSave: false });
+
+  // Create verification URL
+  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${verificationToken}`;
+
+  // Create HTML email template
+  const htmlMessage = `
+    <h1>Verify Your Email</h1>
+    <p>Please click the link below to verify your email address:</p>
+    <a href="${verificationUrl}">${verificationUrl}</a>
+  `;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Email Verification - Football Eliminator',
+      html: htmlMessage
+    });
+
+    res.status(200).json({ success: true, message: 'Verification email sent' });
+  } catch (err) {
+    console.error('Email sending error:', err);
+    user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse('Email could not be sent', 500));
+  }
+});
+
 // Helper function to get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
@@ -290,7 +439,8 @@ const sendTokenResponse = (user, statusCode, res) => {
         lastName: user.lastName,
         username: user.username,
         email: user.email,
-        role: user.role
+        role: user.role,
+        isEmailVerified: user.isEmailVerified
       }
     });
 };

@@ -5,29 +5,27 @@ const AUTH_URL = '/auth';
 
 export const login = async (email, password) => {
   try {
-    console.log(`Attempting login for email: ${email}`);
     const response = await api.post(`${AUTH_URL}/login`, { email, password });
-    console.log('Login response:', response.data);
-    if (response.data.token) {
+    if (response.data.success && response.data.token) {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      console.log('User role after login:', response.data.user.role);
+      return response.data;
+    } else {
+      throw new Error(response.data.message || 'Login failed');
     }
-    return response.data;
   } catch (error) {
-    console.error('Login error:', error.response ? error.response.data : error.message);
-    throw error;
+    if (error.response && error.response.status === 403) {
+      throw new Error('Email not verified');
+    }
+    throw new Error(error.response?.data?.message || error.message || 'Login failed');
   }
 };
 
 export const register = async ({ firstName, lastName, username, email, password }) => {
   try {
     const response = await api.post(`${AUTH_URL}/register`, { firstName, lastName, username, email, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      console.log('User role after registration:', response.data.user.role);
-    }
+    // Remove token and user storage
+    // Instead, return the response data which should include a success message
     return response.data;
   } catch (error) {
     console.error('Registration error:', error.response ? error.response.data : error.message);
@@ -76,5 +74,14 @@ export const resetPassword = async (resettoken, password) => {
   } catch (error) {
     console.error('Reset password error:', error.response ? error.response.data : error.message);
     throw error;
+  }
+};
+
+export const resendVerificationEmail = async (email) => {
+  try {
+    const response = await api.post(`${AUTH_URL}/resend-verification`, { email });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || error.message || 'Failed to resend verification email');
   }
 };

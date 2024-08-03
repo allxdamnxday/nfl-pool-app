@@ -15,14 +15,15 @@ const UserSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required: [true, 'Please add a username']
+    required: [true, 'Please add a username'],
+    unique: true
   },
   email: {
     type: String,
     required: [true, 'Please add an email'],
     unique: true,
     match: [
-      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       'Please add a valid email'
     ]
   },
@@ -37,6 +38,12 @@ const UserSchema = new mongoose.Schema({
     enum: ['user', 'admin'],
     default: 'user'
   },
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationToken: String,
+  verificationTokenExpire: Date,
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {

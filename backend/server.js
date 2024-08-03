@@ -15,8 +15,7 @@ const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
-const blogs = require('./routes/blogs');
-const commentRoutes = require('./routes/commentRoutes');
+
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -45,7 +44,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Route files
 const seasonRoutes = require('./routes/season');
-const gameRoutes = require('./routes/games');
 
 const auth = require('./routes/auth');
 const pools = require('./routes/pools');
@@ -55,6 +53,8 @@ const admin = require('./routes/admin');
 const entries = require('./routes/entries');
 const userEntries = require('./routes/userEntries');
 const requests = require('./routes/requests');
+const blogs = require('./routes/blogs');
+const commentRoutes = require('./routes/commentRoutes');
 
 // Mount routers
 
@@ -71,7 +71,7 @@ app.use('/api/v1/entries/:entryId/picks', pickRoutes); // Use the pickRoutes her
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
-app.use('/api/v1/comments', commentRoutes);
+app.use('/api/v1/blogs', commentRoutes); // Use the commentRoutes here
 
 // Use custom error handler
 app.use(errorHandler);

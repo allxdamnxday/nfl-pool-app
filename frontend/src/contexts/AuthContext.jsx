@@ -44,14 +44,13 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       logger.error('Login failed:', error);
       console.log('Login failed:', error);
-      throw error;
+      throw error; // Make sure to re-throw the error so it can be caught in the Login component
     }
   };
 
   const register = async ({ firstName, lastName, username, email, password }) => {
     try {
       const registeredUser = await registerService({ firstName, lastName, username, email, password });
-      setUser(registeredUser);
       logger.info('User registered successfully', registeredUser);
       console.log('User registered:', registeredUser);
       return registeredUser;
@@ -61,6 +60,7 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
 
   const logout = async () => {
     try {

@@ -4,7 +4,7 @@ exports.createComment = async (req, res) => {
   try {
     const { blogId } = req.params;
     const { content } = req.body;
-    const comment = await commentService.createComment(blogId, req.user._id, content);
+    const comment = await commentService.createComment(blogId, req.user.id, content);
     res.status(201).json(comment);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -14,17 +14,18 @@ exports.createComment = async (req, res) => {
 exports.getBlogComments = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const comments = await commentService.getBlogComments(blogId);
-    res.json(comments);
+    const comments = await Comment.find({ blog: blogId }).sort({ createdAt: -1 });
+    res.json({ data: comments });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ message: 'Error fetching comments' });
   }
 };
 
 exports.likeComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const comment = await commentService.likeComment(commentId, req.user._id);
+    const comment = await commentService.likeComment(commentId, req.user.id);
     res.json(comment);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -35,7 +36,7 @@ exports.editComment = async (req, res) => {
   try {
     const { commentId } = req.params;
     const { content } = req.body;
-    const comment = await commentService.editComment(commentId, req.user._id, content);
+    const comment = await commentService.editComment(commentId, req.user.id, content);
     res.json(comment);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -45,7 +46,7 @@ exports.editComment = async (req, res) => {
 exports.deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    await commentService.deleteComment(commentId, req.user._id);
+    await commentService.deleteComment(commentId, req.user.id);
     res.json({ message: 'Comment deleted successfully' });
   } catch (error) {
     res.status(400).json({ message: error.message });

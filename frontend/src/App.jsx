@@ -28,6 +28,7 @@ import { FootballButton, FieldGoal } from './components/CustomComponents';
 import BlogPostList from './components/BlogPostList';
 import BlogPostDetail from './components/BlogPostDetail';
 import BlogPostCreate from './components/BlogPostCreate';
+import EmailVerification from './components/EmailVerification';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -128,6 +129,8 @@ const AnimatedRoutes = () => {
               </ProtectedAdminRoute>
             }
           />
+          <Route path="/auth/verify-email" element={<EmailVerification />} />
+          <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>
