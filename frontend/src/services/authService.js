@@ -5,20 +5,15 @@ const AUTH_URL = '/auth';
 
 export const login = async (email, password) => {
   try {
-    console.log(`Attempting login for email: ${email}`);
     const response = await api.post(`${AUTH_URL}/login`, { email, password });
-    console.log('Login response:', response.data);
-
     if (response.data.success && response.data.token) {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      console.log('User role after login:', response.data.user.role);
       return response.data;
     } else {
       throw new Error(response.data.message || 'Login failed');
     }
   } catch (error) {
-    console.error('Login error:', error.response ? error.response.data : error.message);
     if (error.response && error.response.status === 403) {
       throw new Error('Email not verified');
     }
@@ -29,11 +24,8 @@ export const login = async (email, password) => {
 export const register = async ({ firstName, lastName, username, email, password }) => {
   try {
     const response = await api.post(`${AUTH_URL}/register`, { firstName, lastName, username, email, password });
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      console.log('User role after registration:', response.data.user.role);
-    }
+    // Remove token and user storage
+    // Instead, return the response data which should include a success message
     return response.data;
   } catch (error) {
     console.error('Registration error:', error.response ? error.response.data : error.message);

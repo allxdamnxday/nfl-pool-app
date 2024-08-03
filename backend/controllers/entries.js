@@ -3,6 +3,7 @@ const Pool = require('../models/Pool');
 const Request = require('../models/Request');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
+const mongoose = require('mongoose');
 
 // @desc    Get all entries for a user
 // @route   GET /api/v1/entries/user
@@ -172,32 +173,53 @@ exports.deleteEntry = asyncHandler(async (req, res, next) => {
 exports.createEntry = asyncHandler(async (req, res, next) => {
   const { poolId } = req.params;
 
-  // Check if pool exists
-  const pool = await Pool.findById(poolId);
-  if (!pool) {
-    return next(new ErrorResponse(`No pool found with id of ${poolId}`, 404));
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Check if pool exists
+    const pool = await Pool.findById(poolId).session(session);
+    if (!pool) {
+      throw new ErrorResponse(`No pool found with id of ${poolId}`, 404);
+    }
+
+    // Check if user already has an active entry in this pool
+    const existingEntry = await Entry.findOne({ user: req.user.id, pool: poolId, isActive: true }).session(session);
+    if (existingEntry) {
+      throw new ErrorResponse('User already has an active entry in this pool', 400);
+    }
+
+    // Check for an approved request
+    const approvedRequest = await Entry.findOne({ user: req.user.id, pool: poolId, isActive: false }).session(session);
+    if (!approvedRequest) {
+      throw new ErrorResponse('User does not have an approved request to join this pool', 403);
+    }
+
+    // Get the next available entry number for this pool
+    const highestEntry = await Entry.findOne({ pool: poolId })
+      .sort('-entryNumber')
+      .limit(1)
+      .session(session);
+    
+    const nextEntryNumber = (highestEntry?.entryNumber || 0) + 1;
+
+    // Update the approved request to be an active entry with the new entry number
+    approvedRequest.isActive = true;
+    approvedRequest.entryNumber = nextEntryNumber;
+    await approvedRequest.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      success: true,
+      data: approvedRequest
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    next(error);
   }
-
-  // Check if user already has an active entry in this pool
-  const existingEntry = await Entry.findOne({ user: req.user.id, pool: poolId, isActive: true });
-  if (existingEntry) {
-    return next(new ErrorResponse('User already has an active entry in this pool', 400));
-  }
-
-  // Check for an approved request
-  const approvedRequest = await Entry.findOne({ user: req.user.id, pool: poolId, isActive: false });
-  if (!approvedRequest) {
-    return next(new ErrorResponse('User does not have an approved request to join this pool', 403));
-  }
-
-  // Update the approved request to be an active entry
-  approvedRequest.isActive = true;
-  await approvedRequest.save();
-
-  res.status(201).json({
-    success: true,
-    data: approvedRequest
-  });
 });
 
 // @desc    Add or update a pick for an entry

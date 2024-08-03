@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
@@ -7,7 +7,6 @@ import logger from '../utils/logger';
 function EmailVerification() {
   const [verificationStatus, setVerificationStatus] = useState('verifying');
   const { token } = useParams();
-  const location = useLocation();
   const showToast = useToast();
   const navigate = useNavigate();
 
@@ -17,7 +16,7 @@ function EmailVerification() {
         const response = await api.get(`/auth/verify-email/${token}`);
         if (response.data.success) {
           setVerificationStatus('success');
-          showToast('Email verified successfully!', 'success');
+          showToast(response.data.message, 'success');
           setTimeout(() => navigate('/login'), 3000);
         } else {
           setVerificationStatus('error');
@@ -33,7 +32,7 @@ function EmailVerification() {
     if (token) {
       verifyEmail();
     }
-  }, [token, location, showToast, navigate]);
+  }, [token, showToast, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8">
@@ -49,7 +48,7 @@ function EmailVerification() {
           )}
           {verificationStatus === 'success' && (
             <div className="text-center">
-              <p className="text-green-400 mb-4">Your email has been successfully verified!</p>
+              <p className="text-green-400 mb-4">{verificationStatus === 'success' ? verificationStatus : 'Email already verified'}</p>
               <p className="text-white mb-4">You will be redirected to the login page shortly.</p>
               <Link
                 to="/login"

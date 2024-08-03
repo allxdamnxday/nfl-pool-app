@@ -38,7 +38,10 @@ exports.register = asyncHandler(async (req, res, next) => {
   });
 
   // Create verification URL
-  const verificationUrl = `${process.env.FRONTEND_URL}/auth/verify-email/${verificationToken}`;
+  const frontendUrl = process.env.FRONTEND_URL || 'https://nfl-pool-app-54b97bcc2195.herokuapp.com';
+  const verificationUrl = `${frontendUrl}/auth/verify-email/${verificationToken}`;
+
+  console.log('Verification URL:', verificationUrl); // Add this log
 
   // Create HTML email template
   const htmlMessage = `
@@ -330,12 +333,22 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
 
   // Find user by verification token and check if it's expired
   const user = await User.findOne({
-    verificationToken: token,
+    $or: [
+      { verificationToken: token },
+      { verificationToken: undefined, isEmailVerified: true }
+    ],
     verificationTokenExpire: { $gt: Date.now() }
   });
 
   if (!user) {
     return next(new ErrorResponse('Invalid or expired token', 400));
+  }
+
+  if (user.isEmailVerified) {
+    return res.status(200).json({
+      success: true,
+      message: 'Email already verified'
+    });
   }
 
   // Update user
