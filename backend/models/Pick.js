@@ -2,24 +2,16 @@
 const mongoose = require('mongoose');
 
 const PickSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'User',
-    required: true
-  },
   entry: {
-    type: mongoose.Schema.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Entry',
-    required: true
-  },
-  game: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Game',
     required: true
   },
   week: {
     type: Number,
-    required: true
+    required: true,
+    min: 1,
+    max: 18
   },
   team: {
     type: String,
@@ -33,5 +25,7 @@ const PickSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+PickSchema.index({ entry: 1, week: 1 }, { unique: true });
 
 module.exports = mongoose.model('Pick', PickSchema);

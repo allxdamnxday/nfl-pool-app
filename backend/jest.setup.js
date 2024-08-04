@@ -1,8 +1,12 @@
+const dotenv = require('dotenv');
+const path = require('path');
+
+dotenv.config({ path: path.resolve(__dirname, '.env.test') });
+
 const mongoose = require('mongoose');
-require('dotenv').config({ path: '.env.test' });
 
 beforeAll(async () => {
-  await mongoose.connect(process.env.MONGODB_URI, {
+  await mongoose.connect(process.env.MONGO_URI_TEST, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,

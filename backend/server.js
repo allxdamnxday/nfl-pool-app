@@ -17,6 +17,7 @@ const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
 
 
+
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
 
@@ -32,12 +33,20 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true
+}));
 app.use(helmet());
 app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
 app.use(apiLimiter);
+
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
 
 // Swagger UI setup
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -67,7 +76,7 @@ app.use('/api/v1/games', games);
 app.use('/api/v1/admin', admin);
 app.use('/api/v1/entries', entries);
 app.use('/api/v1/user/entries', userEntries);
-app.use('/api/v1/entries/:entryId/picks', pickRoutes); // Use the pickRoutes here
+app.use('/api/v1/picks', pickRoutes);
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
@@ -88,8 +97,6 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useCreateIndex: true,
-      useFindAndModify: false
     });
     console.log('MongoDB connected');
   } catch (err) {
@@ -98,12 +105,27 @@ const connectDB = async () => {
   }
 };
 
+const gracefulShutdown = (server) => {
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+      console.log('HTTP server closed');
+      mongoose.connection.close(false, () => {
+        console.log('MongoDB connection closed');
+        process.exit(0);
+      });
+    });
+  });
+};
+
 const startServer = async () => {
   await connectDB();
   const PORT = process.env.PORT || 5000;
   const server = app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   });
+
+  gracefulShutdown(server);
 
   // Handle unhandled promise rejections
   process.on('unhandledRejection', (err) => {

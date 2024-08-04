@@ -84,6 +84,7 @@ function UserEntries() {
           totalEntries={entries.length}
           onEntryChange={handleEntryChange}
           entryName={entries[currentEntry]?.pool.name}
+          entryNumber={entries[currentEntry]?.entryNumber}
         />
 
         <AnimatePresence>
@@ -112,7 +113,7 @@ function UserEntries() {
   );
 }
 
-function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName }) {
+function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName, entryNumber }) {
   return (
     <motion.div 
       className="flex justify-between items-center mb-6 bg-white p-2 rounded-full shadow-md overflow-hidden"
@@ -130,7 +131,7 @@ function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName })
         <FaChevronLeft />
       </motion.button>
       <span className="text-lg md:text-xl font-bold px-4 py-2 truncate text-gray-800">
-        {entryName}
+        {entryName} - Entry #{entryNumber}
       </span>
       <motion.button 
         whileHover={{ scale: 1.1 }}

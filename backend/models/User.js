@@ -113,4 +113,19 @@ UserSchema.methods.getResetPasswordToken = function() {
   return resetToken;
 };
 
+// Add virtual fields for requests and entries
+UserSchema.virtual('requests', {
+  ref: 'Request',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: false
+});
+
+UserSchema.virtual('entries', {
+  ref: 'Entry',
+  localField: '_id',
+  foreignField: 'user',
+  justOne: false
+});
+
 module.exports = mongoose.model('User', UserSchema);

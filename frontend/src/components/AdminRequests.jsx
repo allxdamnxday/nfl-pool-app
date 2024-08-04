@@ -1,6 +1,6 @@
 // frontend/src/components/AdminRequests.jsx
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getRequests, approveRequest } from '../services/requestService';
 import { useToast } from '../contexts/ToastContext';
 import { FaUserAlt, FaFootballBall, FaClipboardList, FaCheckCircle, FaDollarSign, FaClock } from 'react-icons/fa';
@@ -45,42 +45,29 @@ function AdminRequests() {
   };
 
   const renderRequestCard = (request, isApproved = false) => (
-    <div key={request._id} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 transition duration-300 ease-in-out hover:shadow-md">
-      <p className="text-gray-700 mb-2">
-        <FaUserAlt className="inline-block mr-2 text-blue-500" />
-        User: {request.user?.username || 'Unknown User'}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <FaFootballBall className="inline-block mr-2 text-purple-500" />
-        Pool: {request.pool?.name || 'Unknown Pool'}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <FaClipboardList className="inline-block mr-2 text-green-500" />
-        Number of Entries: {request.numberOfEntries}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <FaDollarSign className="inline-block mr-2 text-yellow-500" />
-        Payment Method: {request.paymentMethod || 'Not specified'}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <FaDollarSign className="inline-block mr-2 text-yellow-500" />
-        Payment Amount: ${request.paymentAmount || 'Not specified'}
-      </p>
-      <p className="text-gray-700 mb-2">
-        <FaCheckCircle className="inline-block mr-2 text-green-500" />
-        Status: {request.status}
-      </p>
-      <p className="text-gray-700 mb-4">
-        <FaClock className="inline-block mr-2 text-blue-500" />
-        Created: {new Date(request.createdAt).toLocaleString()}
-      </p>
-      {!isApproved && request.status === 'payment_pending' && (
-        <button
-          onClick={() => handleApprove(request._id)}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 w-full"
-        >
-          Approve
-        </button>
+    <div key={request._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-purple-600 text-white p-4">
+        <h3 className="text-xl font-semibold">Request Details</h3>
+      </div>
+      <div className="p-4 space-y-3">
+        <InfoItem icon={FaUserAlt} label="User" value={request.user?.username || 'Unknown User'} />
+        <InfoItem icon={FaFootballBall} label="Pool" value={request.pool?.name || 'Unknown Pool'} />
+        <InfoItem icon={FaClipboardList} label="Number of Entries" value={request.numberOfEntries} />
+        <InfoItem icon={FaDollarSign} label="Payment Method" value={request.paymentMethod} />
+        <InfoItem icon={FaDollarSign} label="Payment Amount" value={`$${request.paymentAmount || request.totalAmount}`} />
+        <InfoItem icon={FaCheckCircle} label="Payment Confirmation" value={request.paymentConfirmation} />
+        <InfoItem icon={FaCheckCircle} label="Status" value={request.status} />
+        <InfoItem icon={FaClock} label="Created" value={new Date(request.createdAt).toLocaleString()} />
+      </div>
+      {!isApproved && (
+        <div className="px-4 py-3 bg-gray-50 text-right">
+          <button
+            onClick={() => handleApprove(request._id)}
+            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200"
+          >
+            Approve
+          </button>
+        </div>
       )}
     </div>
   );
@@ -111,6 +98,16 @@ function AdminRequests() {
         )}
       </div>
     </ErrorBoundary>
+  );
+}
+
+function InfoItem({ icon: Icon, label, value }) {
+  return (
+    <div className="flex items-center">
+      <Icon className="text-purple-500 mr-2" />
+      <span className="font-medium mr-2">{label}:</span>
+      <span>{value}</span>
+    </div>
   );
 }
 

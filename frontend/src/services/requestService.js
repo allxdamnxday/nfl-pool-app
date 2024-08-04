@@ -49,11 +49,11 @@ export const getUserRequests = async () => {
   }
 };
 
-export const confirmPayment = async (requestId, paymentMethod, paymentAmount, paymentConfirmation) => {
+export const confirmPayment = async (requestId, paymentDetails) => {
   try {
     const response = await api.put(
       `${API_URL}/${requestId}/confirm-payment`,
-      { paymentMethod, paymentAmount, paymentConfirmation }
+      paymentDetails
     );
     logger.info('Payment confirmed:', response.data);
     return response.data.data;

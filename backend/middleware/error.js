@@ -38,6 +38,11 @@ const errorHandler = (err, req, res, next) => {
     error = new ErrorResponse(message, 401);
   }
 
+  // Custom application error
+  if (err instanceof ErrorResponse) {
+    error = err;
+  }
+
   res.status(error.statusCode || 500).json({
     success: false,
     error: error.message || 'Server Error',

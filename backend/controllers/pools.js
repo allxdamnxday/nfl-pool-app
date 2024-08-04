@@ -6,6 +6,7 @@ const Request = require('../models/Request');
 const mongoose = require('mongoose');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
+const poolService = require('../services/poolService');
 
 exports.getPools = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
@@ -47,32 +48,6 @@ exports.deletePool = asyncHandler(async (req, res, next) => {
   }
   await pool.remove();
   res.status(200).json({ success: true, data: {} });
-});
-
-exports.joinPool = asyncHandler(async (req, res, next) => {
-  const pool = await Pool.findById(req.params.id);
-  if (!pool) {
-    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
-  }
-  if (pool.participants.includes(req.user.id)) {
-    return next(new ErrorResponse(`User is already in this pool`, 400));
-  }
-  pool.participants.push(req.user.id);
-  await pool.save();
-  res.status(200).json({ success: true, data: pool });
-});
-
-exports.leavePool = asyncHandler(async (req, res, next) => {
-  const pool = await Pool.findById(req.params.id);
-  if (!pool) {
-    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
-  }
-  if (!pool.participants.includes(req.user.id)) {
-    return next(new ErrorResponse(`User is not in this pool`, 400));
-  }
-  pool.participants = pool.participants.filter(participant => participant.toString() !== req.user.id);
-  await pool.save();
-  res.status(200).json({ success: true, data: pool });
 });
 
 exports.getPoolStats = asyncHandler(async (req, res, next) => {
@@ -150,50 +125,8 @@ exports.getUserPools = asyncHandler(async (req, res, next) => {
 });
 
 exports.getAvailablePools = asyncHandler(async (req, res, next) => {
-  // Find all open pools
-  const openPools = await Pool.find({ status: 'open' });
-
-  // For each pool, check the user's entries and requests
-  const availablePools = await Promise.all(openPools.map(async (pool) => {
-    // Count active entries
-    const activeEntries = await Entry.countDocuments({ 
-      pool: pool._id, 
-      user: req.user.id,
-      isActive: true
-    });
-
-    // Count pending requests
-    const pendingRequests = await Request.countDocuments({ 
-      pool: pool._id, 
-      user: req.user.id, 
-      status: 'pending'
-    });
-
-    // Count approved but not yet active entries
-    const approvedEntries = await Entry.countDocuments({ 
-      pool: pool._id, 
-      user: req.user.id,
-      isActive: false
-    });
-
-    const totalEntries = activeEntries + pendingRequests + approvedEntries;
-
-    return {
-      ...pool.toObject(),
-      userEntries: totalEntries,
-      canJoin: totalEntries < 3,
-      activeEntries,
-      pendingRequests,
-      approvedEntries
-    };
-  }));
-
-  // Include all pools, but mark which ones the user can join
-  res.status(200).json({
-    success: true,
-    count: availablePools.length,
-    data: availablePools
-  });
+  const pools = await poolService.getAvailablePools(req.user.id);
+  res.status(200).json({ success: true, count: pools.length, data: pools });
 });
 
 // Update the status of a pool Admin Route

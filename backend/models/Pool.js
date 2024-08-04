@@ -52,7 +52,31 @@ const PoolSchema = new mongoose.Schema({
   eliminatedUsers: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  description: {
+    type: String,
+    required: [true, 'Please add a pool description'],
+    maxlength: [500, 'Description cannot be more than 500 characters']
+  },
+  startDate: {
+    type: Date,
+    required: [true, 'Please add a start date']
+  },
+  endDate: {
+    type: Date,
+    required: [true, 'Please add an end date']
+  },
+  maxEntries: {
+    type: Number,
+    required: [true, 'Please add a maximum number of entries'],
+    min: [2, 'Pool must allow at least 2 entries'],
+    max: [30000, 'Pool cannot exceed 30000 entries']
+  },
+  prizePot: {
+    type: Number,
+    required: [true, 'Please add a prize pot amount'],
+    min: [0, 'Prize pot cannot be negative']
+  }
 }, {
   timestamps: true,
   toJSON: { virtuals: true },
@@ -62,6 +86,20 @@ const PoolSchema = new mongoose.Schema({
 // Reverse populate with virtuals
 PoolSchema.virtual('picks', {
   ref: 'Pick',
+  localField: '_id',
+  foreignField: 'pool',
+  justOne: false
+});
+
+PoolSchema.virtual('entries', {
+  ref: 'Entry',
+  localField: '_id',
+  foreignField: 'pool',
+  justOne: false
+});
+
+PoolSchema.virtual('requests', {
+  ref: 'Request',
   localField: '_id',
   foreignField: 'pool',
   justOne: false

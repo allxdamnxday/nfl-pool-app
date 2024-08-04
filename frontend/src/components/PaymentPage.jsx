@@ -24,9 +24,7 @@ function PaymentPage() {
     setIsSubmitting(true);
     logger.info(`Attempting to complete payment for pool ${poolId}`);
     try {
-      const request = await createRequest(poolId, numberOfEntries);
-      await confirmPayment(request._id, paymentMethod, totalAmount, paymentConfirmation);
-      logger.info(`Payment request created and confirmed successfully for pool ${poolId}`);
+      const request = await createRequest(poolId, numberOfEntries, paymentMethod, paymentConfirmation, totalAmount);
       showToast('Join request submitted successfully! Awaiting admin approval.', 'success');
       navigate('/dashboard');
     } catch (err) {

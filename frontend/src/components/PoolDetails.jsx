@@ -1,8 +1,9 @@
 // frontend/src/components/PoolDetails.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPoolDetails, joinPool } from '../services/poolService';
-import { createPick } from '../services/pickService';
+import { getPoolDetails } from '../services/poolService';
+import { createJoinRequest } from '../services/requestService';
+import { addOrUpdatePick } from '../services/pickService';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { FaUsers, FaDollarSign, FaTrophy, FaCalendarAlt, FaFootballBall, FaArrowLeft } from 'react-icons/fa';
@@ -23,9 +24,9 @@ function PoolDetails() {
   useEffect(() => {
     const fetchPoolDetails = async () => {
       try {
-        const { pool, games } = await getPoolDetails(id);
-        setPool(pool);
-        setGames(games);
+        const poolData = await getPoolDetails(id);
+        setPool(poolData);
+        setGames(poolData.games);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch pool details. Please try again later.');
@@ -38,13 +39,13 @@ function PoolDetails() {
 
   const handleJoinPool = async () => {
     try {
-      await joinPool(id);
-      showToast('Successfully joined the pool!', 'success');
-      // Refresh pool details after joining
-      const { pool: updatedPool } = await getPoolDetails(id);
-      setPool(updatedPool);
+      await createJoinRequest(id, 1); // Assuming 1 entry by default
+      showToast('Join request submitted successfully!', 'success');
+      // Refresh pool details after submitting join request
+      const updatedPoolData = await getPoolDetails(id);
+      setPool(updatedPoolData);
     } catch (err) {
-      showToast('Failed to join the pool. Please try again later.', 'error');
+      showToast('Failed to submit join request. Please try again later.', 'error');
     }
   };
 
@@ -55,13 +56,11 @@ function PoolDetails() {
     }
 
     try {
-      await createPick(id, {
-        game: selectedGame._id,
-        team: selectedTeam._id,
-        market: selectedGame.markets[0].marketId, // Assuming we're using the first market (e.g., moneyline)
-      });
+      await addOrUpdatePick(pool.userEntry._id, selectedTeam._id, pool.currentWeek);
       showToast('Pick submitted successfully!', 'success');
-      navigate(`/pools/${id}`);
+      // Refresh pool details after submitting pick
+      const updatedPoolData = await getPoolDetails(id);
+      setPool(updatedPoolData);
     } catch (err) {
       showToast('Failed to submit pick. Please try again.', 'error');
     }
@@ -71,7 +70,7 @@ function PoolDetails() {
   if (error) return <div className="text-center text-red-500 text-2xl mt-12">{error}</div>;
   if (!pool) return <div className="text-center text-gray-800 text-2xl mt-12">Pool not found.</div>;
 
-  const isUserParticipant = pool.participants.some(participant => participant._id === user.id);
+  const isUserParticipant = pool.userEntries > 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -88,12 +87,12 @@ function PoolDetails() {
             <InfoItem icon={FaFootballBall} label="Status" value={pool.status} />
           </div>
           <div className="space-y-4">
-            <InfoItem icon={FaUsers} label="Participants" value={`${pool.participants.length} / ${pool.maxParticipants}`} />
+            <InfoItem icon={FaUsers} label="Active Entries" value={pool.activeEntries} />
             <InfoItem icon={FaDollarSign} label="Entry Fee" value={`$${pool.entryFee}`} />
             <InfoItem icon={FaTrophy} label="Prize" value={`$${pool.prizeAmount}`} />
           </div>
         </div>
-        {!isUserParticipant && (
+        {!pool.userEntries && (
           <button
             onClick={handleJoinPool}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-full transition-colors duration-200 mb-8"
@@ -101,7 +100,7 @@ function PoolDetails() {
             Join Pool
           </button>
         )}
-        {isUserParticipant && (
+        {pool.userEntries > 0 && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Make Your Pick</h2>
             <div className="space-y-4 mb-6">

@@ -12,11 +12,15 @@ const {
 
 const router = express.Router();
 
-router.post('/', protect, createRequest);
-router.put('/:id/approve', protect, authorize('admin'), approveRequest);
-router.get('/', protect, authorize('admin'), getRequests);
-router.get('/pool/:poolId', protect, authorize('admin'), getPoolRequests);
-router.get('/user', protect, getUserRequests);
-router.put('/:id/confirm-payment', protect, confirmPayment);
+router.use(protect);
+
+router.post('/', createRequest);
+router.get('/', getUserRequests);
+router.get('/pool/:poolId', authorize('admin'), getPoolRequests);
+
+router.get('/:id', getRequest);
+router.put('/:id/confirm-payment', confirmPayment);
+router.put('/:id/approve', authorize('admin'), approveRequest);
+router.put('/:id/reject', authorize('admin'), rejectRequest);
 
 module.exports = router;
