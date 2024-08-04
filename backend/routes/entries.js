@@ -87,7 +87,7 @@ router.route('/:entryId/picks')
   .post(protect, checkGameStart, addOrUpdatePick);
 
 // Get a pick for a specific week
-router.route('/:entryId/picks/:week')
+router.route('/:entryId/:entryNumber/picks/:week')
   .get(protect, getPickForWeek);
 
 module.exports = router;

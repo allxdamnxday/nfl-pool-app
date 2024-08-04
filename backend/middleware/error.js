@@ -1,47 +1,33 @@
 // backend/middleware/error.js
 const ErrorResponse = require('../utils/errorResponse');
 
+const errorTypes = {
+  CastError: { message: 'Resource not found', statusCode: 404 },
+  ValidationError: { statusCode: 400 },
+  JsonWebTokenError: { message: 'Not authorized to access this route', statusCode: 401 },
+  TokenExpiredError: { message: 'Your session has expired. Please log in again.', statusCode: 401 },
+};
+
 const errorHandler = (err, req, res, next) => {
-  let error = { ...err };
-  error.message = err.message;
+  console.error('Error Middleware - Full error object:', err);
 
-  // Log to console for dev
-  console.error(err);
+  let error = { ...err, message: err.message };
 
-  // Mongoose bad ObjectId
-  if (err.name === 'CastError') {
-    const message = `Resource not found with id of ${err.value}`;
-    error = new ErrorResponse(message, 404);
+  // Log the error stack
+  console.error('Error Middleware - Error stack:', err.stack);
+
+  if (errorTypes[err.name]) {
+    error = new ErrorResponse(
+      errorTypes[err.name].message || Object.values(err.errors).map(val => val.message),
+      errorTypes[err.name].statusCode
+    );
   }
 
-  // Mongoose duplicate key
   if (err.code === 11000) {
-    const message = 'Duplicate field value entered';
-    error = new ErrorResponse(message, 400);
+    error = new ErrorResponse('Duplicate field value entered', 400);
   }
 
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
-    const message = Object.values(err.errors).map(val => val.message);
-    error = new ErrorResponse(message, 400);
-  }
-
-  // JWT Error
-  if (err.name === 'JsonWebTokenError') {
-    const message = 'Not authorized to access this route';
-    error = new ErrorResponse(message, 401);
-  }
-
-  // JWT Expired Error
-  if (err.name === 'TokenExpiredError') {
-    const message = 'Your session has expired. Please log in again.';
-    error = new ErrorResponse(message, 401);
-  }
-
-  // Custom application error
-  if (err instanceof ErrorResponse) {
-    error = err;
-  }
+  console.error('Error Middleware - Formatted error:', error);
 
   res.status(error.statusCode || 500).json({
     success: false,

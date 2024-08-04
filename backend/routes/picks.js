@@ -15,11 +15,11 @@ router.route('/pool/:poolId')
   .get(protect, getPicksForPool);
 
 // Get pick for a specific week
-router.route('/:entryId/:week')
+router.route('/:entryId/:entryNumber/:week')
   .get(protect, getPickForWeek);
 
 // Update or delete a pick
-router.route('/:entryId/:pickId')
+router.route('/:entryId/:entryNumber/:week')
   .put(protect, checkGameStart, updatePick)
   .delete(protect, deletePick);
 

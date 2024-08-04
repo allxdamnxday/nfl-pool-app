@@ -2,18 +2,54 @@ const mongoose = require('mongoose');
 const requestService = require('../../services/requestService');
 const Request = require('../../models/Request');
 const Entry = require('../../models/Entry');
+const User = require('../../models/User');
+const Pool = require('../../models/Pool');
+const { connectToDatabase, closeDatabase, clearDatabase } = require('../testUtils');
 
 describe('Request Service', () => {
+  let user, pool;
+
+  beforeAll(async () => {
+    await connectToDatabase();
+  });
+
+  afterAll(async () => {
+    await closeDatabase();
+  });
+
+  beforeEach(async () => {
+    await clearDatabase();
+    user = await User.create({
+      firstName: 'Test',
+      lastName: 'User',
+      username: 'testuser',
+      email: 'test@example.com',
+      password: 'password123'
+    });
+    pool = await Pool.create({
+      name: 'Test Pool',
+      entryFee: 50,
+      maxEntries: 10
+    });
+  });
+
   describe('createRequest', () => {
     it('should create a new request', async () => {
-      const userId = new mongoose.Types.ObjectId();
-      const poolId = new mongoose.Types.ObjectId();
-      const request = await requestService.createRequest(userId, poolId, 2);
+      const requestData = {
+        userId: user._id,
+        poolId: pool._id,
+        numberOfEntries: 2,
+        totalAmount: 100 // 2 * 50 (entryFee)
+      };
 
-      expect(request.user.toString()).toBe(userId.toString());
-      expect(request.pool.toString()).toBe(poolId.toString());
+      const request = await requestService.createRequest(requestData);
+
+      expect(request).toBeDefined();
+      expect(request.user.toString()).toBe(user._id.toString());
+      expect(request.pool.toString()).toBe(pool._id.toString());
       expect(request.numberOfEntries).toBe(2);
       expect(request.status).toBe('pending');
+      expect(request.totalAmount).toBe(100);
     });
 
     it('should throw an error if user exceeds maximum entries', async () => {

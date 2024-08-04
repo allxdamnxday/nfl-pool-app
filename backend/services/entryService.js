@@ -1,5 +1,6 @@
 const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
+const Pick = require('../models/Pick');
 const ErrorResponse = require('../utils/errorResponse');
 
 class EntryService {
@@ -7,6 +8,10 @@ class EntryService {
     return await Entry.find({ user: userId }).populate('pool', 'name currentWeek');
   }
 
+  async getUserEntriesForPool(userId, poolId) {
+    return await Entry.find({ user: userId, pool: poolId });
+  }
+  
   async getEntry(entryId, userId) {
     const entry = await Entry.findById(entryId).populate('pool').populate('picks');
     if (!entry) {
@@ -45,22 +50,25 @@ class EntryService {
       throw new ErrorResponse(`Invalid week number`, 400);
     }
 
-    let pickIndex = entry.picks.findIndex(p => p.week === parseInt(week));
-    
-    const teamAlreadyPicked = entry.picks.some(p => p.team === team && p.week !== parseInt(week));
+    // Check if the team has already been picked for this entry
+    const teamAlreadyPicked = await Pick.findOne({
+      entry: entryId,
+      team: team,
+      week: { $ne: parseInt(week) }
+    });
+
     if (teamAlreadyPicked) {
-      throw new ErrorResponse(`You already have a ${team} pick this season, please choose another team`, 400);
+      throw new ErrorResponse(`You already have a ${team} pick this season for this entry, please choose another team`, 400);
     }
 
-    if (pickIndex !== -1) {
-      entry.picks[pickIndex].team = team;
-    } else {
-      entry.picks.push({ team, week: parseInt(week) });
-    }
+    // Update or create the pick
+    const pick = await Pick.findOneAndUpdate(
+      { entry: entryId, week: parseInt(week) },
+      { team: team },
+      { upsert: true, new: true }
+    );
 
-    await entry.save();
-
-    return entry.picks.find(p => p.week === parseInt(week));
+    return pick;
   }
 
   async getPickForWeek(entryId, week) {
@@ -71,6 +79,7 @@ class EntryService {
 
     const pick = entry.picks.find(p => p.week === parseInt(week));
     return pick || null;
+
   }
 
   async getUserEntriesWithPicks(userId, populate) {
@@ -87,6 +96,19 @@ class EntryService {
     }
 
     return await query.exec();
+  }
+
+  async eliminateEntry(entryId, week) {
+    const entry = await Entry.findById(entryId);
+    if (!entry) {
+      throw new ErrorResponse(`No entry found with id ${entryId}`, 404);
+    }
+
+    entry.status = 'eliminated';
+    entry.eliminatedWeek = week;
+    await entry.save();
+
+    return entry;
   }
 }
 

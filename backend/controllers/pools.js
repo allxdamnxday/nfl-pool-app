@@ -1,9 +1,5 @@
 // backend/controllers/pools.js
 
-const Pool = require('../models/Pool');
-const Entry = require('../models/Entry');
-const Request = require('../models/Request');
-const mongoose = require('mongoose');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 const poolService = require('../services/poolService');
@@ -13,54 +9,38 @@ exports.getPools = asyncHandler(async (req, res, next) => {
 });
 
 exports.getPool = asyncHandler(async (req, res, next) => {
-  const pool = await Pool.findById(req.params.id).populate('participants', 'username email');
-  if (!pool) {
-    return next(new ErrorResponse(`Pool not found with id of ${req.params.id}`, 404));
-  }
+  const pool = await poolService.getById(req.params.id);
   res.status(200).json({ success: true, data: pool });
 });
 
 exports.createPool = asyncHandler(async (req, res, next) => {
-  req.body.creator = req.user.id;
-  const pool = await Pool.create(req.body);
+  const pool = await poolService.createPool(req.user.id, req.body);
   res.status(201).json({ success: true, data: pool });
 });
 
 exports.updatePool = asyncHandler(async (req, res, next) => {
-  let pool = await Pool.findById(req.params.id);
-  if (!pool) {
-    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
-  }
-  if (pool.creator.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(new ErrorResponse(`User ${req.user.id} is not authorized to update this pool`, 403));
-  }
-  pool = await Pool.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  const pool = await poolService.updatePool(req.params.id, req.user.id, req.body);
   res.status(200).json({ success: true, data: pool });
 });
 
 exports.deletePool = asyncHandler(async (req, res, next) => {
-  const pool = await Pool.findById(req.params.id);
-  if (!pool) {
-    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
-  }
-  if (pool.creator.toString() !== req.user.id && req.user.role !== 'admin') {
-    return next(new ErrorResponse(`User ${req.user.id} is not authorized to delete this pool`, 403));
-  }
-  await pool.remove();
+  await poolService.deletePool(req.params.id, req.user.id);
   res.status(200).json({ success: true, data: {} });
 });
 
 exports.getPoolStats = asyncHandler(async (req, res, next) => {
-  const pool = await Pool.findById(req.params.id);
-  if (!pool) {
-    return next(new ErrorResponse(`No pool with the id of ${req.params.id}`, 404));
-  }
-  const stats = {
-    totalParticipants: pool.participants.length,
-    eliminatedParticipants: pool.eliminatedUsers.length,
-    currentWeek: pool.currentWeek
-  };
+  const stats = await poolService.getPoolStats(req.params.id);
   res.status(200).json({ success: true, data: stats });
+});
+
+exports.getAvailablePools = asyncHandler(async (req, res, next) => {
+  const pools = await poolService.getAvailablePools(req.user.id);
+  res.status(200).json({ success: true, count: pools.length, data: pools });
+});
+
+exports.updatePoolStatus = asyncHandler(async (req, res, next) => {
+  const pool = await poolService.updatePoolStatus(req.params.id, req.body.status);
+  res.status(200).json({ success: true, data: pool });
 });
 
 exports.getUserActivePools = asyncHandler(async (req, res, next) => {
@@ -121,35 +101,6 @@ exports.getUserPools = asyncHandler(async (req, res, next) => {
     success: true, 
     count: poolsWithEntries.length, 
     data: poolsWithEntries 
-  });
-});
-
-exports.getAvailablePools = asyncHandler(async (req, res, next) => {
-  const pools = await poolService.getAvailablePools(req.user.id);
-  res.status(200).json({ success: true, count: pools.length, data: pools });
-});
-
-// Update the status of a pool Admin Route
-exports.updatePoolStatus = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  if (!['open', 'active', 'completed'].includes(status)) {
-    return next(new ErrorResponse('Invalid status. Must be open, active, or completed.', 400));
-  }
-
-  const pool = await Pool.findById(id);
-
-  if (!pool) {
-    return next(new ErrorResponse(`No pool found with id of ${id}`, 404));
-  }
-
-  pool.status = status;
-  await pool.save();
-
-  res.status(200).json({
-    success: true,
-    data: pool
   });
 });
 

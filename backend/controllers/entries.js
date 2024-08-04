@@ -19,15 +19,15 @@ exports.getEntriesForPool = asyncHandler(async (req, res, next) => {
 });
 
 exports.addOrUpdatePick = asyncHandler(async (req, res, next) => {
-  const { entryId } = req.params;
+  const { entryId, entryNumber } = req.params;
   const { team, week } = req.body;
-  const pick = await EntryService.addOrUpdatePick(entryId, req.user.id, team, week);
+  const pick = await EntryService.addOrUpdatePick(entryId, entryNumber, req.user.id, team, week);
   res.status(200).json({ success: true, data: pick });
 });
 
 exports.getPickForWeek = asyncHandler(async (req, res, next) => {
-  const { entryId, week } = req.params;
-  const pick = await EntryService.getPickForWeek(entryId, week);
+  const { entryId, entryNumber, week } = req.params;
+  const pick = await EntryService.getPickForWeek(entryId, entryNumber, week);
   res.status(200).json({ success: true, data: pick });
 });
 

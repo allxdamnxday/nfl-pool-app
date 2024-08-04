@@ -6,7 +6,7 @@ const ErrorResponse = require('../utils/errorResponse');
 exports.createRequest = asyncHandler(async (req, res, next) => {
   const { poolId, numberOfEntries } = req.body;
   
-  // Check existing requests and entries
+  // Check if user already has 3 requests/entries for this pool
   const existingCount = await RequestService.getUserRequestAndEntryCount(req.user.id, poolId);
   if (existingCount + numberOfEntries > 3) {
     return next(new ErrorResponse('You can have a maximum of 3 entries per pool', 400));
@@ -50,3 +50,17 @@ exports.getUserRequests = asyncHandler(async (req, res, next) => {
   const requests = await RequestService.getUserRequests(req.user.id);
   res.status(200).json({ success: true, count: requests.length, data: requests });
 });
+
+exports.getRequest = async (req, res, next) => {
+  try {
+    const request = await Request.findById(req.params.id);
+
+    if (!request) {
+      return next(new ErrorResponse(`Request not found with id of ${req.params.id}`, 404));
+    }
+
+    res.status(200).json({ success: true, data: request });
+  } catch (err) {
+    next(err);
+  }
+};

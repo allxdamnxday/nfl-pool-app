@@ -7,6 +7,12 @@ const PickSchema = new mongoose.Schema({
     ref: 'Entry',
     required: true
   },
+  entryNumber: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 3
+  },
   week: {
     type: Number,
     required: true,
@@ -26,6 +32,6 @@ const PickSchema = new mongoose.Schema({
   timestamps: true
 });
 
-PickSchema.index({ entry: 1, week: 1 }, { unique: true });
+PickSchema.index({ entry: 1, entryNumber: 1, week: 1 }, { unique: true });
 
 module.exports = mongoose.model('Pick', PickSchema);

@@ -1,50 +1,40 @@
 const mongoose = require('mongoose');
 
 const RequestSchema = new mongoose.Schema({
-  pool: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Pool',
-    required: true
-  },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: true
   },
+  pool: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Pool',
+    required: true
+  },
   numberOfEntries: {
     type: Number,
-    required: true,
-    min: 1,
-    max: 3
+    required: true
   },
   status: {
     type: String,
-    enum: ['pending', 'payment_pending', 'payment_received', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected', 'payment_pending'],
     default: 'pending'
-  },
-  paymentMethod: {
-    type: String,
-    enum: ['paypal', 'venmo', 'zelle'],
-    required: true
-  },
-  paymentConfirmation: {
-    type: String,
-    required: true
   },
   totalAmount: {
     type: Number,
     required: true
   },
+  paymentConfirmation: {
+    type: String,
+    required: false // Make this optional if it's not always required
+  },
+  paymentMethod: {
+    type: String,
+    required: false // Make this optional if it's not always required
+  },
   entryNumber: {
     type: Number,
-    required: true,
-    min: 1,
-    max: 3
-  },
-  paymentStatus: {
-    type: String,
-    enum: ['pending', 'completed'],
-    default: 'pending'
+    required: false // Make this optional if it's not always required
   },
   createdAt: {
     type: Date,

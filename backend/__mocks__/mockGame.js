@@ -6,6 +6,10 @@ exports.mockGame = {
     event_date: "2023-10-01T12:00:00Z",
     rotation_number_away: 101,
     rotation_number_home: 102,
+    away_team_id: 1,
+    home_team_id: 2,
+    away_team: "Away Team",
+    home_team: "Home Team",
     score: {
       event_status: "completed",
       winner_away: 1,
@@ -61,5 +65,3 @@ exports.mockGame = {
       attendance: "50000"
     }
   };
-  
-  

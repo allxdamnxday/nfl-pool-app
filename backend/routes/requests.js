@@ -4,9 +4,10 @@ const { protect, authorize } = require('../middleware/auth');
 const { 
   createRequest, 
   approveRequest, 
-  getRequests, 
-  getPoolRequests, 
+  rejectRequest,
   getUserRequests,
+  getPoolRequests,
+  getRequest,
   confirmPayment
 } = require('../controllers/requests');
 
@@ -17,7 +18,6 @@ router.use(protect);
 router.post('/', createRequest);
 router.get('/', getUserRequests);
 router.get('/pool/:poolId', authorize('admin'), getPoolRequests);
-
 router.get('/:id', getRequest);
 router.put('/:id/confirm-payment', confirmPayment);
 router.put('/:id/approve', authorize('admin'), approveRequest);
