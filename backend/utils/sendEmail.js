@@ -1,6 +1,18 @@
 // backend/utils/sendEmail.js
 const nodemailer = require('nodemailer');
 
+/**
+ * Sends an email using nodemailer.
+ * @async
+ * @function sendEmail
+ * @param {Object} options - The email options
+ * @param {string} options.email - The recipient's email address
+ * @param {string} options.subject - The email subject
+ * @param {string} [options.text] - The plain text content of the email
+ * @param {string} [options.html] - The HTML content of the email
+ * @returns {Promise<Object>} The info object from nodemailer
+ * @throws {Error} If there's an error sending the email
+ */
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,

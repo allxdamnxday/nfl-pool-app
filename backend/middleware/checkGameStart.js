@@ -1,10 +1,23 @@
-// middleware/checkGameStart.js
+/**
+ * @module CheckGameStartMiddleware
+ * @description Middleware to verify if a game has started before allowing a pick to be made.
+ */
+
 const Game = require('../models/Game');
 const Entry = require('../models/Entry');
 const ErrorResponse = require('../utils/errorResponse');
 const seasonService = require('../services/seasonService');
 const logger = require('../utils/logger');
 
+/**
+ * Checks if the game for the selected team has started.
+ * @function checkGameStart
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @throws {ErrorResponse} If entry not found, no games found, or game has already started
+ */
 const checkGameStart = async (req, res, next) => {
   try {
     const { entryId } = req.params;
@@ -50,3 +63,21 @@ const checkGameStart = async (req, res, next) => {
 };
 
 module.exports = checkGameStart;
+
+/**
+ * @example
+ * // Using checkGameStart middleware in a route
+ * router.post('/picks/:entryId', checkGameStart, (req, res) => {
+ *   // Handle pick submission
+ * });
+ */
+
+/**
+ * Additional Notes:
+ * - This middleware should be used before processing pick submissions.
+ * - It checks if the game for the selected team has started based on the current date and time.
+ * - If the game has already started, it prevents the pick from being made.
+ * - It uses the seasonService to get the current NFL week if not provided in the request.
+ * - Logging is implemented for debugging and tracking purposes.
+ * - The middleware handles various error scenarios (entry not found, no games found, etc.) and passes appropriate error responses.
+ */

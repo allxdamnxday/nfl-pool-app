@@ -1,8 +1,15 @@
-// backend/services/rundownApiService.js
+/**
+ * @module RundownApiService
+ */
+
 const axios = require('axios');
 const config = require('../config/rundownApi');
 
-// Add this helper function at the top of the file
+/**
+ * Format a date to ISO 8601 string
+ * @param {Date|string} date - The date to format
+ * @returns {string} The formatted date string
+ */
 const formatDateISO8601 = (date) => {
   if (typeof date === 'string') {
     // If it's already a string, assume it's in the correct format
@@ -11,6 +18,10 @@ const formatDateISO8601 = (date) => {
   return date.toISOString();
 };
 
+/**
+ * Axios instance for Rundown API
+ * @type {AxiosInstance}
+ */
 const api = axios.create({
   baseURL: config.BASE_URL,
   headers: {
@@ -19,6 +30,10 @@ const api = axios.create({
   }
 });
 
+/**
+ * Rundown API service
+ * @namespace
+ */
 const rundownApi = {
   config: {
     ...config,
@@ -28,6 +43,14 @@ const rundownApi = {
     AFFILIATE_ID: 3 // Assuming 3 is the affiliate we want
   },
 
+  /**
+   * Fetch NFL schedule
+   * @async
+   * @param {Date|string} fromDate - The start date for the schedule
+   * @param {number} [limit=400] - The maximum number of results to return
+   * @returns {Promise<Array>} Array of NFL schedule data
+   * @throws {Error} If there's an error fetching the schedule
+   */
   fetchNFLSchedule: async (fromDate, limit = 400) => {
     try {
       const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/schedule`;
@@ -45,6 +68,13 @@ const rundownApi = {
     }
   },
 
+  /**
+   * Fetch details for a specific event
+   * @async
+   * @param {string} eventId - The ID of the event
+   * @returns {Promise<Object|null>} The event details or null if not found
+   * @throws {Error} If there's an error fetching the event details
+   */
   fetchEventDetails: async (eventId) => {
     try {
       const response = await api.get(`/events/${eventId}`, {
@@ -81,6 +111,13 @@ const rundownApi = {
     }
   },
 
+  /**
+   * Fetch NFL events for a specific date
+   * @async
+   * @param {Date|string} date - The date to fetch events for
+   * @returns {Promise<Array>} Array of NFL events
+   * @throws {Error} If there's an error fetching the events
+   */
   fetchNFLEvents: async (date) => {
     try {
       const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/events/${formatDateISO8601(date)}`;

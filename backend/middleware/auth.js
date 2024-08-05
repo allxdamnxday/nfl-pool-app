@@ -1,10 +1,24 @@
-// /backend/middleware/auth.js
+/**
+ * @module AuthMiddleware
+ * @description Authentication and authorization middleware for the NFL pool application.
+ * This middleware handles user authentication via JWT tokens and role-based authorization.
+ */
+
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('./async');
 const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 const Blacklist = require('../models/Blacklist');
 
+/**
+ * Protects routes by verifying JWT tokens and setting user information on the request object.
+ * @function protect
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @throws {ErrorResponse} If token is missing, invalid, or user is not found
+ */
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
 
@@ -60,6 +74,13 @@ exports.protect = asyncHandler(async (req, res, next) => {
   }
 });
 
+/**
+ * Authorizes access to routes based on user roles.
+ * @function authorize
+ * @param {...string} roles - Allowed roles for accessing the route
+ * @returns {Function} Middleware function to check user role
+ * @throws {ErrorResponse} If user is not authenticated or doesn't have the required role
+ */
 exports.authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !req.user.role) {
@@ -71,3 +92,25 @@ exports.authorize = (...roles) => {
     next();
   };
 };
+
+/**
+ * @example
+ * // Using the protect middleware
+ * router.get('/protected-route', protect, (req, res) => {
+ *   res.json({ message: 'Access granted', user: req.user });
+ * });
+ * 
+ * // Using the authorize middleware
+ * router.get('/admin-route', protect, authorize('admin'), (req, res) => {
+ *   res.json({ message: 'Admin access granted' });
+ * });
+ */
+
+/**
+ * Additional Notes:
+ * - The protect middleware checks for JWT tokens in the Authorization header or cookies.
+ * - It verifies the token, checks if it's blacklisted, and sets user information on the request object.
+ * - The authorize middleware should be used after the protect middleware to ensure req.user is set.
+ * - Both middlewares use the ErrorResponse utility for consistent error handling.
+ * - Detailed logging is implemented for debugging purposes.
+ */

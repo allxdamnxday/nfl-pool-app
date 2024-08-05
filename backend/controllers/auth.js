@@ -6,9 +6,28 @@ const ErrorResponse = require('../utils/errorResponse');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 
-// @desc    Register user
-// @route   POST /api/v1/auth/register
-// @access  Public
+/**
+ * @module AuthController
+ * @description Handles user authentication and authorization operations including registration, login, logout, password reset, and user detail updates.
+ */
+
+/**
+ * @function register
+ * @description Register a new user
+ * @route POST /api/v1/auth/register
+ * @access Public
+ * 
+ * @param {Object} req.body
+ * @param {string} req.body.firstName - User's first name
+ * @param {string} req.body.lastName - User's last name
+ * @param {string} req.body.username - User's chosen username
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * 
+ * @returns {Object} 201 - Success message
+ * @throws {ErrorResponse} 400 - Missing required fields or duplicate user
+ * @throws {ErrorResponse} 500 - Email sending error
+ */
 exports.register = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, username, email, password } = req.body;
 
@@ -72,9 +91,21 @@ exports.register = asyncHandler(async (req, res, next) => {
   }
 });
 
-// @desc    Login user
-// @route   POST /api/v1/auth/login
-// @access  Public
+/**
+ * @function login
+ * @description Authenticate a user and return a token
+ * @route POST /api/v1/auth/login
+ * @access Public
+ * 
+ * @param {Object} req.body
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * 
+ * @returns {Object} 200 - User data and token
+ * @throws {ErrorResponse} 400 - Missing email or password
+ * @throws {ErrorResponse} 401 - Invalid credentials
+ * @throws {ErrorResponse} 403 - Email not verified
+ */
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -108,7 +139,20 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-// Update the resendVerificationEmail function
+/**
+ * @function resendVerificationEmail
+ * @description Resend verification email to user
+ * @route POST /api/v1/auth/resendverification
+ * @access Public
+ * 
+ * @param {Object} req.body
+ * @param {string} req.body.email - User's email address
+ * 
+ * @returns {Object} 200 - Success message
+ * @throws {ErrorResponse} 404 - User not found
+ * @throws {ErrorResponse} 400 - Email already verified
+ * @throws {ErrorResponse} 500 - Email sending error
+ */
 exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
 
@@ -157,9 +201,14 @@ exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
   }
 });
 
-// @desc    Log user out / clear cookie
-// @route   GET /api/v1/auth/logout
-// @access  Private
+/**
+ * @function logout
+ * @description Log user out and clear cookie
+ * @route GET /api/v1/auth/logout
+ * @access Private
+ * 
+ * @returns {Object} 200 - Success message
+ */
 exports.logout = asyncHandler(async (req, res, next) => {
   const token = req.headers.authorization.split(' ')[1];
 
@@ -174,9 +223,15 @@ exports.logout = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: {} });
 });
 
-// @desc    Get current logged in user
-// @route   GET /api/v1/auth/me
-// @access  Private
+/**
+ * @function getMe
+ * @description Get current logged in user
+ * @route GET /api/v1/auth/me
+ * @access Private
+ * 
+ * @returns {Object} 200 - User data
+ * @throws {ErrorResponse} 404 - User not found
+ */
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   if (!user) {
@@ -185,9 +240,19 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: user });
 });
 
-// @desc    Forgot password
-// @route   POST /api/v1/auth/forgotpassword
-// @access  Public
+/**
+ * @function forgotPassword
+ * @description Forgot password
+ * @route POST /api/v1/auth/forgotpassword
+ * @access Public
+ * 
+ * @param {Object} req.body
+ * @param {string} req.body.email - User's email address
+ * 
+ * @returns {Object} 200 - Success message
+ * @throws {ErrorResponse} 404 - User not found
+ * @throws {ErrorResponse} 500 - Email sending error
+ */
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
@@ -261,9 +326,19 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   }
 });
 
-// @desc    Reset password
-// @route   PUT /api/v1/auth/resetpassword/:resettoken
-// @access  Public
+/**
+ * @function resetPassword
+ * @description Reset password
+ * @route PUT /api/v1/auth/resetpassword/:resettoken
+ * @access Public
+ * 
+ * @param {string} req.params.resettoken - Password reset token
+ * @param {Object} req.body
+ * @param {string} req.body.password - New password
+ * 
+ * @returns {Object} 200 - New token
+ * @throws {ErrorResponse} 400 - Invalid token
+ */
 exports.resetPassword = asyncHandler(async (req, res, next) => {
   // Get hashed token
   const resetPasswordToken = crypto
@@ -291,9 +366,18 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-// @desc    Update user details
-// @route   PUT /api/v1/auth/updatedetails
-// @access  Private
+/**
+ * @function updateDetails
+ * @description Update user details
+ * @route PUT /api/v1/auth/updatedetails
+ * @access Private
+ * 
+ * @param {Object} req.body
+ * @param {string} [req.body.username] - New username
+ * @param {string} [req.body.email] - New email address
+ * 
+ * @returns {Object} 200 - Updated user data
+ */
 exports.updateDetails = asyncHandler(async (req, res, next) => {
   const fieldsToUpdate = {
     username: req.body.username,
@@ -308,9 +392,19 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
   res.status(200).json({ success: true, data: user });
 });
 
-// @desc    Update password
-// @route   PUT /api/v1/auth/updatepassword
-// @access  Private
+/**
+ * @function updatePassword
+ * @description Update password
+ * @route PUT /api/v1/auth/updatepassword
+ * @access Private
+ * 
+ * @param {Object} req.body
+ * @param {string} req.body.currentPassword - Current password
+ * @param {string} req.body.newPassword - New password
+ * 
+ * @returns {Object} 200 - New token
+ * @throws {ErrorResponse} 401 - Incorrect current password
+ */
 exports.updatePassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select('+password');
 
@@ -325,9 +419,17 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   sendTokenResponse(user, 200, res);
 });
 
-// @desc    Verify email
-// @route   GET /api/v1/auth/verify-email/:token
-// @access  Public
+/**
+ * @function verifyEmail
+ * @description Verify email
+ * @route GET /api/v1/auth/verify-email/:token
+ * @access Public
+ * 
+ * @param {string} req.params.token - Verification token
+ * 
+ * @returns {Object} 200 - Success message
+ * @throws {ErrorResponse} 400 - Invalid or expired token
+ */
 exports.verifyEmail = asyncHandler(async (req, res, next) => {
   const { token } = req.params;
 
@@ -363,9 +465,20 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Resend verification email
-// @route   POST /api/v1/auth/resend-verification
-// @access  Public
+/**
+ * @function resendVerificationEmail
+ * @description Resends the verification email to a user who hasn't verified their email yet.
+ * @route POST /api/v1/auth/resend-verification
+ * @access Public
+ * 
+ * @param {Object} req.body
+ * @param {string} req.body.email - The email address of the user requesting verification resend
+ * 
+ * @returns {Object} 200 - Success message indicating the verification email was sent
+ * @throws {ErrorResponse} 404 - If no user is found with the provided email
+ * @throws {ErrorResponse} 400 - If the user's email is already verified
+ * @throws {ErrorResponse} 500 - If there's an error sending the email
+ */
 exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
   const { email } = req.body;
 
@@ -414,7 +527,17 @@ exports.resendVerificationEmail = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Helper function to get token from model, create cookie and send response
+/**
+ * @function sendTokenResponse
+ * @description Helper function to get token from model, create cookie and send response
+ * @private
+ * 
+ * @param {Object} user - The user object
+ * @param {number} statusCode - The HTTP status code to send in the response
+ * @param {Object} res - The response object
+ * 
+ * @returns {void}
+ */
 const sendTokenResponse = (user, statusCode, res) => {
   const token = user.getSignedJwtToken();
 
@@ -444,3 +567,36 @@ const sendTokenResponse = (user, statusCode, res) => {
       }
     });
 };
+
+/**
+ * Middleware:
+ * - asyncHandler: Wraps async functions to handle errors
+ * 
+ * Error Handling:
+ * - Uses ErrorResponse utility for consistent error formatting
+ * - Specific error handling for various scenarios (e.g., invalid credentials, email not verified)
+ * 
+ * Additional Notes:
+ * - Email verification is required before login
+ * - Password reset functionality uses crypto for token generation
+ * - Token blacklisting is implemented for logout security
+ * - All sensitive routes are protected and require authentication
+ * 
+ * @example
+ * // Register a new user
+ * POST /api/v1/auth/register
+ * {
+ *   "firstName": "John",
+ *   "lastName": "Doe",
+ *   "username": "johndoe",
+ *   "email": "john@example.com",
+ *   "password": "password123"
+ * }
+ * 
+ * // Login
+ * POST /api/v1/auth/login
+ * {
+ *   "email": "john@example.com",
+ *   "password": "password123"
+ * }
+ */

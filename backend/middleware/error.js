@@ -1,6 +1,14 @@
-// backend/middleware/error.js
+/**
+ * @module ErrorMiddleware
+ * @description Provides centralized error handling for the application.
+ */
+
 const ErrorResponse = require('../utils/errorResponse');
 
+/**
+ * Error types and their corresponding messages and status codes
+ * @type {Object.<string, {message: string, statusCode: number}>}
+ */
 const errorTypes = {
   CastError: { message: 'Resource not found', statusCode: 404 },
   ValidationError: { statusCode: 400 },
@@ -8,6 +16,14 @@ const errorTypes = {
   TokenExpiredError: { message: 'Your session has expired. Please log in again.', statusCode: 401 },
 };
 
+/**
+ * Global error handling middleware
+ * @function errorHandler
+ * @param {Error} err - The error object
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
 const errorHandler = (err, req, res, next) => {
   console.error('Error Middleware - Full error object:', err);
 
@@ -37,3 +53,24 @@ const errorHandler = (err, req, res, next) => {
 };
 
 module.exports = errorHandler;
+
+/**
+ * @example
+ * // Using error middleware in Express app
+ * const express = require('express');
+ * const errorHandler = require('./middleware/error');
+ * const app = express();
+ * 
+ * // ... other middleware and routes
+ * 
+ * app.use(errorHandler);
+ */
+
+/**
+ * Additional Notes:
+ * - This middleware should be used as the last middleware in the Express application
+ * - It handles various types of errors and provides appropriate error responses
+ * - In development mode, it includes the error stack in the response
+ * - Custom error types can be added to the errorTypes object for specific error handling
+ * - Errors are logged to the console for debugging purposes
+ */

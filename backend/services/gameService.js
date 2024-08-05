@@ -1,7 +1,22 @@
+/**
+ * @module GameService
+ */
+
 const axios = require('axios');
 const calculateNFLWeek = require('../utils/nflWeekCalculator');
 
+/**
+ * Service class for managing games
+ * @class GameService
+ */
 class GameService {
+  /**
+   * Fetch games for a specific date
+   * @async
+   * @param {string} date - The date to fetch games for (format: YYYY-MM-DD)
+   * @returns {Promise<Array>} Array of processed game objects
+   * @throws {Error} If there's an error fetching games
+   */
   async fetchGamesForDate(date) {
     const options = {
       method: 'GET',

@@ -1,7 +1,13 @@
-//backend/utils/logger.js
+/**
+ * @module logger
+ */
 
 const winston = require('winston');
 
+/**
+ * Winston logger instance configured for production and development environments.
+ * @type {winston.Logger}
+ */
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(

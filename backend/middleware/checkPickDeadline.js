@@ -1,8 +1,21 @@
-// middleware/checkPickDeadline.js
+/**
+ * @module CheckPickDeadlineMiddleware
+ * @description Middleware to verify if the pick submission deadline has passed for a given week.
+ */
+
 const moment = require('moment-timezone');
 const ErrorResponse = require('../utils/errorResponse');
 const seasonService = require('../services/seasonService');
 
+/**
+ * Checks if the pick submission deadline has passed for the given week.
+ * @function checkPickDeadline
+ * @async
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @throws {ErrorResponse} If the submission deadline has passed
+ */
 const checkPickDeadline = async (req, res, next) => {
   try {
     const { week } = req.body;
@@ -32,3 +45,22 @@ const checkPickDeadline = async (req, res, next) => {
 };
 
 module.exports = checkPickDeadline;
+
+/**
+ * @example
+ * // Using checkPickDeadline middleware in a route
+ * router.post('/picks', checkPickDeadline, (req, res) => {
+ *   // Handle pick submission
+ * });
+ */
+
+/**
+ * Additional Notes:
+ * - This middleware should be used before processing pick submissions.
+ * - It checks if the submission deadline (Sunday 1 PM Pacific Time) has passed for the given week.
+ * - The deadline is set to Sunday 1 PM Pacific Time for the current week.
+ * - If it's already past Sunday 1 PM, it uses the next week's deadline.
+ * - It uses the seasonService to get the current NFL week for comparison.
+ * - The middleware allows submissions for future weeks without deadline restrictions.
+ * - Moment-timezone is used to handle timezone-specific date and time calculations.
+ */

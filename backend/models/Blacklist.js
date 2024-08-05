@@ -1,6 +1,15 @@
-// models/Blacklist.js
+/**
+ * @module Blacklist
+ */
+
 const mongoose = require('mongoose');
 
+/**
+ * Blacklist Schema
+ * @typedef {Object} BlacklistSchema
+ * @property {string} token - The blacklisted JWT token
+ * @property {Date} createdAt - The date when the token was blacklisted
+ */
 const BlacklistSchema = new mongoose.Schema({
   token: {
     type: String,
@@ -13,4 +22,8 @@ const BlacklistSchema = new mongoose.Schema({
   }
 });
 
+/**
+ * Blacklist model
+ * @type {mongoose.Model<BlacklistSchema>}
+ */
 module.exports = mongoose.model('Blacklist', BlacklistSchema);

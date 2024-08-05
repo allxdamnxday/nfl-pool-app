@@ -28,19 +28,28 @@ const { protect } = require('../middleware/auth');
  *           schema:
  *             type: object
  *             required:
+ *               - firstName
+ *               - lastName
  *               - username
  *               - email
  *               - password
  *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
  *               username:
  *                 type: string
+ *                 minLength: 3
  *               email:
  *                 type: string
+ *                 format: email
  *               password:
  *                 type: string
+ *                 minLength: 6
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User registered successfully. Please check your email to verify your account.
  *         content:
  *           application/json:
  *             schema:
@@ -48,8 +57,26 @@ const { protect } = require('../middleware/auth');
  *               properties:
  *                 success:
  *                   type: boolean
- *                 token:
+ *                 message:
  *                   type: string
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       msg:
+ *                         type: string
+ *                       param:
+ *                         type: string
+ *                       location:
+ *                         type: string
  */
 router.post('/register', register);
 

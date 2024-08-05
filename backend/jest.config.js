@@ -6,4 +6,5 @@ module.exports = {
     '^utils/sendEmail$': '<rootDir>/__mocks__/sendEmail.js'
   },
   testTimeout: 30000,
+  setupFilesAfterEnv: ['<rootDir>/backend/jest.setup.js'],
 };

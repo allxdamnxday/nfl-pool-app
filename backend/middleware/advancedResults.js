@@ -1,5 +1,15 @@
-// backend/middleware/advancedResults.js
+/**
+ * @module AdvancedResultsMiddleware
+ * @description Provides advanced querying, filtering, sorting, and pagination functionality for API endpoints.
+ */
 
+/**
+ * Creates a middleware function for advanced results processing.
+ * @function advancedResults
+ * @param {mongoose.Model} model - The Mongoose model to query
+ * @param {string|Object} [populate] - The populate options for the query
+ * @returns {Function} Express middleware function
+ */
 const advancedResults = (model, populate) => async (req, res, next) => {
     let query;
   
@@ -79,3 +89,27 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   };
   
   module.exports = advancedResults;
+
+/**
+ * @example
+ * // Using advancedResults middleware in a route
+ * router.get('/users', advancedResults(User), (req, res) => {
+ *   res.status(200).json(res.advancedResults);
+ * });
+ * 
+ * // Example API call: GET /api/v1/users?select=name,email&sort=-createdAt&page=2&limit=10
+ */
+
+/**
+ * Additional Notes:
+ * - This middleware supports filtering, sorting, selecting specific fields, pagination, and population of related documents.
+ * - Query parameters:
+ *   - select: Comma-separated list of fields to include
+ *   - sort: Comma-separated list of fields to sort by (prefix with '-' for descending order)
+ *   - page: Page number for pagination
+ *   - limit: Number of results per page
+ * - Advanced filtering is supported using MongoDB query operators (e.g., gte, lte, in)
+ * - The middleware attaches the processed results to res.advancedResults
+ * - Default sort is by '-createdAt' if not specified
+ * - Default pagination is 25 items per page
+ */

@@ -5,33 +5,11 @@ import logger from '../utils/logger';
 
 const API_URL = '/requests';
 
-export const getRequests = async () => {
-  try {
-    const response = await api.get(API_URL);
-    logger.info('Requests retrieved:', response.data);
-    return response.data.data;
-  } catch (error) {
-    logger.error('Error fetching requests:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
-export const approveRequest = async (requestId) => {
-  try {
-    const response = await api.put(`${API_URL}/${requestId}/approve`);
-    logger.info('Request approved:', response.data);
-    return response.data.data;
-  } catch (error) {
-    logger.error('Error approving request:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
 export const createRequest = async (poolId, numberOfEntries) => {
   try {
     const response = await api.post(API_URL, { poolId, numberOfEntries });
     logger.info('Request created:', response.data);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     logger.error('Error creating request:', error.response ? error.response.data : error.message);
     throw error;
@@ -40,11 +18,22 @@ export const createRequest = async (poolId, numberOfEntries) => {
 
 export const getUserRequests = async () => {
   try {
-    const response = await api.get(`${API_URL}/user`);
+    const response = await api.get(API_URL);
     logger.info('User requests retrieved:', response.data);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     logger.error('Error fetching user requests:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const getRequestById = async (requestId) => {
+  try {
+    const response = await api.get(`${API_URL}/${requestId}`);
+    logger.info('Request retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    logger.error('Error fetching request:', error.response ? error.response.data : error.message);
     throw error;
   }
 };
@@ -56,9 +45,42 @@ export const confirmPayment = async (requestId, paymentDetails) => {
       paymentDetails
     );
     logger.info('Payment confirmed:', response.data);
-    return response.data.data;
+    return response.data;
   } catch (error) {
     logger.error('Error confirming payment:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const getPoolRequests = async (poolId) => {
+  try {
+    const response = await api.get(`${API_URL}/pool/${poolId}`);
+    logger.info('Pool requests retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    logger.error('Error fetching pool requests:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const approveRequest = async (requestId) => {
+  try {
+    const response = await api.put(`${API_URL}/${requestId}/approve`);
+    logger.info('Request approved:', response.data);
+    return response.data;
+  } catch (error) {
+    logger.error('Error approving request:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const rejectRequest = async (requestId) => {
+  try {
+    const response = await api.put(`${API_URL}/${requestId}/reject`);
+    logger.info('Request rejected:', response.data);
+    return response.data;
+  } catch (error) {
+    logger.error('Error rejecting request:', error.response ? error.response.data : error.message);
     throw error;
   }
 };

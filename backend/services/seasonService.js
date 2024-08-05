@@ -1,8 +1,17 @@
-// backend/services/seasonService.js
+/**
+ * @module SeasonService
+ */
+
 const Game = require('../models/Game');
 const Settings = require('../models/Settings');
 const rundownApi = require('./rundownApiService');
-const config = require('../config/rundownApi'); // Ensure this line is added to import the config
+const config = require('../config/rundownApi');
+
+/**
+ * Formats a date to ISO 8601 string
+ * @param {Date|string} date - The date to format
+ * @returns {string} The formatted date string
+ */
 const formatDateISO8601 = (date) => {
   if (typeof date === 'string') {
     return date;
@@ -10,7 +19,12 @@ const formatDateISO8601 = (date) => {
   return date.toISOString();
 };
 
-// Helper function to update last sync date in database
+/**
+ * Updates the last sync date in the database
+ * @async
+ * @param {Date} date - The date to set as the last sync date
+ * @returns {Promise<void>}
+ */
 const updateLastSyncDate = async (date) => {
   await Settings.findOneAndUpdate(
     { key: 'lastSyncDate' },
@@ -19,11 +33,22 @@ const updateLastSyncDate = async (date) => {
   );
 };
 
+/**
+ * Retrieves the stored season year from the database
+ * @async
+ * @returns {Promise<number|null>} The stored season year or null if not found
+ */
 const getStoredSeasonYear = async () => {
   const setting = await Settings.findOne({ key: 'currentSeasonYear' });
   return setting ? setting.value : null;
 };
 
+/**
+ * Updates the stored season year in the database
+ * @async
+ * @param {number} year - The year to store
+ * @returns {Promise<void>}
+ */
 const updateStoredSeasonYear = async (year) => {
   await Settings.findOneAndUpdate(
     { key: 'currentSeasonYear' },
@@ -32,7 +57,12 @@ const updateStoredSeasonYear = async (year) => {
   );
 };
 
-// Function to calculate NFL week number (as a fallback)
+/**
+ * Calculates the NFL week number
+ * @param {Date} date - The date to calculate the week for
+ * @param {number} seasonYear - The year of the NFL season
+ * @returns {number} The calculated NFL week number
+ */
 const calculateNFLWeek = (date, seasonYear) => {
   const seasonStart = new Date(seasonYear, 8, 1); // September 1st
   seasonStart.setDate(seasonStart.getDate() + (4 - seasonStart.getDay() + 7) % 7); // First Thursday after September 1st
@@ -42,7 +72,11 @@ const calculateNFLWeek = (date, seasonYear) => {
   return Math.floor(dayDiff / 7) + 1;
 };
 
-// Updated transformGameData function with week calculation
+/**
+ * Transforms game data from API format to our database format
+ * @param {Object} apiGame - The game data from the API
+ * @returns {Object|null} The transformed game data or null if invalid
+ */
 const transformGameData = (apiGame) => {
   if (!apiGame) {
     console.error('Received undefined or null apiGame');
@@ -80,8 +114,14 @@ const transformGameData = (apiGame) => {
     }
   };
 };
-  
-// Updated initializeSeasonData function with error handling
+
+/**
+ * Initializes season data by fetching and storing games
+ * @async
+ * @param {number} seasonYear - The year of the season to initialize
+ * @returns {Promise<void>}
+ * @throws {Error} If there's an error fetching or storing the data
+ */
 const initializeSeasonData = async (seasonYear) => {
   try {
     console.log(`Fetching schedule for season ${seasonYear}`);
@@ -123,10 +163,16 @@ const initializeSeasonData = async (seasonYear) => {
   }
 };
 
-// Updated updateGameData function with error handling
-const updateGameData = async (date = new Date()) => {
+/**
+ * Updates game data for a specific season
+ * @async
+ * @param {number} seasonYear - The year of the season to update
+ * @returns {Promise<void>}
+ * @throws {Error} If there's an error updating the data
+ */
+const updateGameData = async (seasonYear) => {
   try {
-    const formattedDate = formatDateISO8601(date);
+    const formattedDate = formatDateISO8601(new Date());
     const events = await rundownApi.fetchNFLEvents(formattedDate);
     
     const updatePromises = events.map(event => 
@@ -138,7 +184,7 @@ const updateGameData = async (date = new Date()) => {
     );
 
     await Promise.all(updatePromises);
-    await updateLastSyncDate(date);
+    await updateLastSyncDate(new Date());
     
     console.log(`Updated games for ${formattedDate}`);
   } catch (error) {
@@ -147,24 +193,36 @@ const updateGameData = async (date = new Date()) => {
   }
 };
 
-// Get detailed game information
-const getDetailedGameInfo = async (eventId) => {
+/**
+ * Retrieves detailed game information
+ * @async
+ * @param {string} gameId - The ID of the game to retrieve
+ * @returns {Promise<Object>} The detailed game information
+ * @throws {Error} If there's an error fetching the game details
+ */
+const getDetailedGameInfo = async (gameId) => {
   try {
-    const eventData = await rundownApi.fetchEventDetails(eventId);
+    const eventData = await rundownApi.fetchEventDetails(gameId);
     const detailedGame = transformGameData(eventData);
     return await Game.findOneAndUpdate(
-      { event_id: eventId },
+      { event_id: gameId },
       detailedGame,
       { new: true }
     );
   } catch (error) {
-    console.error(`Error fetching detailed info for game ${eventId}:`, error);
+    console.error(`Error fetching detailed info for game ${gameId}:`, error);
     throw error;
   }
 };
 
-// Manage season status and updates
-const manageSeason = async () => {
+/**
+ * Manages the season data, including initialization and updates
+ * @async
+ * @param {number} [seasonYear] - The year of the season to manage (optional)
+ * @returns {Promise<void>}
+ * @throws {Error} If there's an error managing the season data
+ */
+const manageSeason = async (seasonYear) => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const seasonStartDate = new Date(currentYear, 8, 1); // September 1st
@@ -186,7 +244,14 @@ const manageSeason = async () => {
   }
 };
 
-// Update historical data for a date range
+/**
+ * Updates historical data for a specific date range
+ * @async
+ * @param {Date} startDate - The start date of the range to update
+ * @param {Date} endDate - The end date of the range to update
+ * @returns {Promise<void>}
+ * @throws {Error} If there's an error updating the historical data
+ */
 const updateHistoricalData = async (startDate, endDate) => {
   try {
     let currentDate = new Date(startDate);
@@ -204,7 +269,15 @@ const updateHistoricalData = async (startDate, endDate) => {
   }
 };
 
-const getGamesByWeek = async (seasonYear, weekNumber) => {
+/**
+ * Retrieves games for a specific week and season
+ * @async
+ * @param {number} weekNumber - The week number to retrieve games for
+ * @param {number} seasonYear - The year of the season
+ * @returns {Promise<Array>} An array of games for the specified week
+ * @throws {Error} If there's an error fetching the games
+ */
+const getGamesByWeek = async (weekNumber, seasonYear) => {
   try {
     const games = await Game.find({
       'schedule.season_year': seasonYear
@@ -220,6 +293,12 @@ const getGamesByWeek = async (seasonYear, weekNumber) => {
   }
 };
 
+/**
+ * Retrieves games for the current week
+ * @async
+ * @returns {Promise<Array>} An array of games for the current week
+ * @throws {Error} If there's an error fetching the games
+ */
 const getCurrentWeekGames = async () => {
   try {
     const currentDate = new Date();
@@ -262,6 +341,13 @@ const getCurrentWeekGames = async () => {
   }
 };
 
+/**
+ * Updates week numbers for games in a specific season
+ * @async
+ * @param {number} seasonYear - The year of the season to update
+ * @returns {Promise<void>}
+ * @throws {Error} If there's an error updating the week numbers
+ */
 const updateWeekNumbers = async (seasonYear) => {
   const games = await Game.find({
     'schedule.season_year': seasonYear,
@@ -277,6 +363,12 @@ const updateWeekNumbers = async (seasonYear) => {
   console.log(`Updated week numbers for ${games.length} games`);
 };
 
+/**
+ * Retrieves the current NFL week and season year
+ * @async
+ * @returns {Promise<Object>} An object containing the current week and season year
+ * @throws {Error} If there's an error calculating the current week
+ */
 const getCurrentNFLWeek = async () => {
   const currentDate = new Date();
   const seasonStartDate = new Date(currentDate.getFullYear(), 8, 1); // September 1st
