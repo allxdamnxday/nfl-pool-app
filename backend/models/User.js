@@ -87,6 +87,20 @@ const UserSchema = new mongoose.Schema({
 // Add compound index for firstName and lastName
 UserSchema.index({ firstName: 1, lastName: 1 }, { unique: true });
 
+// Add a pre-save hook to check for duplicate email
+UserSchema.pre('save', async function(next) {
+  const user = this;
+  if (user.isModified('email')) {
+    const existingUser = await User.findOne({ email: user.email });
+    if (existingUser) {
+      const error = new Error('Email already exists');
+      error.name = 'ValidationError';
+      next(error);
+    }
+  }
+  next();
+});
+
 /**
  * Encrypt password using bcrypt before saving
  * @function

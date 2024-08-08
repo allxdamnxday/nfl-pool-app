@@ -94,17 +94,17 @@ class RequestService extends BaseService {
       testLogger.error(`No request found with id of ${requestId}`);
       throw new ErrorResponse(`No request found with id of ${requestId}`, 404);
     }
-
-    if (request.user.toString() !== userId) {
+  
+    if (request.user.toString() !== userId.toString()) {  // Add .toString() to both sides
       testLogger.warn(`User ${userId} is not authorized to confirm payment for this request`);
       throw new ErrorResponse(`User ${userId} is not authorized to confirm payment for this request`, 403);
     }
-
+  
     request.paymentStatus = 'confirmed';
     request.transactionId = transactionId;
     request.paymentType = paymentType;
     await request.save();
-
+  
     testLogger.info(`Request ${requestId} payment confirmed`);
     return request;
   }

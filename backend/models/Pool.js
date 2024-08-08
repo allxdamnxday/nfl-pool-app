@@ -99,7 +99,7 @@ const PoolSchema = new mongoose.Schema({
   maxEntries: {
     type: Number,
     required: [true, 'Please add a maximum number of entries'],
-    min: [2, 'Pool must allow at least 2 entries'],
+    min: [1, 'Pool must allow at least 1 entry'],
     max: [30000, 'Pool cannot exceed 30000 entries']
   },
   prizePot: {

@@ -1,12 +1,22 @@
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const dotenv = require('dotenv');
+const path = require('path');
+
+// Load env vars from .env.test file
+dotenv.config({ path: path.join(__dirname, '..', '.env.test') });
 
 let mongod;
 
 module.exports.connect = async () => {
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
-  await mongoose.connect(uri);
+  await mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  });
 };
 
 module.exports.closeDatabase = async () => {

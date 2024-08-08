@@ -14,8 +14,7 @@ const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
-
-
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.join(__dirname, '.env') });
@@ -47,14 +46,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve Swagger UI
+// Swagger documentation route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Endpoint to get swagger.json
-app.get('/swagger.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
-});
 
 // Route files
 const seasonRoutes = require('./routes/season');
@@ -98,16 +91,20 @@ app.post('/register', validateRegister, (req, res) => {
 
 // Add the connectDB function
 const connectDB = async () => {
-  try {
+  if (process.env.NODE_ENV === 'test') {
+    const mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  } else {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
   }
+  console.log('MongoDB connected');
 };
 
 const gracefulShutdown = (server) => {
