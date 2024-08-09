@@ -24,6 +24,7 @@ const mongoose = require('mongoose');
  * @property {Date} endDate - The end date of the pool
  * @property {number} maxEntries - The maximum number of entries allowed per user
  * @property {number} prizePot - The total prize pot for the pool
+ * @property {number} numberOfWeeks - The number of weeks for the pool
  */
 
 /**
@@ -46,8 +47,8 @@ const PoolSchema = new mongoose.Schema({
   currentWeek: {
     type: Number,
     default: 1,
-    min: [1, 'Week number must be at least 1'],
-    max: [18, 'Week number cannot exceed 18']
+    min: [1, 'Current week must be at least 1'],
+    max: [18, 'Current week cannot exceed 18']
   },
   status: {
     type: String,
@@ -106,6 +107,12 @@ const PoolSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please add a prize pot amount'],
     min: [0, 'Prize pot cannot be negative']
+  },
+  numberOfWeeks: {
+    type: Number,
+    required: [true, 'Please add the number of weeks for the pool'],
+    min: [1, 'Number of weeks must be at least 1'],
+    max: [18, 'Number of weeks cannot exceed 18']
   }
 }, {
   timestamps: true,
@@ -177,7 +184,8 @@ module.exports = Pool;
  *   startDate: new Date('2023-09-07'),
  *   endDate: new Date('2024-01-07'),
  *   maxEntries: 3,
- *   prizePot: 5000
+ *   prizePot: 5000,
+ *   numberOfWeeks: 17
  * });
  * 
  * // Saving the pool to the database
@@ -219,6 +227,7 @@ module.exports = Pool;
  * - startDate and endDate are required
  * - maxEntries is required and must be between 2 and 30000
  * - prizePot is required and must be non-negative
+ * - numberOfWeeks is required and must be between 1 and 18
  * 
  * Additional Notes:
  * - The model uses timestamps to automatically add and update createdAt and updatedAt fields

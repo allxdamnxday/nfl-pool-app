@@ -8,6 +8,7 @@ const Entry = require('../models/Entry');
 const Game = require('../models/Game');
 const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
+const moment = require('moment');  // If not already using moment, consider adding it for easier time manipulations
 
 /**
  * Service class for managing picks
@@ -70,14 +71,19 @@ class PickService {
       throw new ErrorResponse(`No game found for team ${team} in week ${week}`, 404);
     }
 
-    if (new Date() >= game.startTime) {
+    const now = moment.utc();  // Get current time in UTC
+    if (now.isAfter(moment(game.startTime))) {  // Compare UTC times
       logger.warn(`Attempted to update pick after game start for entry ${entryId}, week ${week}`);
       throw new ErrorResponse(`Cannot update pick after game has started`, 400);
     }
 
     const pick = await Pick.findOneAndUpdate(
       { entry: entryId, entryNumber, week: parseInt(week) },
-      { team: team },
+      { 
+        team: team,
+        pickMadeAt: now.toDate(),  // Store as UTC Date object
+        game: game._id
+      },
       { upsert: true, new: true }
     );
 
@@ -177,19 +183,29 @@ class PickService {
       throw new ErrorResponse(`User not authorized to update this pick`, 401);
     }
 
-    const pick = await Pick.findOneAndUpdate(
+    const existingPick = await Pick.findOne({ entry: entryId, entryNumber, week: parseInt(week) }).populate('game');
+    if (!existingPick) {
+      logger.error(`No pick found for entry ${entryId}, number ${entryNumber}, week ${week}`);
+      throw new ErrorResponse(`No pick found for entry ${entryId}, number ${entryNumber}, week ${week}`, 404);
+    }
+
+    const now = moment.utc();  // Get current time in UTC
+    if (now.isAfter(moment(existingPick.game.startTime))) {  // Compare UTC times
+      logger.warn(`Attempted to update pick after game start for entry ${entryId}, week ${week}`);
+      throw new ErrorResponse(`Cannot update pick after game has started`, 400);
+    }
+
+    // Include pickMadeAt in the update data
+    updateData.pickMadeAt = now.toDate();  // Store as UTC Date object
+
+    const updatedPick = await Pick.findOneAndUpdate(
       { entry: entryId, entryNumber, week: parseInt(week) },
       updateData,
       { new: true, runValidators: true }
     );
 
-    if (!pick) {
-      logger.error(`No pick found for entry ${entryId}, number ${entryNumber}, week ${week}`);
-      throw new ErrorResponse(`No pick found for entry ${entryId}, number ${entryNumber}, week ${week}`, 404);
-    }
-
     logger.info(`Successfully updated pick for entry ${entryId}, week ${week}`);
-    return pick;
+    return updatedPick;
   }
 
   /**

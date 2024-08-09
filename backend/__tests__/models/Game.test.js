@@ -19,6 +19,11 @@ describe('Game Model Test', () => {
     expect(validGame.home_team_id).toBeDefined();
     expect(validGame.away_team).toBeDefined();
     expect(validGame.home_team).toBeDefined();
+    // New fields
+    expect(validGame.rotation_number_away).toBeDefined();
+    expect(validGame.rotation_number_home).toBeDefined();
+    expect(validGame.total).toBeDefined();
+    expect(validGame.favored_team).toBeDefined();
   });
 
   it('should fail to create game without required fields', async () => {
@@ -79,6 +84,12 @@ describe('Game Model Test', () => {
       expect(team.abbreviation).toBeDefined();
       expect(typeof team.is_away).toBe('boolean');
       expect(typeof team.is_home).toBe('boolean');
+      // New fields
+      expect(team.logo).toBeDefined();
+      expect(team.conference_id).toBeDefined();
+      expect(team.division_id).toBeDefined();
+      expect(team.ranking).toBeDefined();
+      expect(team.record).toBeDefined();
     });
   });
 
@@ -90,6 +101,15 @@ describe('Game Model Test', () => {
     expect(typeof game.score.score_home).toBe('number');
     expect(Array.isArray(game.score.score_away_by_period)).toBe(true);
     expect(Array.isArray(game.score.score_home_by_period)).toBe(true);
+    // New fields
+    expect(game.score.venue_name).toBeDefined();
+    expect(game.score.venue_location).toBeDefined();
+    expect(typeof game.score.game_clock).toBe('number');
+    expect(game.score.display_clock).toBeDefined();
+    expect(typeof game.score.game_period).toBe('number');
+    expect(game.score.broadcast).toBeDefined();
+    expect(game.score.event_status_detail).toBeDefined();
+    expect(game.score.updated_at).toBeDefined();
   });
 
   it('should validate schedule structure', async () => {
@@ -98,5 +118,23 @@ describe('Game Model Test', () => {
     expect(game.schedule.season_type).toBeDefined();
     expect(typeof game.schedule.season_year).toBe('number');
     expect(typeof game.schedule.week).toBe('number');
+    // New fields
+    expect(game.schedule.league_name).toBeDefined();
+    expect(typeof game.schedule.conference_competition).toBe('boolean');
+    expect(game.schedule.week_name).toBeDefined();
+    expect(game.schedule.week_detail).toBeDefined();
+    expect(game.schedule.event_name).toBeDefined();
+    expect(game.schedule.attendance).toBeDefined();
+  });
+
+  it('should validate odds structure', async () => {
+    const game = await createTestGame();
+    expect(game.odds).toBeDefined();
+    expect(game.odds.moneyline).toBeDefined();
+    expect(typeof game.odds.moneyline.moneyline_away).toBe('number');
+    expect(typeof game.odds.moneyline.moneyline_home).toBe('number');
+    expect(game.odds.spread).toBeDefined();
+    expect(typeof game.odds.spread.point_spread_away).toBe('number');
+    expect(typeof game.odds.spread.point_spread_home).toBe('number');
   });
 });

@@ -2,13 +2,14 @@
  * @module PoolService
  * @description Service for managing pools in the NFL pool application
  */
-
+const mongoose = require('mongoose');
 const Pool = require('../models/Pool');
 const Request = require('../models/Request');
 const Entry = require('../models/Entry');
 const BaseService = require('./baseService');
 const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
+const User = require('../models/User'); // Added this line at the top of the file
 
 /**
  * Service class for managing pools
@@ -66,16 +67,32 @@ class PoolService extends BaseService {
    * @param {string} userId - The ID of the user creating the pool
    * @param {Object} poolData - The data for the new pool
    * @param {string} poolData.name - The name of the pool
+   * @param {number} poolData.season - The season year of the pool
+   * @param {number} poolData.maxParticipants - The maximum number of participants allowed
    * @param {number} poolData.entryFee - The entry fee for the pool
-   * @param {number} poolData.numberOfWeeks - The number of weeks the pool will run (1-18)
+   * @param {number} poolData.prizeAmount - The prize amount for the pool
+   * @param {string} poolData.description - The description of the pool
+   * @param {Date} poolData.startDate - The start date of the pool
+   * @param {Date} poolData.endDate - The end date of the pool
+   * @param {number} poolData.maxEntries - The maximum number of entries allowed per user
+   * @param {number} poolData.prizePot - The total prize pot for the pool
+   * @param {number} poolData.numberOfWeeks - The number of weeks for the pool
    * @returns {Promise<Object>} The created pool object
    * @throws {ErrorResponse} If there's an error creating the pool
    * 
    * @example
    * try {
    *   const newPool = await poolService.createPool('user123', {
-   *     name: 'My NFL Pool',
+   *     name: 'NFL 2023 Survivor Pool',
+   *     season: 2023,
+   *     maxParticipants: 100,
    *     entryFee: 50,
+   *     prizeAmount: 4500,
+   *     description: 'Join our exciting NFL 2023 Survivor Pool!',
+   *     startDate: new Date('2023-09-07'),
+   *     endDate: new Date('2024-01-07'),
+   *     maxEntries: 3,
+   *     prizePot: 5000,
    *     numberOfWeeks: 17
    *   });
    *   console.log('New pool created:', newPool);
@@ -84,13 +101,64 @@ class PoolService extends BaseService {
    * }
    */
   async createPool(userId, poolData) {
-    logger.info(`Creating new pool for user ${userId}`);
     try {
-      poolData.creator = userId;
-      return await this.create(poolData);
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new ErrorResponse('User not found', 404);
+      }
+
+      // Ensure all required fields are present
+      const requiredFields = ['name', 'season', 'maxParticipants', 'entryFee', 'prizeAmount', 'description', 'startDate', 'endDate', 'maxEntries', 'prizePot', 'numberOfWeeks'];
+      const missingFields = requiredFields.filter(field => !poolData[field]);
+
+      if (missingFields.length > 0) {
+        throw new ErrorResponse(`Please add ${missingFields.join(', ')}`, 400);
+      }
+
+      // Validate the data
+      if (poolData.season < 2020) {
+        throw new ErrorResponse('Season year must be 2020 or later', 400);
+      }
+      if (poolData.maxParticipants < 2 || poolData.maxParticipants > 10000) {
+        throw new ErrorResponse('Pool must have between 2 and 10000 participants', 400);
+      }
+      if (poolData.entryFee < 0) {
+        throw new ErrorResponse('Entry fee cannot be negative', 400);
+      }
+      if (poolData.prizeAmount < 0) {
+        throw new ErrorResponse('Prize amount cannot be negative', 400);
+      }
+      if (poolData.maxEntries < 1 || poolData.maxEntries > 30000) {
+        throw new ErrorResponse('Max entries must be between 1 and 30000', 400);
+      }
+      if (poolData.prizePot < 0) {
+        throw new ErrorResponse('Prize pot cannot be negative', 400);
+      }
+      if (poolData.numberOfWeeks < 1 || poolData.numberOfWeeks > 18) {
+        throw new ErrorResponse('Number of weeks must be between 1 and 18', 400);
+      }
+
+      // If all validations pass, create the pool
+      const pool = await Pool.create({
+        ...poolData,
+        creator: userId,
+        status: 'open',
+        currentWeek: 1
+      });
+
+      return pool;
     } catch (error) {
-      logger.error(`Error creating pool for user ${userId}: ${error.message}`);
-      throw new ErrorResponse(`Error creating pool: ${error.message}`, 400);
+      if (error instanceof ErrorResponse) {
+        throw error;
+      }
+      // If it's a mongoose validation error, throw a more specific error message
+      if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(err => err.message);
+        throw new ErrorResponse(messages.join('. '), 400);
+      }
+      // For any other errors, log and throw a generic error message
+      logger.error(`Error creating pool: ${error.message}`);
+      throw new ErrorResponse(`Error creating pool: ${error.message}`, 500);
     }
   }
 
@@ -148,13 +216,18 @@ class PoolService extends BaseService {
   async deletePool(poolId, userId) {
     logger.info(`Deleting pool ${poolId} for user ${userId}`);
     try {
-      const pool = await this.getById(poolId);
-      
-      if (pool.creator.toString() !== userId) {
+      const pool = await Pool.findById(poolId);
+
+      if (!pool) {
+        throw new ErrorResponse(`Pool not found with id of ${poolId}`, 404);
+      }
+
+      if (pool.creator.toString() !== userId.toString()) {
         throw new ErrorResponse(`User ${userId} is not authorized to delete this pool`, 403);
       }
       
-      return await this.delete(poolId);
+      await pool.remove();
+      return { success: true };
     } catch (error) {
       logger.error(`Error deleting pool ${poolId} for user ${userId}: ${error.message}`);
       throw error;
@@ -231,13 +304,13 @@ class PoolService extends BaseService {
   async getUserPools(userId) {
     logger.info(`Fetching pools for user ${userId}`);
     try {
-      const userPools = await Pool.find({ participants: userId });
+      const userPools = await Pool.find({ creator: userId });
       
       return Promise.all(userPools.map(async (pool) => {
         const activeEntries = await Entry.countDocuments({ 
           pool: pool._id, 
           user: userId,
-          isActive: true
+          status: 'active'
         });
         return {
           ...pool.toObject(),
@@ -261,15 +334,18 @@ class PoolService extends BaseService {
     logger.info(`Fetching pools with entries for user ${userId}`);
     try {
       const pools = await Pool.find({ participants: userId });
-      const entries = await Entry.find({ user: userId, isActive: true });
-      
-      const poolsWithEntries = pools.map(pool => ({
-        ...pool.toObject(),
-        activeEntries: entries.filter(entry => entry.pool.toString() === pool._id.toString()).length,
-        userEntryId: entries.find(entry => entry.pool.toString() === pool._id.toString())?._id
-      }));
+      const entries = await Entry.find({ user: userId });
 
-      return poolsWithEntries;
+      return pools.map(pool => {
+        const activeEntries = entries.filter(entry => 
+          entry.pool.toString() === pool._id.toString() && entry.status === 'active'
+        );
+        return {
+          ...pool.toObject(),
+          activeEntries: activeEntries.length,
+          userEntryId: activeEntries.length > 0 ? activeEntries[0]._id : undefined
+        };
+      });
     } catch (error) {
       logger.error(`Error fetching pools with entries for user ${userId}: ${error.message}`);
       throw new ErrorResponse(`Error fetching user pools with entries: ${error.message}`, 500);
@@ -298,7 +374,7 @@ class PoolService extends BaseService {
                     $and: [
                       { $eq: ['$pool', '$$poolId'] },
                       { $eq: ['$user', mongoose.Types.ObjectId(userId)] },
-                      { $eq: ['$isActive', true] }
+                      { $eq: ['$status', 'active'] }
                     ]
                   }
                 }
@@ -309,6 +385,7 @@ class PoolService extends BaseService {
         },
         {
           $match: {
+            status: 'active',
             $expr: { $gt: [{ $size: '$userEntry' }, 0] }
           }
         }

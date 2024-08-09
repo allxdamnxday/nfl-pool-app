@@ -1,0 +1,94 @@
+1. Fetch sports list using GET /sports:
+
+Example:
+const axios = require('axios');
+
+const options = {
+  method: 'GET',
+  url: 'https://therundown-therundown-v1.p.rapidapi.com/sports',
+  headers: {
+    'x-rapidapi-key': '1701031eb1mshc800e3940304359p1bd6ccjsn44c6f4718739',
+    'x-rapidapi-host': 'therundown-therundown-v1.p.rapidapi.com',
+    'X-RapidAPI-Mock-Response': '200'
+  }
+};
+
+try {
+	const response = await axios.request(options);
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
+}
+
+
+
+2. Fetch schedule for a sport using GET /sports/{sport_id}/schedule
+Use this stored event_id when fetching specific game details, scores, or odds.
+Path Parameters:
+sport_id: (int) - the id of the sport, we want to use 2 as its the id for football
+Query Parameters:
+from: (Date) - should be the start of the season for the sport example 2024-09-02 for football, it will call games starting from this date and going forward until it reaches the limit set by the limit parameter
+limit: (int) - number of games to return, default to the typical number of games in a season for the sport
+
+Example:
+const axios = require('axios');
+
+const options = {
+  method: 'GET',
+  url: 'https://therundown-therundown-v1.p.rapidapi.com/sports/2/schedule',
+  params: {
+    from: '2024-09-02',
+    limit: '300'
+  },
+  headers: {
+    'x-rapidapi-key': '1701031eb1mshc800e3940304359p1bd6ccjsn44c6f4718739',
+    'x-rapidapi-host': 'therundown-therundown-v1.p.rapidapi.com'
+  }
+};
+
+try {
+	const response = await axios.request(options);
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
+}
+
+
+
+3. For each game, fetch scores and odds using GET /sports/{sport_id}/events/{date}
+
+path parameters:
+sport_id: (int) - the id of the sport, we want to use 2 as its the id for football
+date: (Date) - should be used every day to fetch the latest games and update our database
+
+Query Parameters:
+include: (string) - should be scores
+affiliate_ids: (string) - should be 4
+offset: (string) - should be 0
+
+const axios = require('axios');
+
+const options = {
+  method: 'GET',
+  url: 'https://therundown-therundown-v1.p.rapidapi.com/sports/2/events/2024-08-08',
+  params: {
+    include: 'scores',
+    affiliate_ids: '4',
+    offset: '0'
+  },
+  headers: {
+    'x-rapidapi-key': '1701031eb1mshc800e3940304359p1bd6ccjsn44c6f4718739',
+    'x-rapidapi-host': 'therundown-therundown-v1.p.rapidapi.com',
+    'X-RapidAPI-Mock-Response': '200'
+  }
+};
+
+try {
+	const response = await axios.request(options);
+	console.log(response.data);
+} catch (error) {
+	console.error(error);
+}
+
+RESPONSE:
+{"meta":{"delta_last_id":"11ef-55e5-1f202540-8198-fa0a19b174de"},"events":[{"event_id":"8bb32582bf598374676e5e6cfdcda2c6","event_uuid":"11ef-55d9-f052d800-8876-3a6fd1056acb","sport_id":2,"event_date":"2024-08-08T23:00:00Z","rotation_number_away":105,"rotation_number_home":106,"score":{"event_id":"8bb32582bf598374676e5e6cfdcda2c6","event_status":"STATUS_IN_PROGRESS","winner_away":0,"winner_home":0,"score_away":3,"score_home":13,"score_away_by_period":[3,0],"score_home_by_period":[0,13],"venue_name":"MetLife Stadium","venue_location":"East Rutherford, NJ","game_clock":289,"display_clock":"4:49","game_period":2,"broadcast":"Fox 5 New York","event_status_detail":"4:49 - 2nd","updated_at":"2024-08-09T00:19:37Z"},"teams":[{"team_id":2692,"team_normalized_id":82,"name":"Detroit Lions","is_away":true,"is_home":false},{"team_id":2680,"team_normalized_id":78,"name":"New York Giants","is_away":false,"is_home":true}],"teams_normalized":[{"team_id":82,"name":"Detroit","mascot":"Lions","abbreviation":"DET","conference_id":34,"division_id":12,"ranking":0,"record":"0-0","is_away":true,"is_home":false,"conference":{"conference_id":34,"sport_id":2,"name":"National Football Conference"},"division":{"division_id":12,"conference_id":34,"sport_id":2,"name":"NFC North"}},{"team_id":78,"name":"New York","mascot":"Giants","abbreviation":"NYG","conference_id":34,"division_id":11,"ranking":0,"record":"0-0","is_away":false,"is_home":true,"conference":{"conference_id":34,"sport_id":2,"name":"National Football Conference"},"division":{"division_id":11,"conference_id":34,"sport_id":2,"name":"NFC East"}}],"schedule":{"league_name":"National Football League","conference_competition":false,"season_type":"Preseason","season_year":2024,"event_name":"Detroit at New York - 2024-08-08T23:00:00Z","attendance":"0"},"lines":{"4":{"line_id":17594011,"moneyline":{"moneyline_away":0.0001,"moneyline_away_delta":-164.9999,"moneyline_home":0.0001,"moneyline_home_delta":190.0001,"moneyline_draw":0.0001,"moneyline_draw_delta":190.0001,"line_id":17594011,"event_id":"8bb32582bf598374676e5e6cfdcda2c6","sport_id":2,"affiliate_id":4,"date_updated":"2024-08-08T23:10:05.778545Z","format":"American"},"spread":{"point_spread_away":0.0001,"point_spread_home":0.0001,"point_spread_away_delta":-2.9999,"point_spread_home_delta":3.0001,"point_spread_away_money":0.0001,"point_spread_away_money_delta":-99.9999,"point_spread_home_money":0.0001,"point_spread_home_money_delta":120.0001,"line_id":17594011,"event_id":"8bb32582bf598374676e5e6cfdcda2c6","sport_id":2,"affiliate_id":4,"date_updated":"2024-08-08T23:10:05.847655Z","format":"American"},"total":{"total_over":0.0001,"total_over_delta":-35.4999,"total_under":0.0001,"total_under_delta":-35.4999,"total_over_money":0.0001,"total_over_money_delta":110.0001,"total_under_money":0.0001,"total_under_money_delta":110.0001,"line_id":17594011,"event_id":"8bb32582bf598374676e5e6cfdcda2c6","sport_id":2,"affiliate_id":4,"date_updated":"2024-08-08T23:10:05.873366Z","format":"American"},"affiliate":{ "affiliate_id":4,"affiliate_name":"Sportsbetting","affiliate_url":"http://bit.ly/2JT73M1"}}}},{"event_id":"996577b19fdef9ce1ebdcc5f76cf7f2d","event_uuid":"11ef-55d9-f052d800-829a-17a4c7f454f2","sport_id":2,"event_date":"2024-08-08T23:00:00Z","rotation_number_away":103,"rotation_number_home":104,"score":{"event_id":"996577b19fdef9ce1ebdcc5f76cf7f2d","event_status":"STATUS_IN_PROGRESS","winner_away":0,"winner_home":0,"score_away":0,"score_home":7,"score_away_by_period":[0,0],"score_home_by_period":[0,7],"venue_name":"Gillette Stadium","venue_location":"Foxborough, MA","game_clock":165,"display_clock":"2:45","game_period":2,"broadcast":"NFL Net","event_status_detail":"2:45 - 2nd","updated_at":"2024-08-09T00:19:54Z"},"teams":[{"team_id":2654,"team_normalized_id":86,"name":"Carolina Panthers","is_away":true,"is_home":false},{"team_id":2667,"team_normalized_id":63,"name":"New England Patriots","is_away":false,"is_home":true}],"teams_normalized":[{"team_id":86,"name":"Carolina","mascot":"Panthers","abbreviation":"CAR","conference_id":34,"division_id":13,"ranking":0,"record":"0-0","is_away":true,"is_home":false,"conference":{"conference_id":34,"sport_id":2,"name":"National Football Conference"},"division":{"division_id":13,"conference_id":34,"sport_id":2,"name":"NFC South"}},{"team_id":63,"name":"New England","mascot":"Patriots","abbreviation":"NE","conference_id":33,"division_id":7,"ranking":0,"record":"0-0","is_away":false,"is_home":true,"conference":{"conference_id":33,"sport_id":2,"name":"American Football Conference"},"division":{"division_id":7,"conference_id":33,"sport_id":2,"name":"AFC East"}}],"schedule":{"league_name":"National Football League","conference_competition":false,"season_type":"Preseason","season_year":2024,"event_name":"Carolina at New England - 2024-08-08T23:00:00Z","attendance":"0"},"lines":{"4":{"line_id":17594012,"moneyline":{"moneyline_away":0.0001,"moneyline_away_delta":-244.9999,"moneyline_home":0.0001,"moneyline_home_delta":290.0001,"moneyline_draw":0.0001,"moneyline_draw_delta":290.0001,"line_id":17594012,"event_id":"996577b19fdef9ce1ebdcc5f76cf7f2d","sport_id":2,"affiliate_id":4,"date_updated":"2024-08-08T23:08:55.148304Z","format":"American"},"spread":{"point_spread_away":0.0001,"point_spread_home":0.0001,"point_spread_away_delta":-6.4999,"point_spread_home_delta":6.5001,"point_spread_away_money":0.0001,"point_spread_away_money_delta":118.0001,"point_spread_home_money":0.0001,"point_spread_home_money_delta":102.0001,"line_id":17594012,"event_id":"996577b19fdef9ce1ebdcc5f76cf7f2d","sport_id":2,"affiliate_id":4,"date_updated":"2024-08-08T23:08:55.219713Z","format":"American"},"total":{"total_over":0.0001,"total_over_delta":-34.4999,"total_under":0.0001,"total_under_delta":-34.4999,"total_over_money":0.0001,"total_over_money_delta":105.0001,"total_under_money":0.0001,"total_under_money_delta":115.0001,"line_id":17594012,"event_id":"996577b19fdef9ce1ebdcc5f76cf7f2d","sport_id":2,"affiliate_id":4,"date_updated":"2024-08-08T23:08:55.249915Z","format":"American"},"affiliate":{ "affiliate_id":4,"affiliate_name":"Sportsbetting","affiliate_url":"http://bit.ly/2JT73M1"}}}}]}

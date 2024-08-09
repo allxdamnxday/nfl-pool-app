@@ -27,6 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.30.1",
     "mongoose": "^5.12.3",
+    "nock": "^13.5.4",
     "nodemailer": "^6.9.14",
     "readline": "^1.3.0",
     "sanitize": "^2.1.2",

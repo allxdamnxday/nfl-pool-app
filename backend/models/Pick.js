@@ -14,6 +14,8 @@ const mongoose = require('mongoose');
  * @property {number} week - The week number of the pick (1-18)
  * @property {string} team - The team picked
  * @property {string} result - The result of the pick (win, loss, or pending)
+ * @property {mongoose.Schema.Types.ObjectId} game - Reference to the Game model
+ * @property {Date} pickMadeAt - Timestamp when the pick was made
  */
 
 /**
@@ -47,6 +49,16 @@ const PickSchema = new mongoose.Schema({
     type: String,
     enum: ['win', 'loss', 'pending'],
     default: 'pending'
+  },
+  game: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Game',
+    required: true
+  },
+  pickMadeAt: {
+    type: Date,
+    default: Date.now,
+    required: [true, 'Pick made timestamp is required']
   }
 }, {
   timestamps: true
@@ -70,7 +82,8 @@ module.exports = Pick;
  *   entry: '60d5ecb74d6bb830b8e70bfe',
  *   entryNumber: 1,
  *   week: 5,
- *   team: 'Patriots'
+ *   team: 'Patriots',
+ *   pickMadeAt: new Date() // This is optional as it defaults to current time
  * });
  * 
  * // Saving the pick to the database
@@ -99,6 +112,7 @@ module.exports = Pick;
 /**
  * Relationships:
  * - Pick has a many-to-one relationship with Entry (via 'entry' field)
+ * - Pick has a many-to-one relationship with Game (via 'game' field)
  * 
  * Validation Rules:
  * - entry field is required and must be a valid Entry ObjectId
@@ -106,6 +120,8 @@ module.exports = Pick;
  * - week is required and must be between 1 and 18
  * - team is required and should be a valid NFL team name
  * - result must be one of: 'win', 'loss', or 'pending'
+ * - game field is required and must be a valid Game ObjectId
+ * - pickMadeAt is automatically set to the current time when the pick is created
  * 
  * Additional Notes:
  * - The model uses timestamps to automatically add and update createdAt and updatedAt fields
@@ -114,4 +130,6 @@ module.exports = Pick;
  * - The combination of entry, entryNumber, and week must be unique to prevent duplicate picks
  * - Care should be taken to ensure that picks are made before the start of each game
  * - The model does not include game details directly; it assumes integration with a separate game/schedule system
+ * - The pickMadeAt field can be used to enforce pick deadlines and for auditing purposes
+ * - When updating a pick, make sure to update the pickMadeAt field if necessary
  */

@@ -76,8 +76,12 @@ class BaseService {
    */
   async create(data) {
     try {
-      return await this.model.create(data);
+      console.log(`Attempting to create ${this.model.modelName} with data:`, JSON.stringify(data));
+      const item = await this.model.create(data);
+      console.log(`${this.model.modelName} created successfully:`, JSON.stringify(item));
+      return item;
     } catch (error) {
+      console.error(`Error creating ${this.model.modelName}:`, error);
       throw new ErrorResponse(`Error creating ${this.model.modelName}: ${error.message}`, 400);
     }
   }

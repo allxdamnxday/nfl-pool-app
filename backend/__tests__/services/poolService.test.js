@@ -8,7 +8,16 @@ const Entry = require('../../models/Entry');
 const User = require('../../models/User');
 const ErrorResponse = require('../../utils/errorResponse');
 const { connect, closeDatabase, clearDatabase } = require('../testSetup');
-const { createTestUser, createTestPool, createTestRequest, createTestEntry } = require('../testUtils');
+const { 
+  createUser, 
+  createAdmin, 
+  createRequest, 
+  createPool, 
+  createEntry, 
+  createPick, 
+  createGame,
+  createObjectId
+} = require('../mockDataFactory');
 
 describe('PoolService', () => {
   beforeAll(async () => await connect());
@@ -17,11 +26,11 @@ describe('PoolService', () => {
 
   describe('getAvailablePools', () => {
     it('should return available pools with user-specific information', async () => {
-      const user = await createTestUser();
-      const pool1 = await createTestPool(user._id, { status: 'open' });
-      const pool2 = await createTestPool(user._id, { status: 'open' });
-      await createTestRequest(user._id, pool1._id);
-      await createTestEntry(user._id, pool2._id, new mongoose.Types.ObjectId());
+      const user = await User.create(createUser());
+      const pool1 = await Pool.create(createPool(user._id, { status: 'open' }));
+      const pool2 = await Pool.create(createPool(user._id, { status: 'open' }));
+      await Request.create(createRequest(user._id, pool1._id));
+      await Entry.create(createEntry(user._id, pool2._id, createObjectId()));
 
       const availablePools = await PoolService.getAvailablePools(user._id);
 
@@ -33,9 +42,9 @@ describe('PoolService', () => {
     });
 
     it('should only return open pools', async () => {
-      const user = await createTestUser();
-      await createTestPool(user._id, { status: 'open' });
-      await createTestPool(user._id, { status: 'active' });
+      const user = await User.create(createUser());
+      await Pool.create(createPool(user._id, { status: 'open' }));
+      await Pool.create(createPool(user._id, { status: 'active' }));
 
       const availablePools = await PoolService.getAvailablePools(user._id);
 
@@ -46,55 +55,63 @@ describe('PoolService', () => {
 
   describe('createPool', () => {
     it('should create a new pool', async () => {
-      const user = await createTestUser();
-      const poolData = {
-        name: 'Test Pool',
-        entryFee: 50,
-        numberOfWeeks: 17
-      };
-
+      const user = await User.create(createUser());
+      const poolData = createPool(user._id);
+  
       const newPool = await PoolService.createPool(user._id, poolData);
-
+  
       expect(newPool.name).toBe(poolData.name);
       expect(newPool.entryFee).toBe(poolData.entryFee);
       expect(newPool.numberOfWeeks).toBe(poolData.numberOfWeeks);
       expect(newPool.creator.toString()).toBe(user._id.toString());
+      expect(newPool.status).toBe('open');
+      expect(newPool.season).toBe(poolData.season);
     });
-
+  
     it('should throw an error if required fields are missing', async () => {
-      const user = await createTestUser();
+      const user = await User.create(createUser());
       const invalidPoolData = { name: 'Invalid Pool' };
-
+  
       await expect(PoolService.createPool(user._id, invalidPoolData))
-        .rejects.toThrow(ErrorResponse);
+        .rejects.toThrow(/Please add season, maxParticipants, entryFee, prizeAmount, description, startDate, endDate, maxEntries, prizePot, numberOfWeeks/);
+    });
+  
+    it('should throw an error if invalid data is provided', async () => {
+      const user = await User.create(createUser());
+      const invalidPoolData = createPool(user._id, {
+        numberOfWeeks: 20, // Invalid: more than 18 weeks
+      });
+  
+      await expect(PoolService.createPool(user._id, invalidPoolData))
+        .rejects.toThrow('Number of weeks must be between 1 and 18');
     });
   });
 
   describe('updatePool', () => {
     it('should update a pool', async () => {
-      const user = await createTestUser();
-      const pool = await createTestPool(user._id);
+      const user = await User.create(createUser());
+      const pool = await Pool.create(createPool(user._id));
       const updateData = { name: 'Updated Pool Name' };
-
-      const updatedPool = await PoolService.updatePool(pool._id, user._id, updateData);
-
+    
+      const updatedPool = await PoolService.updatePool(pool._id, user._id.toString(), updateData);
+    
       expect(updatedPool.name).toBe(updateData.name);
     });
 
-    it('should throw an error if user is not authorized', async () => {
-      const user1 = await createTestUser();
-      const user2 = await createTestUser();
-      const pool = await createTestPool(user1._id);
-
+    it('should throw an error if user is not authorized to update', async () => {
+      const user1 = await User.create(createUser());
+      const user2 = await User.create(createUser());
+      const pool = await Pool.create(createPool(user1._id));
+    
       await expect(PoolService.updatePool(pool._id, user2._id, { name: 'Unauthorized Update' }))
-        .rejects.toThrow('User is not authorized to update this pool');
+        .rejects.toThrow(`User ${user2._id} is not authorized to update this pool`);
     });
   });
 
   describe('deletePool', () => {
     it('should delete a pool', async () => {
-      const user = await createTestUser();
-      const pool = await createTestPool(user._id);
+      const user = await User.create(createUser());
+      const pool = await Pool.create(createPool(user._id));
 
       await PoolService.deletePool(pool._id, user._id);
 
@@ -102,24 +119,24 @@ describe('PoolService', () => {
       expect(deletedPool).toBeNull();
     });
 
-    it('should throw an error if user is not authorized', async () => {
-      const user1 = await createTestUser();
-      const user2 = await createTestUser();
-      const pool = await createTestPool(user1._id);
-
+    it('should throw an error if user is not authorized to delete', async () => {
+      const user1 = await User.create(createUser());
+      const user2 = await User.create(createUser());
+      const pool = await Pool.create(createPool(user1._id));
+    
       await expect(PoolService.deletePool(pool._id, user2._id))
-        .rejects.toThrow('User is not authorized to delete this pool');
+        .rejects.toThrow(`User ${user2._id} is not authorized to delete this pool`);
     });
   });
 
   describe('getPoolStats', () => {
     it('should return correct pool statistics', async () => {
-      const user = await createTestUser();
-      const pool = await createTestPool(user._id, {
+      const user = await User.create(createUser());
+      const pool = await Pool.create(createPool(user._id, {
         participants: [user._id],
         eliminatedUsers: [],
         currentWeek: 5
-      });
+      }));
 
       const stats = await PoolService.getPoolStats(pool._id);
 
@@ -131,8 +148,8 @@ describe('PoolService', () => {
 
   describe('updatePoolStatus', () => {
     it('should update pool status', async () => {
-      const user = await createTestUser();
-      const pool = await createTestPool(user._id, { status: 'open' });
+      const user = await User.create(createUser());
+      const pool = await Pool.create(createPool(user._id, { status: 'open' }));
 
       const updatedPool = await PoolService.updatePoolStatus(pool._id, 'active');
 
@@ -140,8 +157,8 @@ describe('PoolService', () => {
     });
 
     it('should throw an error for invalid status', async () => {
-      const user = await createTestUser();
-      const pool = await createTestPool(user._id);
+      const user = await User.create(createUser());
+      const pool = await Pool.create(createPool(user._id));
 
       await expect(PoolService.updatePoolStatus(pool._id, 'invalid'))
         .rejects.toThrow('Invalid status. Must be open, active, or completed.');
@@ -150,11 +167,11 @@ describe('PoolService', () => {
 
   describe('getUserPools', () => {
     it('should return pools for a user with active entry count', async () => {
-      const user = await createTestUser();
-      const pool1 = await createTestPool(user._id);
-      const pool2 = await createTestPool(user._id);
-      await createTestEntry(user._id, pool1._id, new mongoose.Types.ObjectId(), { isActive: true });
-      await createTestEntry(user._id, pool2._id, new mongoose.Types.ObjectId(), { isActive: false });
+      const user = await User.create(createUser());
+      const pool1 = await Pool.create(createPool(user._id));
+      const pool2 = await Pool.create(createPool(user._id));
+      await Entry.create(createEntry(user._id, pool1._id, createObjectId(), { status: 'active' }));
+      await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
 
       const userPools = await PoolService.getUserPools(user._id);
 
@@ -166,11 +183,14 @@ describe('PoolService', () => {
 
   describe('getUserPoolsWithEntries', () => {
     it('should return pools with active entries for a user', async () => {
-      const user = await createTestUser();
-      const pool1 = await createTestPool(user._id);
-      const pool2 = await createTestPool(user._id);
-      const entry1 = await createTestEntry(user._id, pool1._id, new mongoose.Types.ObjectId(), { isActive: true });
-      await createTestEntry(user._id, pool2._id, new mongoose.Types.ObjectId(), { isActive: false });
+      const user = await User.create(createUser());
+      const pool1 = await Pool.create(createPool(user._id));
+      const pool2 = await Pool.create(createPool(user._id));
+      const entry1 = await Entry.create(createEntry(user._id, pool1._id, createObjectId(), { status: 'active' }));
+      await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
+
+      await Pool.findByIdAndUpdate(pool1._id, { $push: { participants: user._id } });
+      await Pool.findByIdAndUpdate(pool2._id, { $push: { participants: user._id } });
 
       const poolsWithEntries = await PoolService.getUserPoolsWithEntries(user._id);
 
@@ -184,11 +204,11 @@ describe('PoolService', () => {
 
   describe('getUserActivePools', () => {
     it('should return only active pools for a user', async () => {
-      const user = await createTestUser();
-      const pool1 = await createTestPool(user._id);
-      const pool2 = await createTestPool(user._id);
-      await createTestEntry(user._id, pool1._id, new mongoose.Types.ObjectId(), { isActive: true });
-      await createTestEntry(user._id, pool2._id, new mongoose.Types.ObjectId(), { isActive: false });
+      const user = await User.create(createUser());
+      const pool1 = await Pool.create(createPool(user._id, { status: 'active' }));
+      const pool2 = await Pool.create(createPool(user._id, { status: 'completed' }));
+      await Entry.create(createEntry(user._id, pool1._id, createObjectId(), { status: 'active' }));
+      await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
 
       const activePools = await PoolService.getUserActivePools(user._id);
 
@@ -199,4 +219,17 @@ describe('PoolService', () => {
 
   describe('getPoolEntries', () => {
     it('should return all entries for a pool', async () => {
-      const user1
+      const user1 = await User.create(createUser());
+      const user2 = await User.create(createUser());
+      const pool = await Pool.create(createPool(user1._id));
+      await Entry.create(createEntry(user1._id, pool._id, createObjectId()));
+      await Entry.create(createEntry(user2._id, pool._id, createObjectId()));
+
+      const entries = await PoolService.getPoolEntries(pool._id);
+
+      expect(entries).toHaveLength(2);
+      expect(entries[0].pool.toString()).toBe(pool._id.toString());
+      expect(entries[1].pool.toString()).toBe(pool._id.toString());
+    });
+  });
+});

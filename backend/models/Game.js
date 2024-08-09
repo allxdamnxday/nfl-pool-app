@@ -39,13 +39,21 @@ const mongoose = require('mongoose');
  * @property {string} teams_normalized.name - Name of the team
  * @property {string} teams_normalized.mascot - Mascot of the team
  * @property {string} teams_normalized.abbreviation - Abbreviation of the team name
- * @property {string} teams_normalized.logo - URL of the team logo
  * @property {number} teams_normalized.conference_id - ID of the team's conference
  * @property {number} teams_normalized.division_id - ID of the team's division
  * @property {number} teams_normalized.ranking - Ranking of the team
  * @property {string} teams_normalized.record - Team's record
  * @property {boolean} teams_normalized.is_away - Indicates if the team is away
  * @property {boolean} teams_normalized.is_home - Indicates if the team is home
+ * @property {Object} teams_normalized.conference - Conference information
+ * @property {number} teams_normalized.conference.conference_id - ID of the conference
+ * @property {number} teams_normalized.conference.sport_id - ID of the sport
+ * @property {string} teams_normalized.conference.name - Name of the conference
+ * @property {Object} teams_normalized.division - Division information
+ * @property {number} teams_normalized.division.division_id - ID of the division
+ * @property {number} teams_normalized.division.conference_id - ID of the division's conference
+ * @property {number} teams_normalized.division.sport_id - ID of the division's sport
+ * @property {string} teams_normalized.division.name - Name of the division
  * @property {Object} schedule - Schedule information
  * @property {string} schedule.league_name - Name of the league
  * @property {boolean} schedule.conference_competition - Indicates if it's a conference competition
@@ -56,6 +64,33 @@ const mongoose = require('mongoose');
  * @property {string} schedule.week_detail - Detailed information about the week
  * @property {string} schedule.event_name - Name of the event
  * @property {string} schedule.attendance - Attendance information
+ * @property {Object} odds - Betting odds information
+ * @property {Object} odds.moneyline - Moneyline odds
+ * @property {number} odds.moneyline.moneyline_away - Moneyline odds for the away team
+ * @property {number} odds.moneyline.moneyline_away_delta - Delta value for the away team moneyline
+ * @property {number} odds.moneyline.moneyline_home - Moneyline odds for the home team
+ * @property {number} odds.moneyline.moneyline_home_delta - Delta value for the home team moneyline
+ * @property {number} odds.moneyline.moneyline_draw - Moneyline odds for a draw
+ * @property {number} odds.moneyline.moneyline_draw_delta - Delta value for the draw moneyline
+ * @property {Object} odds.spread - Spread odds
+ * @property {number} odds.spread.point_spread_away - Point spread for the away team
+ * @property {number} odds.spread.point_spread_away_delta - Delta value for the away team point spread
+ * @property {number} odds.spread.point_spread_home - Point spread for the home team
+ * @property {number} odds.spread.point_spread_home_delta - Delta value for the home team point spread
+ * @property {number} odds.spread.point_spread_away_money - Moneyline odds for the away team point spread
+ * @property {number} odds.spread.point_spread_away_money_delta - Delta value for the away team point spread moneyline
+ * @property {number} odds.spread.point_spread_home_money - Moneyline odds for the home team point spread
+ * @property {number} odds.spread.point_spread_home_money_delta - Delta value for the home team point spread moneyline
+ * @property {Object} odds.total - Total odds
+ * @property {number} odds.total.total_over - Total over odds
+ * @property {number} odds.total.total_over_delta - Delta value for the total over odds
+ * @property {number} odds.total.total_under - Total under odds
+ * @property {number} odds.total.total_under_delta - Delta value for the total under odds
+ * @property {number} odds.total.total_over_money - Moneyline odds for the total over
+ * @property {number} odds.total.total_over_money_delta - Delta value for the total over moneyline
+ * @property {number} odds.total.total_under_money - Moneyline odds for the total under
+ * @property {number} odds.total.total_under_money_delta - Delta value for the total under moneyline
+ * @property {string} favored_team - The team favored to win
  */
 const GameSchema = new mongoose.Schema({
   event_id: { type: String, required: true, unique: true },
@@ -91,7 +126,7 @@ const GameSchema = new mongoose.Schema({
     name: String,
     mascot: String,
     abbreviation: String,
-    logo: String,
+    // logo: String, // Remove or comment out if not needed
     conference_id: Number,
     division_id: Number,
     ranking: Number,
@@ -109,7 +144,18 @@ const GameSchema = new mongoose.Schema({
     week_detail: String,
     event_name: String,
     attendance: String
-  }
+  },
+  odds: {
+    moneyline: {
+      moneyline_away: Number,
+      moneyline_home: Number
+    },
+    spread: {
+      point_spread_away: Number,
+      point_spread_home: Number
+    }
+  },
+  favored_team: { type: String }
 }, { timestamps: true });
 
 // Indexes

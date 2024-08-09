@@ -2,7 +2,7 @@
  * @module EntryService
  * @description Service module for managing entries in the NFL pool application. This service handles operations related to user entries, including retrieval, creation, and updating of entries and their associated picks.
  */
-
+const Game = require('../models/Game');
 const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
 const Pick = require('../models/Pick');
@@ -84,11 +84,11 @@ class EntryService {
     if (!entry) {
       throw new ErrorResponse(`Entry not found with id of ${entryId}`, 404);
     }
-
-    if (entry.user.toString() !== userId) {
-      throw new ErrorResponse(`User ${userId} is not authorized to view this entry`, 403);
+  
+    if (entry.user.toString() !== userId.toString()) {
+      throw new ErrorResponse(`User is not authorized to view this entry`, 403);
     }
-
+  
     return entry;
   }
 
@@ -191,11 +191,11 @@ class EntryService {
    * }
    */
   async getPickForWeek(entryId, week) {
-    const entry = await Entry.findById(entryId);
+    const entry = await Entry.findById(entryId).populate('picks');
     if (!entry) {
       throw new ErrorResponse(`No entry found with id ${entryId}`, 404);
     }
-
+  
     const pick = entry.picks.find(p => p.week === parseInt(week));
     return pick || null;
   }
@@ -229,9 +229,12 @@ class EntryService {
             select: 'away_team home_team event_date schedule.week'
           }
         });
+      } else {
+        query = query.populate('picks');
       }
-
-      return await query.exec();
+  
+      const entries = await query.exec();
+      return entries;
     } catch (error) {
       throw new ErrorResponse(`Error fetching entries with picks for user ${userId}: ${error.message}`, 500);
     }
