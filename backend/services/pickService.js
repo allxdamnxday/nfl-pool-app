@@ -65,14 +65,22 @@ class PickService {
       throw new ErrorResponse(`You already have a ${team} pick this season for this entry, please choose another team`, 400);
     }
 
-    const game = await Game.findOne({ week, $or: [{ homeTeam: team }, { awayTeam: team }] });
+    const game = await Game.findOne({
+      'schedule.week': week,
+      $or: [
+        { away_team: team },
+        { home_team: team },
+        { 'teams_normalized.name': team }
+      ]
+    });
+
     if (!game) {
       logger.error(`No game found for team ${team} in week ${week}`);
       throw new ErrorResponse(`No game found for team ${team} in week ${week}`, 404);
     }
 
     const now = moment.utc();  // Get current time in UTC
-    if (now.isAfter(moment(game.startTime))) {  // Compare UTC times
+    if (now.isAfter(moment(game.event_date))) {  // Compare UTC times
       logger.warn(`Attempted to update pick after game start for entry ${entryId}, week ${week}`);
       throw new ErrorResponse(`Cannot update pick after game has started`, 400);
     }
@@ -82,7 +90,7 @@ class PickService {
       { 
         team: team,
         pickMadeAt: now.toDate(),  // Store as UTC Date object
-        game: game._id
+        game: game._id  // Add this line to associate the pick with the game
       },
       { upsert: true, new: true }
     );
@@ -190,7 +198,7 @@ class PickService {
     }
 
     const now = moment.utc();  // Get current time in UTC
-    if (now.isAfter(moment(existingPick.game.startTime))) {  // Compare UTC times
+    if (now.isAfter(moment(existingPick.game.event_date))) {  // Compare UTC times
       logger.warn(`Attempted to update pick after game start for entry ${entryId}, week ${week}`);
       throw new ErrorResponse(`Cannot update pick after game has started`, 400);
     }

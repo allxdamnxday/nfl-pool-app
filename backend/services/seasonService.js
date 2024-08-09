@@ -39,13 +39,45 @@ const getSetting = async (key) => {
  * @param {Date} date - The date to calculate the week for.
  * @param {number} seasonYear - The year of the NFL season.
  * @returns {number} The calculated NFL week number.
+ * 
+ * Math explanation:
+ * 1. Set season start to September 1st of the given year: new Date(seasonYear, 8, 1)
+ * 2. Adjust to the first Thursday after Sept 1st: (4 - seasonStart.getDay() + 7) % 7
+ *    - 4 represents Thursday (0-indexed week starting with Sunday)
+ *    - Add 7 and use modulo to ensure positive result
+ * 3. Calculate time difference in milliseconds: date.getTime() - seasonStart.getTime()
+ * 4. Convert milliseconds to days: timeDiff / (1000 * 3600 * 24)
+ *    - 1000 ms/s * 3600 s/h * 24 h/day
+ * 5. Calculate weeks: Math.floor(dayDiff / 7)
+ * 6. Add 1 to start week numbering at 1 instead of 0
  */
 const calculateNFLWeek = (date, seasonYear) => {
-  const seasonStart = new Date(seasonYear, 8, 1);
-  seasonStart.setDate(seasonStart.getDate() + (4 - seasonStart.getDay() + 7) % 7);
-  const timeDiff = date.getTime() - seasonStart.getTime();
+  // Create dates in Eastern Time
+  const options = { timeZone: 'America/New_York', year: 'numeric', month: 'numeric', day: 'numeric' };
+  const seasonStartET = new Date(seasonYear, 8, 1).toLocaleString('en-US', options);
+  const seasonStart = new Date(seasonStartET);
+  seasonStart.setDate(seasonStart.getDate() + (4 - seasonStart.getDay() + 7) % 7); // First Thursday
+
+  const inputDateET = date.toLocaleString('en-US', options);
+  const inputDate = new Date(inputDateET);
+
+  console.log(`Season start: ${seasonStart.toISOString()}`);
+  console.log(`Input date: ${inputDate.toISOString()}`);
+
+  if (inputDate < seasonStart) {
+    console.log('Date is before season start');
+    return 0; // Before season starts
+  }
+
+  const timeDiff = inputDate.getTime() - seasonStart.getTime();
   const dayDiff = timeDiff / (1000 * 3600 * 24);
-  return Math.floor(dayDiff / 7) + 1;
+  const weekNumber = Math.floor(dayDiff / 7) + 1;
+
+  console.log(`Time difference: ${timeDiff}`);
+  console.log(`Day difference: ${dayDiff}`);
+  console.log(`Calculated week number: ${weekNumber}`);
+
+  return weekNumber;
 };
 
 /**

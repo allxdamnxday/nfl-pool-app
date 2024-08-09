@@ -13,13 +13,12 @@ describe('Game Model Test', () => {
     expect(validGame._id).toBeDefined();
     expect(validGame.event_id).toBeDefined();
     expect(validGame.event_uuid).toBeDefined();
-    expect(validGame.sport_id).toBe(1);
+    expect(validGame.sport_id).toBe(2); // NFL sport_id
     expect(validGame.event_date).toBeDefined();
     expect(validGame.away_team_id).toBeDefined();
     expect(validGame.home_team_id).toBeDefined();
     expect(validGame.away_team).toBeDefined();
     expect(validGame.home_team).toBeDefined();
-    // New fields
     expect(validGame.rotation_number_away).toBeDefined();
     expect(validGame.rotation_number_home).toBeDefined();
     expect(validGame.total).toBeDefined();
@@ -84,12 +83,12 @@ describe('Game Model Test', () => {
       expect(team.abbreviation).toBeDefined();
       expect(typeof team.is_away).toBe('boolean');
       expect(typeof team.is_home).toBe('boolean');
-      // New fields
-      expect(team.logo).toBeDefined();
       expect(team.conference_id).toBeDefined();
       expect(team.division_id).toBeDefined();
       expect(team.ranking).toBeDefined();
       expect(team.record).toBeDefined();
+      expect(team.conference).toBeDefined();
+      expect(team.division).toBeDefined();
     });
   });
 
@@ -101,7 +100,6 @@ describe('Game Model Test', () => {
     expect(typeof game.score.score_home).toBe('number');
     expect(Array.isArray(game.score.score_away_by_period)).toBe(true);
     expect(Array.isArray(game.score.score_home_by_period)).toBe(true);
-    // New fields
     expect(game.score.venue_name).toBeDefined();
     expect(game.score.venue_location).toBeDefined();
     expect(typeof game.score.game_clock).toBe('number');
@@ -115,12 +113,11 @@ describe('Game Model Test', () => {
   it('should validate schedule structure', async () => {
     const game = await createTestGame();
     expect(game.schedule).toBeDefined();
+    expect(game.schedule.league_name).toBeDefined();
+    expect(typeof game.schedule.conference_competition).toBe('boolean');
     expect(game.schedule.season_type).toBeDefined();
     expect(typeof game.schedule.season_year).toBe('number');
     expect(typeof game.schedule.week).toBe('number');
-    // New fields
-    expect(game.schedule.league_name).toBeDefined();
-    expect(typeof game.schedule.conference_competition).toBe('boolean');
     expect(game.schedule.week_name).toBeDefined();
     expect(game.schedule.week_detail).toBeDefined();
     expect(game.schedule.event_name).toBeDefined();
@@ -136,5 +133,8 @@ describe('Game Model Test', () => {
     expect(game.odds.spread).toBeDefined();
     expect(typeof game.odds.spread.point_spread_away).toBe('number');
     expect(typeof game.odds.spread.point_spread_home).toBe('number');
+    expect(game.odds.total).toBeDefined();
+    expect(typeof game.odds.total.total_over).toBe('number');
+    expect(typeof game.odds.total.total_under).toBe('number');
   });
 });

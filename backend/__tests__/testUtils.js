@@ -185,6 +185,15 @@ module.exports.findGamesByWeekAndSeason = async (week, season) => {
 };
 
 /**
+ * Find a game by event ID.
+ * @param {string} eventId - The event ID to search for.
+ * @returns {Promise<Game>} The found game document.
+ */
+module.exports.findGameByEventId = async (eventId) => {
+  return await Game.findOne({ event_id: eventId });
+};
+
+/**
  * Update a pool document.
  * @param {mongoose.Types.ObjectId} poolId - The pool ID to update.
  * @param {Object} updateData - The data to update.

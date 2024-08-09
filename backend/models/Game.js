@@ -126,13 +126,23 @@ const GameSchema = new mongoose.Schema({
     name: String,
     mascot: String,
     abbreviation: String,
-    // logo: String, // Remove or comment out if not needed
     conference_id: Number,
     division_id: Number,
     ranking: Number,
     record: String,
     is_away: Boolean,
-    is_home: Boolean
+    is_home: Boolean,
+    conference: {
+      conference_id: Number,
+      sport_id: Number,
+      name: String
+    },
+    division: {
+      division_id: Number,
+      conference_id: Number,
+      sport_id: Number,
+      name: String
+    }
   }],
   schedule: {
     league_name: String,
@@ -148,11 +158,31 @@ const GameSchema = new mongoose.Schema({
   odds: {
     moneyline: {
       moneyline_away: Number,
-      moneyline_home: Number
+      moneyline_away_delta: Number,
+      moneyline_home: Number,
+      moneyline_home_delta: Number,
+      moneyline_draw: Number,
+      moneyline_draw_delta: Number
     },
     spread: {
       point_spread_away: Number,
-      point_spread_home: Number
+      point_spread_away_delta: Number,
+      point_spread_home: Number,
+      point_spread_home_delta: Number,
+      point_spread_away_money: Number,
+      point_spread_away_money_delta: Number,
+      point_spread_home_money: Number,
+      point_spread_home_money_delta: Number
+    },
+    total: {
+      total_over: Number,
+      total_over_delta: Number,
+      total_under: Number,
+      total_under_delta: Number,
+      total_over_money: Number,
+      total_over_money_delta: Number,
+      total_under_money: Number,
+      total_under_money_delta: Number
     }
   },
   favored_team: { type: String }

@@ -30,6 +30,8 @@ describe('PickService', () => {
       const entry = await Entry.create(createEntry(user._id, pool._id, request._id));
       const game = await Game.create(createGame({ 
         schedule: { week: 5 },
+        away_team: 'Patriots',
+        home_team: '49ers',
         teams_normalized: [
           { name: 'Patriots', is_away: true, is_home: false },
           { name: '49ers', is_away: false, is_home: true }
@@ -42,6 +44,7 @@ describe('PickService', () => {
       expect(pick.team).toBe('Patriots');
       expect(pick.week).toBe(5);
       expect(pick.entry.toString()).toBe(entry._id.toString());
+      expect(pick.game.toString()).toBe(game._id.toString());
     });
 
     it('should throw an error if user is not authorized', async () => {
@@ -52,6 +55,8 @@ describe('PickService', () => {
       const entry = await Entry.create(createEntry(user1._id, pool._id, request._id));
       await Game.create(createGame({ 
         schedule: { week: 5 },
+        away_team: 'Patriots',
+        home_team: '49ers',
         teams_normalized: [
           { name: 'Patriots', is_away: true, is_home: false },
           { name: '49ers', is_away: false, is_home: true }
@@ -60,7 +65,7 @@ describe('PickService', () => {
       }));
 
       await expect(PickService.addOrUpdatePick(entry._id, entry.entryNumber, user2._id.toString(), 'Patriots', 5))
-        .rejects.toThrow('User is not authorized to update this entry');
+        .rejects.toThrow(`User ${user2._id.toString()} is not authorized to update this entry`);
     });
 
     it('should throw an error if team is already picked for another week', async () => {
@@ -70,6 +75,8 @@ describe('PickService', () => {
       const entry = await Entry.create(createEntry(user._id, pool._id, request._id));
       await Game.create(createGame({ 
         schedule: { week: 5 },
+        away_team: 'Patriots',
+        home_team: '49ers',
         teams_normalized: [
           { name: 'Patriots', is_away: true, is_home: false },
           { name: '49ers', is_away: false, is_home: true }
@@ -78,6 +85,8 @@ describe('PickService', () => {
       }));
       await Game.create(createGame({ 
         schedule: { week: 6 },
+        away_team: 'Patriots',
+        home_team: 'Jets',
         teams_normalized: [
           { name: 'Patriots', is_away: true, is_home: false },
           { name: 'Jets', is_away: false, is_home: true }
@@ -97,6 +106,8 @@ describe('PickService', () => {
       const entry = await Entry.create(createEntry(user._id, pool._id, request._id));
       await Game.create(createGame({ 
         schedule: { week: 5 },
+        away_team: 'Patriots',
+        home_team: '49ers',
         teams_normalized: [
           { name: 'Patriots', is_away: true, is_home: false },
           { name: '49ers', is_away: false, is_home: true }
@@ -115,7 +126,17 @@ describe('PickService', () => {
       const pool = await Pool.create(createPool(user._id));
       const request = await Request.create(createRequest(user._id, pool._id));
       const entry = await Entry.create(createEntry(user._id, pool._id, request._id));
-      const pick = await Pick.create(createPick(entry._id, { week: 5, team: 'Patriots' }));
+      await Game.create(createGame({ 
+        schedule: { week: 5 },
+        away_team: 'Patriots',
+        home_team: '49ers',
+        teams_normalized: [
+          { name: 'Patriots', is_away: true, is_home: false },
+          { name: '49ers', is_away: false, is_home: true }
+        ],
+        event_date: new Date(Date.now() + 86400000) // 1 day in the future
+      }));
+      await Pick.create(createPick(entry._id, { week: 5, team: 'Patriots', entryNumber: entry.entryNumber }));
 
       const picks = await PickService.getPicksForWeek(entry._id, entry.entryNumber, 5);
 
