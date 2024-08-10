@@ -3,7 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPoolDetails, getPoolEntries } from '../services/poolService';
 import { createJoinRequest } from '../services/requestService';
-import { addOrUpdatePick } from '../services/pickService';
+import { addOrUpdatePick, getGamesForWeek } from '../services/pickService';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { FaUsers, FaDollarSign, FaTrophy, FaCalendarAlt, FaFootballBall, FaArrowLeft } from 'react-icons/fa';
@@ -31,7 +31,11 @@ function PoolDetails() {
         ]);
         setPool(poolData);
         setEntries(entriesData);
-        setGames(poolData.games || []);
+        
+        // Fetch games for the current week
+        const gamesData = await getGamesForWeek(poolData.seasonYear, poolData.currentWeek);
+        setGames(gamesData);
+        
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch pool details. Please try again later.');
@@ -65,7 +69,7 @@ function PoolDetails() {
       if (!userEntry) {
         throw new Error('User entry not found');
       }
-      await addOrUpdatePick(userEntry._id, selectedTeam._id, pool.currentWeek);
+      await addOrUpdatePick(userEntry._id, userEntry.entryNumber, selectedTeam, pool.currentWeek);
       showToast('Pick submitted successfully!', 'success');
       // Refresh pool details after submitting pick
       const [updatedPoolData, updatedEntriesData] = await Promise.all([

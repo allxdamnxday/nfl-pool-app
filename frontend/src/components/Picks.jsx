@@ -48,7 +48,7 @@ function Picks() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [currentPick, setCurrentPick] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const { entryId, week } = useParams();
+  const { entryId, entryNumber, week } = useParams();
   const showToast = useToast();
   const [currentWeek, setCurrentWeek] = useState(parseInt(week) || 1);
   const totalWeeks = 18; // Adjust this based on your NFL season structure
@@ -67,7 +67,7 @@ function Picks() {
         const weekNumber = parseInt(currentWeek) || 1;
         const [gamesData, pickData] = await Promise.all([
           getGamesForWeek(seasonYear, weekNumber),
-          getPickForWeek(entryId, weekNumber)
+          getPickForWeek(entryId, entryNumber, weekNumber)
         ]);
         setGames(gamesData);
         if (pickData) {
@@ -86,7 +86,7 @@ function Picks() {
     };
 
     fetchData();
-  }, [entryId, currentWeek, showToast]);
+  }, [entryId, entryNumber, currentWeek, showToast]);
 
   const handlePickClick = (team) => {
     setSelectedTeam(team);
@@ -96,7 +96,7 @@ function Picks() {
   const handleConfirmPick = async () => {
     try {
       const weekNumber = parseInt(currentWeek) || 1;
-      await addOrUpdatePick(entryId, selectedTeam, weekNumber);
+      await addOrUpdatePick(entryId, entryNumber, selectedTeam, weekNumber);
       showToast('Pick submitted successfully', 'success');
       setCurrentPick(selectedTeam); // Ensure currentPick is set as a string
       setShowConfirmation(false);
