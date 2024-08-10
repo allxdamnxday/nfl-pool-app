@@ -36,9 +36,15 @@ exports.register = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Please provide all required fields', 400));
   }
 
-  // Check if the combination of firstName and lastName already exists
-  const existingUser = await User.findOne({ firstName, lastName });
+  // Check if user already exists
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
+    return next(new ErrorResponse('User with this email already exists', 400));
+  }
+
+  // Check if the combination of firstName and lastName already exists
+  const existingNameUser = await User.findOne({ firstName, lastName });
+  if (existingNameUser) {
     return next(new ErrorResponse('A user with this first and last name combination already exists', 400));
   }
 
@@ -315,7 +321,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
       html: htmlMessage
     });
 
-    res.status(200).json({ success: true, data: 'Email sent' });
+    res.status(200).json({ success: true, message: 'Email sent' });
   } catch (err) {
     console.error('Email sending error:', err);
     user.resetPasswordToken = undefined;
@@ -360,9 +366,13 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
   
-  // Save user without validation
-  await user.save({ validateBeforeSave: false });
+  // Save user with validation
+  await user.save();
 
+  // Log the user object after saving
+  console.log('User after save:', user);
+
+  // Send token response
   sendTokenResponse(user, 200, res);
 });
 
@@ -435,15 +445,12 @@ exports.verifyEmail = asyncHandler(async (req, res, next) => {
 
   // Find user by verification token and check if it's expired
   const user = await User.findOne({
-    $or: [
-      { verificationToken: token },
-      { verificationToken: undefined, isEmailVerified: true }
-    ],
+    verificationToken: token,
     verificationTokenExpire: { $gt: Date.now() }
   });
 
   if (!user) {
-    return next(new ErrorResponse('Invalid or expired token', 400));
+    return next(new ErrorResponse('Invalid token', 400));
   }
 
   if (user.isEmailVerified) {
