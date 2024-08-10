@@ -9,7 +9,8 @@ const {
   getUserRequests,
   getPoolRequests,
   getRequest,
-  confirmPayment
+  confirmPayment,
+  getRequests
 } = require('../controllers/requests');
 
 const router = express.Router();
@@ -61,13 +62,13 @@ router.post('/', asyncHandler(createRequest));
  * @swagger
  * /api/v1/requests:
  *   get:
- *     summary: Get all requests for the current user
+ *     summary: Get all requests (Admin only)
  *     tags: [Requests]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of user requests
+ *         description: List of all requests
  *         content:
  *           application/json:
  *             schema:
@@ -83,8 +84,10 @@ router.post('/', asyncHandler(createRequest));
  *                     $ref: '#/components/schemas/Request'
  *       401:
  *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
  */
-router.get('/', asyncHandler(getUserRequests));
+router.get('/', authorize('admin'), asyncHandler(getRequests));
 
 /**
  * @swagger

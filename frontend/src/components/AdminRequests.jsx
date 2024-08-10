@@ -20,13 +20,15 @@ function AdminRequests() {
     try {
       setIsLoading(true);
       const response = await getAllRequests();
+      logger.info('Full response:', response);
+
       if (response.success && Array.isArray(response.data)) {
         // Filter requests that are pending and have confirmed payments
         const pendingRequests = response.data.filter(
           request => request.status === 'pending' && request.paymentStatus === 'confirmed'
         );
         setRequests(pendingRequests);
-        logger.info(`Fetched ${pendingRequests.length} pending requests with confirmed payments`);
+        logger.info(`Fetched ${pendingRequests.length} pending requests with confirmed payments out of ${response.count} total requests`);
       } else {
         logger.error('Invalid response format:', response);
         showToast('Error: Received invalid data format', 'error');

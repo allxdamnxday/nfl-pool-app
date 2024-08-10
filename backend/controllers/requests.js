@@ -91,15 +91,19 @@ exports.rejectRequest = asyncHandler(async (req, res, next) => {
 
 /**
  * @function getRequests
- * @description Get all requests
+ * @description Get all requests (Admin only)
  * @route GET /api/v1/requests
  * @access Private (Admin only)
  * 
- * @returns {Object} 200 - Array of all requests
+ * @returns {Object} 200 - Array of all requests with count
  */
 exports.getRequests = asyncHandler(async (req, res, next) => {
   const requests = await RequestService.getAllRequests();
-  res.status(200).json({ success: true, data: requests });
+  res.status(200).json({ 
+    success: true, 
+    count: requests.length, 
+    data: requests 
+  });
 });
 
 /**

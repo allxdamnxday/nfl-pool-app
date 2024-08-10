@@ -16,9 +16,9 @@ export const createRequest = async (poolId, numberOfEntries) => {
   }
 };
 
-export const confirmPayment = async (requestId, paymentType, transactionId) => {
+export const confirmPayment = async (requestId, transactionId, paymentType) => {
   try {
-    const response = await api.put(`${API_URL}/${requestId}/confirm-payment`, { paymentType, transactionId });
+    const response = await api.put(`${API_URL}/${requestId}/confirm-payment`, { transactionId, paymentType });
     logger.info('Payment confirmed:', response.data);
     return response.data;
   } catch (error) {
@@ -86,7 +86,7 @@ export const getAllRequests = async () => {
   try {
     const response = await api.get(`${API_URL}`);
     logger.info('All requests retrieved:', response.data);
-    return response.data.data; // Return the array of requests
+    return response.data; // This should include success, count, and data properties
   } catch (error) {
     logger.error('Error fetching all requests:', error.response ? error.response.data : error.message);
     throw error;
