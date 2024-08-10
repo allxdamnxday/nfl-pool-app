@@ -4,6 +4,17 @@
 /backend/node_modules
 /backend/docs
 # Build outputs
+/backend/__mocks__/
+/backend/apiTestandResponses/
+/backend/coverage/
+/backend/logs/
+dist/
+build/
+out/
+dist/
+build/
+out/
+# Build outputs
 /dist
 /build
 /frontend/dist

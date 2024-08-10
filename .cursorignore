@@ -3,6 +3,13 @@ node_modules/
 jspm_packages/
 
 # Build outputs
+/backend/__mocks__/
+/backend/apiTestandResponses/
+/backend/coverage/
+/backend/logs/
+dist/
+build/
+out/
 dist/
 build/
 out/
