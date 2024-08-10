@@ -10,7 +10,8 @@ const {
   getUserPools,
   getAvailablePools,
   updatePoolStatus,
-  getPoolEntries
+  getPoolEntries,
+  getUserPoolsWithEntries
 } = require('../controllers/pools');
 
 const Pool = require('../models/Pool');
@@ -158,6 +159,33 @@ router.get('/user', getUserPools);
  *         description: Not authorized
  */
 router.get('/user/active', getUserActivePools);
+
+/**
+ * @swagger
+ * /api/v1/pools/user/entries:
+ *   get:
+ *     summary: Get pools with entries for the current user
+ *     tags: [Pools]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of user's pools with entries
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PoolWithEntries'
+ *       401:
+ *         description: Not authorized
+ */
+router.get('/user/entries', getUserPoolsWithEntries);
 
 /**
  * @swagger

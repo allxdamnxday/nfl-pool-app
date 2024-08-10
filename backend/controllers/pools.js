@@ -140,20 +140,14 @@ exports.updatePoolStatus = asyncHandler(async (req, res, next) => {
 
 /**
  * @function getUserActivePools
- * @description Get all active pools for a specific user
- * @route GET /api/v1/pools/user/:userId/active
+ * @description Get all active pools for the current user
+ * @route GET /api/v1/pools/user/active
  * @access Private
  * 
- * @param {string} req.params.userId - User ID
- * 
  * @returns {Object} 200 - Array of active pools for the user
- * @throws {ErrorResponse} 403 - User not authorized to access this data
  */
 exports.getUserActivePools = asyncHandler(async (req, res, next) => {
-  const userId = req.params.userId;
-  if (req.user.id !== userId && req.user.role !== 'admin') {
-    return next(new ErrorResponse(`Not authorized to access this route`, 403));
-  }
+  const userId = req.user.id;
   const userPools = await poolService.getUserActivePools(userId);
   res.status(200).json({ success: true, count: userPools.length, data: userPools });
 });
@@ -186,9 +180,7 @@ exports.getUserPools = asyncHandler(async (req, res, next) => {
  * @returns {Object} 200 - Array of pools with active entries for the user
  */
 exports.getUserPoolsWithEntries = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
-  const poolsWithEntries = await poolService.getUserPoolsWithEntries(userId);
-
+  const poolsWithEntries = await poolService.getUserPoolsWithEntries(req.user.id);
   res.status(200).json({
     success: true,
     data: poolsWithEntries
@@ -206,7 +198,7 @@ exports.getUserPoolsWithEntries = asyncHandler(async (req, res, next) => {
  * @returns {Object} 200 - Array of entries for the pool
  */
 exports.getPoolEntries = asyncHandler(async (req, res, next) => {
-  const entries = await Entry.find({ pool: req.params.id });
+  const entries = await poolService.getPoolEntries(req.params.id);
   res.status(200).json({
     success: true,
     count: entries.length,
