@@ -16,13 +16,8 @@ function Entries() {
   useEffect(() => {
     const fetchEntries = async () => {
       try {
-        const response = await getUserEntries();
-        if (response.success && Array.isArray(response.data)) {
-          setEntries(response.data);
-        } else {
-          setError('Invalid data format received from the server.');
-          showToast('Error loading entries', 'error');
-        }
+        const entriesData = await getUserEntries();
+        setEntries(entriesData);
       } catch (error) {
         console.error('Failed to fetch entries:', error);
         setError('Failed to load entries. Please try again later.');

@@ -84,3 +84,14 @@ export const rejectRequest = async (requestId) => {
     throw error;
   }
 };
+
+export const getAllRequests = async () => {
+  try {
+    const response = await api.get(`${API_URL}`);
+    logger.info('All requests retrieved:', response.data);
+    return response.data;
+  } catch (error) {
+    logger.error('Error fetching all requests:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};

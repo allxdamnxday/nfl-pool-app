@@ -3,9 +3,43 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getGamesForWeek, addOrUpdatePick, getPickForWeek } from '../services/pickService';
 import { useToast } from '../contexts/ToastContext';
 import { FaCalendarAlt, FaClock, FaChevronLeft, FaChevronRight, FaFootballBall } from 'react-icons/fa';
-import defaultLogo from '/img/nfl_logos/default-team-logo.png';
+import defaultLogo from '/logos/default-team-logo.png';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogoSpinner } from './CustomComponents';
+const teamLogoMap = {
+'ARI': 'ARI.png',
+'ATL': 'ATL.png',
+'BAL': 'BAL.png',
+'BUF': 'BUF.png',
+'CAR': 'CAR.png',
+'CHI': 'CHI.png',
+'CIN': 'CIN.png',
+'CLE': 'CLE.png',
+'DAL': 'DAL.png',
+'DEN': 'DEN.png',
+'DET': 'DET.png',
+'GB': 'GB.png',
+'HOU': 'HOU.png',
+'IND': 'IND.png',
+'JAX': 'JAX.png',
+'KC': 'KC.png',
+'LAC': 'LAC.png',
+'LAR': 'LAR.png',
+'LAS': 'LAS.png',
+'MIA': 'MIA.png',
+'MIN': 'MIN.png',
+'NE': 'NE.png',
+'NO': 'NO.png',
+'NYG': 'NYG.png',
+'NYJ': 'NYJ.png',
+'PHI': 'PHI.png',
+'PIT': 'PIT.png',
+'SEA': 'SEA.png',
+'SF': 'SF.png',
+'TB': 'TB.png',
+'TEN': 'TEN.png',
+'WSH': 'WSH.png',
+};
 
 function Picks() {
   const navigate = useNavigate();
@@ -20,8 +54,8 @@ function Picks() {
   const totalWeeks = 18; // Adjust this based on your NFL season structure
 
   const getTeamLogo = (team) => {
-    if (team && team.abbreviation) {
-      return `/img/nfl_logos/${team.abbreviation}.png`;
+    if (team && team.abbreviation && teamLogoMap[team.abbreviation]) {
+      return `/img/nfl_logos/${teamLogoMap[team.abbreviation]}`;
     }
     return defaultLogo;
   };
@@ -226,10 +260,10 @@ function TeamButton({ team, record, isSelected, onClick }) {
       }`}
     >
       <img
-        src={`/img/nfl_logos/${team.split(' ')[0].substring(0, 3).toUpperCase()}.png`}
-        alt={`${team} logo`}
+        src={getTeamLogo(team)}
+        alt={`${team.name} logo`}
         className="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-1 sm:mb-2"
-        onError={(e) => { e.target.onerror = null; e.target.src = '/img/nfl_logos/default-team-logo.png'; }}
+        onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}
       />
       <span className="font-bold text-xs sm:text-sm mb-1 text-center">{team}</span>
       <span className={`text-xs px-2 py-1 rounded-full ${isSelected ? 'bg-white text-purple-600' : 'bg-gray-800 text-white'}`}>
@@ -292,7 +326,7 @@ function PickStatus({ currentPick }) {
           <div className="flex items-center space-x-2">
             <span className="font-bold text-purple-400">Current Pick:</span>
             <img
-              src={`/img/nfl_logos/${currentPick.split(' ')[0].substring(0, 3).toUpperCase()}.png`}
+              src={getTeamLogo({ abbreviation: currentPick.split(' ')[0].substring(0, 3).toUpperCase() })}
               alt={`${currentPick} logo`}
               className="w-8 h-8 object-contain"
               onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}
