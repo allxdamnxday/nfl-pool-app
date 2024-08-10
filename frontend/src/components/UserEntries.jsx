@@ -16,7 +16,7 @@ function UserEntries() {
   useEffect(() => {
     const fetchEntries = async () => {
       try {
-        const fetchedEntries = await getUserEntriesWithPicks();
+        const fetchedEntries = await getUserEntriesWithPicks('picks.game,pool');
         setEntries(fetchedEntries);
       } catch (error) {
         console.error('Failed to fetch entries:', error);

@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { getPoolDetails } from '../services/poolService';
-import { getUserEntries } from '../services/entryService';
+import { getPoolDetails, getPoolEntries } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaCheckCircle, FaTimesCircle, FaArrowLeft } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 
@@ -26,17 +25,17 @@ function PoolEntries() {
 
       try {
         setLoading(true);
-        const [poolData, userEntriesData] = await Promise.all([
+        const [poolData, entriesData] = await Promise.all([
           getPoolDetails(poolId),
-          getUserEntries()
+          getPoolEntries(poolId)
         ]);
         
         setPool(poolData);
         
-        // Filter entries for the current pool
-        const poolEntries = userEntriesData.data.filter(entry => entry.pool._id === poolId);
+        // Filter entries for the current user
+        const userEntries = entriesData.filter(entry => entry.user === user.id);
         
-        setEntries(poolEntries);
+        setEntries(userEntries);
       } catch (err) {
         console.error('Error fetching pool entries:', err);
         setError('Failed to load entries. Please try again later.');
@@ -92,16 +91,16 @@ function EntryCard({ entry, pool }) {
     <div className="bg-white rounded-lg shadow-md p-6 transition duration-300 ease-in-out hover:shadow-lg">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold text-gray-800">Entry #{entry.entryNumber}</h3>
-        <StatusBadge isActive={entry.isActive} />
+        <StatusBadge isActive={entry.status === 'active'} />
       </div>
       <div className="space-y-2 mb-4">
         <InfoItem icon={FaFootballBall} label="Picks Made" value={entry.picks?.length || 0} />
         <InfoItem icon={FaCalendarAlt} label="Current Week" value={pool?.currentWeek} />
         <InfoItem 
-          icon={entry.eliminated ? FaTimesCircle : FaCheckCircle} 
+          icon={entry.status === 'eliminated' ? FaTimesCircle : FaCheckCircle} 
           label="Status" 
-          value={entry.eliminated ? 'Eliminated' : 'Still In'}
-          valueColor={entry.eliminated ? 'text-red-500' : 'text-green-500'}
+          value={entry.status === 'eliminated' ? 'Eliminated' : 'Still In'}
+          valueColor={entry.status === 'eliminated' ? 'text-red-500' : 'text-green-500'}
         />
       </div>
       <Link 

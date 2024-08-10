@@ -2,27 +2,28 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPoolDetails } from '../services/poolService';
-import { getNFLTeams, submitPick } from '../services/pickService';
+import { getGamesForWeek, addOrUpdatePick } from '../services/pickService';
 import { FaFootballBall, FaCalendarAlt } from 'react-icons/fa';
+import { LogoSpinner } from './CustomComponents';
+import { useToast } from '../contexts/ToastContext';
 
 function MakePick() {
   const [pool, setPool] = useState(null);
-  const [teams, setTeams] = useState([]);
+  const [games, setGames] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { id } = useParams();
+  const { id, entryNumber } = useParams();
   const navigate = useNavigate();
+  const showToast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [poolData, teamsData] = await Promise.all([
-          getPoolDetails(id),
-          getNFLTeams()
-        ]);
+        const poolData = await getPoolDetails(id);
         setPool(poolData);
-        setTeams(teamsData);
+        const gamesData = await getGamesForWeek(poolData.seasonYear, poolData.currentWeek);
+        setGames(gamesData);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch data. Please try again later.');
@@ -36,18 +37,19 @@ function MakePick() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedTeam) {
-      setError('Please select a team before submitting.');
+      showToast('Please select a team before submitting.', 'error');
       return;
     }
     try {
-      await submitPick(id, pool.currentWeek, selectedTeam);
+      await addOrUpdatePick(id, entryNumber, selectedTeam, pool.currentWeek);
+      showToast('Pick submitted successfully!', 'success');
       navigate(`/pools/${id}`);
     } catch (err) {
-      setError('Failed to submit pick. Please try again.');
+      showToast('Failed to submit pick. Please try again.', 'error');
     }
   };
 
-  if (loading) return <div className="text-center text-white text-2xl mt-12">Loading...</div>;
+  if (loading) return <div className="flex justify-center items-center h-screen"><LogoSpinner size={20} /></div>;
   if (error) return <div className="text-center text-red-500 text-2xl mt-12">{error}</div>;
   if (!pool) return <div className="text-center text-white text-2xl mt-12">Pool not found.</div>;
 
@@ -74,8 +76,11 @@ function MakePick() {
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-purple-500"
             >
               <option value="">Select a team</option>
-              {teams.map((team) => (
-                <option key={team._id} value={team._id}>{team.name}</option>
+              {games.map((game) => (
+                <React.Fragment key={game._id}>
+                  <option value={game.home_team}>{game.home_team}</option>
+                  <option value={game.away_team}>{game.away_team}</option>
+                </React.Fragment>
               ))}
             </select>
           </div>

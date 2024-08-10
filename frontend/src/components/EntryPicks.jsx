@@ -2,28 +2,47 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getEntriesForUser } from '../services/entryService';
+import { getUserEntriesWithPicks } from '../services/entryService';
 import { getCurrentNFLWeek } from '../services/seasonService';
 import { FaFootballBall, FaCalendarAlt } from 'react-icons/fa';
+import { LogoSpinner } from './CustomComponents';
 
 function EntryPicks() {
   const [entries, setEntries] = useState([]);
   const [currentWeek, setCurrentWeek] = useState(null);
-  const { userId } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const fetchedEntries = await getEntriesForUser(userId);
+        const [fetchedEntries, { week }] = await Promise.all([
+          getUserEntriesWithPicks('picks,pool'),
+          getCurrentNFLWeek()
+        ]);
         setEntries(fetchedEntries);
-        const { week } = await getCurrentNFLWeek();
         setCurrentWeek(week);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError('Failed to load entries. Please try again later.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
-  }, [userId]);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <LogoSpinner size={20} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500 text-2xl mt-12">{error}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white p-8">

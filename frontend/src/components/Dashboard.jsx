@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { getUserPools } from '../services/poolService';
+import { getUserPoolsWithEntries } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 
@@ -20,7 +20,7 @@ function Dashboard() {
       try {
         setLoading(true);
         setError(null);
-        const userPools = await getUserPools(user.id);
+        const userPools = await getUserPoolsWithEntries();
         setPools(userPools);
       } catch (error) {
         console.error('Failed to fetch user pools:', error);

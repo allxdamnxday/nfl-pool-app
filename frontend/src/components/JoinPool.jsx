@@ -1,7 +1,7 @@
 // src/components/JoinPool.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPoolDetails } from '../services/poolService';
+import { getPoolDetails, getAvailablePools } from '../services/poolService';
 import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
 import { FaArrowLeft, FaFootballBall, FaUserPlus, FaDollarSign } from 'react-icons/fa';
@@ -20,7 +20,11 @@ function JoinPool() {
   useEffect(() => {
     const fetchPoolDetails = async () => {
       try {
-        const poolData = await getPoolDetails(poolId);
+        const availablePools = await getAvailablePools();
+        const poolData = availablePools.find(p => p._id === poolId);
+        if (!poolData) {
+          throw new Error('Pool not found or not available');
+        }
         setPool(poolData);
         setUserEntries(poolData.userEntries || 0);
         setLoading(false);

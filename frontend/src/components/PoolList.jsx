@@ -72,22 +72,16 @@ function PoolCard({ pool }) {
         <InfoItem icon={FaCalendarAlt} label="Season" value={pool.season} />
         <InfoItem icon={FaCalendarAlt} label="Current Week" value={pool.currentWeek} />
         <InfoItem icon={FaDollarSign} label="Entry Fee" value={`$${pool.entryFee}`} />
-        <InfoItem icon={FaClipboardList} label="Your Entries" value={`${pool.userEntries} / 3`} />
         <InfoItem icon={FaUsers} label="Active Entries" value={pool.activeEntries} />
-        <InfoItem icon={FaClipboardList} label="Pending Requests" value={pool.pendingRequests} />
-        <InfoItem icon={FaClipboardList} label="Approved Entries" value={pool.approvedEntries} />
+        <InfoItem icon={FaClipboardList} label="Max Entries per User" value="3" />
       </div>
       <div className="bg-gray-50 px-6 py-4">
-        {pool.canJoin ? (
-          <Link 
-            to={`/pools/${pool._id}/join`} 
-            className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 block text-center"
-          >
-            {pool.userEntries === 0 ? 'Join Pool' : 'Add Entry'}
-          </Link>
-        ) : (
-          <span className="text-gray-500 block text-center">Maximum entries reached</span>
-        )}
+        <Link 
+          to={`/pools/${pool._id}/join`} 
+          className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 block text-center"
+        >
+          View Pool Details
+        </Link>
       </div>
     </div>
   );

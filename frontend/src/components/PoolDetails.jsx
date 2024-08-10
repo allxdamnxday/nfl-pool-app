@@ -1,7 +1,7 @@
 // frontend/src/components/PoolDetails.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPoolDetails } from '../services/poolService';
+import { getPoolDetails, getPoolEntries } from '../services/poolService';
 import { createJoinRequest } from '../services/requestService';
 import { addOrUpdatePick } from '../services/pickService';
 import { AuthContext } from '../contexts/AuthContext';
@@ -11,6 +11,7 @@ import { LogoSpinner } from './CustomComponents';
 
 function PoolDetails() {
   const [pool, setPool] = useState(null);
+  const [entries, setEntries] = useState([]);
   const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [selectedTeam, setSelectedTeam] = useState(null);
@@ -22,11 +23,15 @@ function PoolDetails() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPoolDetails = async () => {
+    const fetchPoolData = async () => {
       try {
-        const poolData = await getPoolDetails(id);
+        const [poolData, entriesData] = await Promise.all([
+          getPoolDetails(id),
+          getPoolEntries(id)
+        ]);
         setPool(poolData);
-        setGames(poolData.games);
+        setEntries(entriesData);
+        setGames(poolData.games || []);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch pool details. Please try again later.');
@@ -34,7 +39,7 @@ function PoolDetails() {
       }
     };
 
-    fetchPoolDetails();
+    fetchPoolData();
   }, [id]);
 
   const handleJoinPool = async () => {
@@ -56,11 +61,19 @@ function PoolDetails() {
     }
 
     try {
-      await addOrUpdatePick(pool.userEntry._id, selectedTeam._id, pool.currentWeek);
+      const userEntry = entries.find(entry => entry.user === user.id);
+      if (!userEntry) {
+        throw new Error('User entry not found');
+      }
+      await addOrUpdatePick(userEntry._id, selectedTeam._id, pool.currentWeek);
       showToast('Pick submitted successfully!', 'success');
       // Refresh pool details after submitting pick
-      const updatedPoolData = await getPoolDetails(id);
+      const [updatedPoolData, updatedEntriesData] = await Promise.all([
+        getPoolDetails(id),
+        getPoolEntries(id)
+      ]);
       setPool(updatedPoolData);
+      setEntries(updatedEntriesData);
     } catch (err) {
       showToast('Failed to submit pick. Please try again.', 'error');
     }
@@ -70,7 +83,7 @@ function PoolDetails() {
   if (error) return <div className="text-center text-red-500 text-2xl mt-12">{error}</div>;
   if (!pool) return <div className="text-center text-gray-800 text-2xl mt-12">Pool not found.</div>;
 
-  const isUserParticipant = pool.userEntries > 0;
+  const userEntry = entries.find(entry => entry.user === user.id);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -87,12 +100,12 @@ function PoolDetails() {
             <InfoItem icon={FaFootballBall} label="Status" value={pool.status} />
           </div>
           <div className="space-y-4">
-            <InfoItem icon={FaUsers} label="Active Entries" value={pool.activeEntries} />
+            <InfoItem icon={FaUsers} label="Active Entries" value={entries.filter(e => e.status === 'active').length} />
             <InfoItem icon={FaDollarSign} label="Entry Fee" value={`$${pool.entryFee}`} />
             <InfoItem icon={FaTrophy} label="Prize" value={`$${pool.prizeAmount}`} />
           </div>
         </div>
-        {!pool.userEntries && (
+        {!userEntry && (
           <button
             onClick={handleJoinPool}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-full transition-colors duration-200 mb-8"
@@ -100,7 +113,7 @@ function PoolDetails() {
             Join Pool
           </button>
         )}
-        {pool.userEntries > 0 && (
+        {userEntry && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Make Your Pick</h2>
             <div className="space-y-4 mb-6">
