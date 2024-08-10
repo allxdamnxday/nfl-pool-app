@@ -1,6 +1,7 @@
 // routes/requests.js
 const express = require('express');
 const { protect, authorize } = require('../middleware/auth');
+const asyncHandler = require('../middleware/async');
 const { 
   createRequest, 
   approveRequest, 
@@ -54,7 +55,7 @@ router.use(protect);
  *       401:
  *         description: Unauthorized
  */
-router.post('/', createRequest);
+router.post('/', asyncHandler(createRequest));
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ router.post('/', createRequest);
  *       401:
  *         description: Unauthorized
  */
-router.get('/', getUserRequests);
+router.get('/', asyncHandler(getUserRequests));
 
 /**
  * @swagger
@@ -116,7 +117,7 @@ router.get('/', getUserRequests);
  *       404:
  *         description: Request not found
  */
-router.get('/:id', getRequest);
+router.get('/:id', asyncHandler(getRequest));
 
 /**
  * @swagger
@@ -165,7 +166,7 @@ router.get('/:id', getRequest);
  *       404:
  *         description: Request not found
  */
-router.put('/:id/confirm-payment', confirmPayment);
+router.put('/:id/confirm-payment', asyncHandler(confirmPayment));
 
 /**
  * @swagger
@@ -202,7 +203,7 @@ router.put('/:id/confirm-payment', confirmPayment);
  *       403:
  *         description: Forbidden
  */
-router.get('/pool/:poolId', authorize('admin'), getPoolRequests);
+router.get('/pool/:poolId', authorize('admin'), asyncHandler(getPoolRequests));
 
 /**
  * @swagger
@@ -244,7 +245,7 @@ router.get('/pool/:poolId', authorize('admin'), getPoolRequests);
  *       404:
  *         description: Request not found
  */
-router.put('/:id/approve', authorize('admin'), approveRequest);
+router.put('/:id/approve', authorize('admin'), asyncHandler(approveRequest));
 
 /**
  * @swagger
@@ -279,6 +280,6 @@ router.put('/:id/approve', authorize('admin'), approveRequest);
  *       404:
  *         description: Request not found
  */
-router.put('/:id/reject', authorize('admin'), rejectRequest);
+router.put('/:id/reject', authorize('admin'), asyncHandler(rejectRequest));
 
 module.exports = router;

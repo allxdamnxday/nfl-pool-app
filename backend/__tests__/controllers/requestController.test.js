@@ -4,6 +4,7 @@ const requestRoutes = require('../../routes/requests');
 const RequestService = require('../../services/requestService');
 const { protect, authorize } = require('../../middleware/auth');
 const ErrorResponse = require('../../utils/errorResponse');
+const errorHandler = require('../../middleware/error');
 
 // Mock the RequestService
 jest.mock('../../services/requestService');
@@ -20,6 +21,7 @@ jest.mock('../../middleware/auth', () => ({
 const app = express();
 app.use(express.json());
 app.use('/api/v1/requests', requestRoutes);
+app.use(errorHandler); // Add this line
 
 // Add this at the top of your test file
 process.on('unhandledRejection', (reason, promise) => {
@@ -72,6 +74,8 @@ describe('Request Controller', () => {
         .post('/api/v1/requests')
         .send(mockRequest);
 
+      console.log('Full response:', res);
+
       expect(res.statusCode).toBe(400);
       expect(res.body).toEqual({
         success: false,
@@ -112,7 +116,7 @@ describe('Request Controller', () => {
         paymentType: 'credit_card'
       };
 
-      RequestService.confirmPayment.mockRejectedValue(new Error('Request not found'));
+      RequestService.confirmPayment.mockRejectedValue(new ErrorResponse('Request not found', 404));
 
       const res = await request(app)
         .put('/api/v1/requests/mockRequestId/confirm-payment')
@@ -132,8 +136,9 @@ describe('Request Controller', () => {
         _id: 'mockRequestId',
         status: 'approved'
       };
+      const mockEntries = [{ _id: 'entry1' }, { _id: 'entry2' }];
 
-      RequestService.approveRequest.mockResolvedValue(mockApprovedRequest);
+      RequestService.approveRequest.mockResolvedValue({ request: mockApprovedRequest, entries: mockEntries });
 
       const res = await request(app)
         .put('/api/v1/requests/mockRequestId/approve');
@@ -141,7 +146,7 @@ describe('Request Controller', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body).toEqual({
         success: true,
-        data: mockApprovedRequest
+        data: { request: mockApprovedRequest, entries: mockEntries }
       });
       expect(RequestService.approveRequest).toHaveBeenCalledWith('mockRequestId');
     });

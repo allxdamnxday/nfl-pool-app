@@ -89,12 +89,12 @@ class RequestService extends BaseService {
    * }
    */
   async confirmPayment(requestId, userId, transactionId, paymentType) {
-    const request = await Request.findById(requestId);
+    const request = await Request.findOne({ _id: requestId, user: userId });
+
     if (!request) {
-      testLogger.error(`No request found with id of ${requestId}`);
-      throw new ErrorResponse(`No request found with id of ${requestId}`, 404);
+      throw new ErrorResponse('Request not found', 404);
     }
-  
+
     if (request.user.toString() !== userId.toString()) {  // Add .toString() to both sides
       testLogger.warn(`User ${userId} is not authorized to confirm payment for this request`);
       throw new ErrorResponse(`User ${userId} is not authorized to confirm payment for this request`, 403);
