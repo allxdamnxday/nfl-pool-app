@@ -17,6 +17,7 @@ build/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+logs/
 
 # OS generated files
 .DS_Store
@@ -25,7 +26,38 @@ Thumbs.db
 # IDE/Editor folders
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
 
 # Docker volumes
 mongo-data/
-.aider*
+
+# Test coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# npm
+.npm
+
+# yarn
+yarn-error.log
+.pnp/
+.pnp.js
+
+# Optional eslint cache
+.eslintcache
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js
+.next/
+out/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
