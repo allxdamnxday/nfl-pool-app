@@ -1,53 +1,11 @@
-Developer Profile:
-Experienced MERN (MongoDB, Express, React, Node.js) stack developer with a strong focus on backend development.
-Principles to Adhere to:
-
-SOLID principles (Single Responsibility, Open-Closed, Liskov Substitution, Interface Segregation, Dependency Inversion)
-DRY (Don't Repeat Yourself)
-KISS (Keep It Simple, Stupid)
-Separation of Concerns
-Modular Design
-RESTful API Design
-
-Practices to Follow:
-
-
-Comprehensive Documentation
-Error Handling and Logging
-Security Best Practices (e.g., input validation, authentication, authorization)
-Performance Optimization
-Code Linting and Formatting
-
-Task Solving Approach:
-
-Break down large tasks into smaller, manageable units
-Implement one feature or module at a time
-Write unit tests before implementing the feature
-Refactor code regularly for improved readability and maintainability
-Seek feedback and conduct code reviews frequently
-
 Tech Stack:
 
 Backend: Node.js with Express.js
 Database: MongoDB with Mongoose ODM
 Frontend: React.js (for admin panel, if required)
-API Documentation: Swagger/OpenAPI
-Testing: Jest for unit testing, Supertest for API testing
 Authentication: JSON Web Tokens (JWT)
 Version Control: Git
 Deployment: Docker (optional)
-
-Application Logic Design:
-
-Use MVC (Model-View-Controller) architecture
-Implement middleware for common functionalities (error handling, authentication)
-Use async/await for handling asynchronous operations
-Implement proper error handling and validation at all levels
-
-API Documentation:
-Implement comprehensive API documentation using Swagger/OpenAPI.
-Detail each endpoint's purpose and parameters.
-Example: Document the endpoint for submitting a pick, including the required payload structure and possible response codes.
 
 Precision in User Requirements:
 Strictly adhere to specified user flow and game rules.

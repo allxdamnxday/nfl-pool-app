@@ -9,6 +9,8 @@
     "test:models:watch": "cross-env NODE_ENV=test jest --config jest.config.js --watch --detectOpenHandles __tests__/models",
     "test:services": "cross-env NODE_ENV=test jest --config jest.config.js --runInBand --detectOpenHandles --forceExit __tests__/services",
     "test:services:watch": "cross-env NODE_ENV=test jest --config jest.config.js --watch --detectOpenHandles __tests__/services",
+    "test:controllers": "cross-env NODE_ENV=test jest --config jest.config.js --runInBand --detectOpenHandles --forceExit __tests__/controllers",
+    "test:controllers:watch": "cross-env NODE_ENV=test jest --config jest.config.js --watch --detectOpenHandles __tests__/controllers",
     "test:coverage": "cross-env NODE_ENV=test jest --config jest.config.js --coverage --detectOpenHandles --forceExit",
     "docs": "jsdoc -c jsdoc.json",
     "generate-swagger": "node -e \"const fs = require('fs'); const swaggerSpec = require('./config/swaggerOptions'); fs.writeFileSync('swagger.json', JSON.stringify(swaggerSpec, null, 2));\""

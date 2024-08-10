@@ -123,3 +123,44 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# Jest coverage output
+coverage/
+
+# JSDoc generated documentation
+docs/
+
+# Swagger generated files
+swagger.json
+swagger.yaml
+
+# Any other generated documentation
+generated-docs/
+
+# Test reports
+test-report/
+
+# Istanbul coverage reports
+.nyc_output/
+
+# SonarQube scanner working directory
+.scannerwork/
+
+# Zipped files
+*.zip
+*.gz
+*.tar
+*.rar
+*.7z
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Rotating log files
+*.log.*
