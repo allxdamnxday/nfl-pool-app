@@ -153,6 +153,23 @@ const rundownApi = {
       logger.error('Error fetching NFL events:', error.message);
       throw error;
     }
+  },
+
+  fetchNFLEventsRange: async (fromDate, toDate) => {
+    const events = [];
+    let currentDate = new Date(fromDate);
+
+    while (currentDate <= toDate) {
+      try {
+        const dailyEvents = await rundownApi.fetchNFLEvents(currentDate);
+        events.push(...dailyEvents);
+      } catch (error) {
+        logger.error(`Error fetching NFL events for ${currentDate.toISOString()}:`, error.message);
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return events;
   }
 };
 

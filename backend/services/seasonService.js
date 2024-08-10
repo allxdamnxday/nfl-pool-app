@@ -9,6 +9,7 @@ const Settings = require('../models/Settings');
 const rundownApi = require('./rundownApiService');
 const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
+const { getLogoUrl } = require('../utils/logoHelper');
 
 /**
  * Updates a setting in the database.
@@ -100,7 +101,7 @@ const transformGameData = (apiGame) => {
   const eventDate = new Date(apiGame.event_date);
   const calculatedWeek = calculateNFLWeek(eventDate, apiGame.schedule.season_year);
 
-  return {
+  const transformedGame = {
     event_id: apiGame.event_id,
     event_uuid: apiGame.event_uuid,
     sport_id: apiGame.sport_id,
@@ -129,7 +130,10 @@ const transformGameData = (apiGame) => {
       event_status_detail: apiGame.score.event_status_detail,
       updated_at: new Date(apiGame.score.updated_at)
     },
-    teams_normalized: apiGame.teams_normalized,
+    teams_normalized: apiGame.teams_normalized.map(team => ({
+      ...team,
+      logo_url: getLogoUrl(team.abbreviation)
+    })),
     schedule: {
       league_name: apiGame.schedule.league_name,
       conference_competition: apiGame.schedule.conference_competition,
@@ -142,6 +146,8 @@ const transformGameData = (apiGame) => {
     odds: apiGame.lines,
     favored_team: apiGame.lines?.spread?.point_spread_away < 0 ? apiGame.teams_normalized.find(t => t.is_away).name : apiGame.teams_normalized.find(t => t.is_home).name
   };
+
+  return transformedGame;
 };
 
 /**
@@ -255,5 +261,6 @@ module.exports = {
   updateSetting,
   calculateNFLWeek,
   getCurrentSeasonYear,
+  transformGameData,
   getCurrentNFLWeek
 };

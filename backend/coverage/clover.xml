@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1723271573243" clover="3.2.0">
-  <project timestamp="1723271573243" name="All files">
-    <metrics statements="801" coveredstatements="664" conditionals="221" coveredconditionals="153" methods="139" coveredmethods="113" elements="1161" coveredelements="930" complexity="0" loc="801" ncloc="801" packages="9" files="29" classes="29"/>
+<coverage generated="1723309112380" clover="3.2.0">
+  <project timestamp="1723309112380" name="All files">
+    <metrics statements="860" coveredstatements="723" conditionals="221" coveredconditionals="154" methods="149" coveredmethods="123" elements="1230" coveredelements="1000" complexity="0" loc="860" ncloc="860" packages="9" files="33" classes="33"/>
     <package name="__tests__">
       <metrics statements="103" coveredstatements="78" conditionals="40" coveredconditionals="31" methods="35" coveredmethods="17"/>
       <file name="mockDataFactory.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\__tests__\mockDataFactory.js">
@@ -144,7 +144,52 @@
       </file>
     </package>
     <package name="controllers">
-      <metrics statements="82" coveredstatements="74" conditionals="4" coveredconditionals="2" methods="20" coveredmethods="18"/>
+      <metrics statements="121" coveredstatements="113" conditionals="4" coveredconditionals="2" methods="30" coveredmethods="28"/>
+      <file name="entries.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\entries.js">
+        <metrics statements="25" coveredstatements="25" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="6"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="38" count="2" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="53" count="2" type="stmt"/>
+        <line num="54" count="2" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="75" count="1" type="stmt"/>
+        <line num="76" count="2" type="stmt"/>
+        <line num="77" count="2" type="stmt"/>
+        <line num="78" count="2" type="stmt"/>
+        <line num="79" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="96" count="2" type="stmt"/>
+        <line num="97" count="2" type="stmt"/>
+        <line num="98" count="2" type="stmt"/>
+        <line num="112" count="1" type="stmt"/>
+        <line num="113" count="2" type="stmt"/>
+        <line num="114" count="2" type="stmt"/>
+        <line num="115" count="2" type="stmt"/>
+      </file>
+      <file name="picks.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\picks.js">
+        <metrics statements="14" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="36" count="2" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+      </file>
       <file name="pools.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\pools.js">
         <metrics statements="42" coveredstatements="42" conditionals="0" coveredconditionals="0" methods="12" coveredmethods="12"/>
         <line num="6" count="1" type="stmt"/>
@@ -235,29 +280,29 @@
       </file>
     </package>
     <package name="middleware">
-      <metrics statements="17" coveredstatements="14" conditionals="12" coveredconditionals="5" methods="4" coveredmethods="3"/>
+      <metrics statements="17" coveredstatements="14" conditionals="12" coveredconditionals="6" methods="4" coveredmethods="3"/>
       <file name="async.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\middleware\async.js">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
-        <line num="12" count="26" type="stmt"/>
-        <line num="13" count="30" type="stmt"/>
-        <line num="15" count="2" type="stmt"/>
+        <line num="12" count="36" type="stmt"/>
+        <line num="13" count="49" type="stmt"/>
+        <line num="15" count="4" type="stmt"/>
       </file>
       <file name="error.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\middleware\error.js">
-        <metrics statements="14" coveredstatements="11" conditionals="12" coveredconditionals="5" methods="2" coveredmethods="1"/>
-        <line num="6" count="2" type="stmt"/>
-        <line num="12" count="2" type="stmt"/>
-        <line num="27" count="2" type="stmt"/>
-        <line num="28" count="4" type="stmt"/>
-        <line num="30" count="4" type="stmt"/>
-        <line num="33" count="4" type="stmt"/>
-        <line num="35" count="4" type="cond" truecount="1" falsecount="1"/>
+        <metrics statements="14" coveredstatements="11" conditionals="12" coveredconditionals="6" methods="2" coveredmethods="1"/>
+        <line num="6" count="4" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="27" count="4" type="stmt"/>
+        <line num="28" count="11" type="stmt"/>
+        <line num="30" count="11" type="stmt"/>
+        <line num="33" count="11" type="stmt"/>
+        <line num="35" count="11" type="cond" truecount="1" falsecount="1"/>
         <line num="36" count="0" type="stmt"/>
         <line num="37" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="42" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="42" count="11" type="cond" truecount="1" falsecount="1"/>
         <line num="43" count="0" type="stmt"/>
-        <line num="46" count="4" type="stmt"/>
-        <line num="48" count="4" type="cond" truecount="1" falsecount="1"/>
-        <line num="55" count="2" type="stmt"/>
+        <line num="46" count="11" type="stmt"/>
+        <line num="48" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="4" type="stmt"/>
       </file>
     </package>
     <package name="models">
@@ -359,7 +404,33 @@
       </file>
     </package>
     <package name="routes">
-      <metrics statements="34" coveredstatements="34" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <metrics statements="54" coveredstatements="54" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="entries.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\routes\entries.js">
+        <metrics statements="12" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
+        <line num="79" count="1" type="stmt"/>
+        <line num="116" count="1" type="stmt"/>
+        <line num="150" count="1" type="stmt"/>
+        <line num="202" count="1" type="stmt"/>
+        <line num="246" count="1" type="stmt"/>
+        <line num="249" count="1" type="stmt"/>
+      </file>
+      <file name="picks.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\routes\picks.js">
+        <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="49" count="1" type="stmt"/>
+        <line num="188" count="1" type="stmt"/>
+        <line num="193" count="1" type="stmt"/>
+      </file>
       <file name="pools.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\routes\pools.js">
         <metrics statements="20" coveredstatements="20" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
@@ -897,9 +968,9 @@
       <metrics statements="12" coveredstatements="12" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
       <file name="errorResponse.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\errorResponse.js">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-        <line num="18" count="34" type="stmt"/>
-        <line num="19" count="34" type="stmt"/>
-        <line num="23" count="10" type="stmt"/>
+        <line num="18" count="40" type="stmt"/>
+        <line num="19" count="40" type="stmt"/>
+        <line num="23" count="12" type="stmt"/>
       </file>
       <file name="logger.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\logger.js">
         <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>

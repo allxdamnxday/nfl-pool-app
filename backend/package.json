@@ -13,6 +13,7 @@
     "test:controllers:watch": "cross-env NODE_ENV=test jest --config jest.config.js --watch --detectOpenHandles __tests__/controllers",
     "test:coverage": "cross-env NODE_ENV=test jest --config jest.config.js --coverage --detectOpenHandles --forceExit",
     "docs": "jsdoc -c jsdoc.json",
+    "init-nfl-data": "node scripts/initializeNFLData.js",
     "generate-swagger": "node -e \"const fs = require('fs'); const swaggerSpec = require('./config/swaggerOptions'); fs.writeFileSync('swagger.json', JSON.stringify(swaggerSpec, null, 2));\""
   },
   "dependencies": {

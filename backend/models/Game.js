@@ -45,6 +45,7 @@ const mongoose = require('mongoose');
  * @property {string} teams_normalized.record - Team's record
  * @property {boolean} teams_normalized.is_away - Indicates if the team is away
  * @property {boolean} teams_normalized.is_home - Indicates if the team is home
+ * @property {string} teams_normalized.logo_url - URL of the team's logo
  * @property {Object} teams_normalized.conference - Conference information
  * @property {number} teams_normalized.conference.conference_id - ID of the conference
  * @property {number} teams_normalized.conference.sport_id - ID of the sport
@@ -132,6 +133,7 @@ const GameSchema = new mongoose.Schema({
     record: String,
     is_away: Boolean,
     is_home: Boolean,
+    logo_url: String, // Added logo_url field
     conference: {
       conference_id: Number,
       sport_id: Number,
