@@ -24,12 +24,17 @@ function PaymentPage() {
     setIsSubmitting(true);
     logger.info(`Attempting to complete payment for pool ${poolId}`);
     try {
-      const request = await createRequest(poolId, numberOfEntries, paymentMethod, paymentConfirmation, totalAmount);
-      showToast('Join request submitted successfully! Awaiting admin approval.', 'success');
+      // Step 1: Create the request
+      const request = await createRequest(poolId, numberOfEntries);
+      
+      // Step 2: Confirm the payment
+      await confirmPayment(request.data._id, paymentConfirmation, paymentMethod);
+      
+      showToast('Payment confirmed and join request submitted successfully! Awaiting admin approval.', 'success');
       navigate('/dashboard');
     } catch (err) {
-      logger.error(`Failed to submit join request: ${err.message}`, { poolId, numberOfEntries });
-      showToast('Failed to submit join request. Please try again.', 'error');
+      logger.error(`Failed to submit join request or confirm payment: ${err.message}`, { poolId, numberOfEntries });
+      showToast('Failed to complete the process. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
     }

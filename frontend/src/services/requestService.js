@@ -16,6 +16,17 @@ export const createRequest = async (poolId, numberOfEntries) => {
   }
 };
 
+export const confirmPayment = async (requestId, paymentType, transactionId) => {
+  try {
+    const response = await api.put(`${API_URL}/${requestId}/confirm-payment`, { paymentType, transactionId });
+    logger.info('Payment confirmed:', response.data);
+    return response.data;
+  } catch (error) {
+    logger.error('Error confirming payment:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
 export const getUserRequests = async () => {
   try {
     const response = await api.get(API_URL);
@@ -34,20 +45,6 @@ export const getRequestById = async (requestId) => {
     return response.data;
   } catch (error) {
     logger.error('Error fetching request:', error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
-export const confirmPayment = async (requestId, paymentDetails) => {
-  try {
-    const response = await api.put(
-      `${API_URL}/${requestId}/confirm-payment`,
-      paymentDetails
-    );
-    logger.info('Payment confirmed:', response.data);
-    return response.data;
-  } catch (error) {
-    logger.error('Error confirming payment:', error.response ? error.response.data : error.message);
     throw error;
   }
 };
@@ -89,7 +86,7 @@ export const getAllRequests = async () => {
   try {
     const response = await api.get(`${API_URL}`);
     logger.info('All requests retrieved:', response.data);
-    return response.data;
+    return response.data.data; // Return the array of requests
   } catch (error) {
     logger.error('Error fetching all requests:', error.response ? error.response.data : error.message);
     throw error;

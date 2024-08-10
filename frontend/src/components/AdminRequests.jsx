@@ -19,11 +19,23 @@ function AdminRequests() {
   const fetchRequests = async () => {
     try {
       setIsLoading(true);
-      const fetchedRequests = await getAllRequests();
-      setRequests(fetchedRequests);
+      const response = await getAllRequests();
+      if (response.success && Array.isArray(response.data)) {
+        // Filter requests that are pending and have confirmed payments
+        const pendingRequests = response.data.filter(
+          request => request.status === 'pending' && request.paymentStatus === 'confirmed'
+        );
+        setRequests(pendingRequests);
+        logger.info(`Fetched ${pendingRequests.length} pending requests with confirmed payments`);
+      } else {
+        logger.error('Invalid response format:', response);
+        showToast('Error: Received invalid data format', 'error');
+        setRequests([]);
+      }
     } catch (error) {
       logger.error('Failed to fetch requests:', error);
       showToast('Failed to fetch requests. Please try again later.', 'error');
+      setRequests([]);
     } finally {
       setIsLoading(false);
     }
@@ -31,10 +43,15 @@ function AdminRequests() {
 
   const handleApprove = async (requestId) => {
     try {
-      const { request, entries } = await approveRequest(requestId);
-      logger.info('Request approved successfully:', request, entries);
-      showToast('Request approved successfully!', 'success');
-      setRequests(prevRequests => prevRequests.map(r => r._id === requestId ? request : r));
+      const response = await approveRequest(requestId);
+      if (response.success) {
+        const { request, entries } = response.data;
+        logger.info('Request approved successfully:', request, entries);
+        showToast('Request approved successfully!', 'success');
+        setRequests(prevRequests => prevRequests.filter(r => r._id !== requestId));
+      } else {
+        throw new Error('Approval failed');
+      }
     } catch (error) {
       logger.error('Failed to approve request:', error);
       showToast('Failed to approve request. Please try again.', 'error');
@@ -43,10 +60,14 @@ function AdminRequests() {
 
   const handleReject = async (requestId) => {
     try {
-      const rejectedRequest = await rejectRequest(requestId);
-      logger.info('Request rejected successfully:', rejectedRequest);
-      showToast('Request rejected successfully!', 'success');
-      setRequests(prevRequests => prevRequests.map(r => r._id === requestId ? rejectedRequest : r));
+      const response = await rejectRequest(requestId);
+      if (response.success) {
+        logger.info('Request rejected successfully:', response.data);
+        showToast('Request rejected successfully!', 'success');
+        setRequests(prevRequests => prevRequests.filter(r => r._id !== requestId));
+      } else {
+        throw new Error('Rejection failed');
+      }
     } catch (error) {
       logger.error('Failed to reject request:', error);
       showToast('Failed to reject request. Please try again.', 'error');
@@ -59,16 +80,16 @@ function AdminRequests() {
         <h3 className="text-xl font-semibold">Request Details</h3>
       </div>
       <div className="p-4 space-y-3">
-        <InfoItem icon={FaUserAlt} label="User" value={request.user?.username || 'Unknown User'} />
+        <InfoItem icon={FaUserAlt} label="User" value={request.user?.username || request.user || 'Unknown User'} />
         <InfoItem icon={FaFootballBall} label="Pool" value={request.pool?.name || 'Unknown Pool'} />
         <InfoItem icon={FaClipboardList} label="Number of Entries" value={request.numberOfEntries} />
         <InfoItem icon={FaDollarSign} label="Payment Type" value={request.paymentType || 'Not specified'} />
-        <InfoItem icon={FaDollarSign} label="Total Amount" value={`$${request.totalAmount}`} />
+        <InfoItem icon={FaDollarSign} label="Total Amount" value={request.totalAmount ? `$${request.totalAmount}` : 'Not specified'} />
         <InfoItem icon={FaCheckCircle} label="Payment Status" value={request.paymentStatus} />
         <InfoItem icon={FaCheckCircle} label="Status" value={request.status} />
-        <InfoItem icon={FaClock} label="Created" value={new Date(request.createdAt).toLocaleString()} />
+        <InfoItem icon={FaClock} label="Created" value={request.createdAt ? new Date(request.createdAt).toLocaleString() : 'Not specified'} />
       </div>
-      {request.status === 'pending' && (
+      {request.status === 'pending' && request.paymentStatus === 'confirmed' && (
         <div className="px-4 py-3 bg-gray-50 text-right space-x-2">
           <button
             onClick={() => handleApprove(request._id)}
@@ -94,9 +115,9 @@ function AdminRequests() {
   return (
     <ErrorBoundary>
       <div>
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">All Requests</h2>
+        <h2 className="text-3xl font-bold mb-6 text-gray-800">Pending Requests with Confirmed Payments</h2>
         {requests.length === 0 ? (
-          <p className="text-xl text-gray-600">No requests found.</p>
+          <p className="text-xl text-gray-600">No pending requests with confirmed payments found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {requests.map(request => renderRequestCard(request))}
