@@ -1,14 +1,13 @@
 # Dependencies
-node_modules/
-jspm_packages/
-/.pnp
-.pnp.js
+/node_modules
+/frontend/node_modules
+/backend/node_modules
 
-# Build output
-dist/
-build/
-out/
-.next/
+# Build outputs
+/dist
+/build
+/frontend/dist
+/frontend/build
 
 # Environment variables
 .env
@@ -18,112 +17,48 @@ out/
 .env.production.local
 
 # Logs
-logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
 # OS generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# IDE/Editor folders
-.vscode/*
-!.vscode/extensions.json
+# IDE files
+.vscode/
 .idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-*.sublime-project
-*.sublime-workspace
-
-# Docker volumes
-mongo-data/
 
 # Test coverage
-coverage/
+/coverage
 
 # Temporary files
 *.tmp
 *.temp
-*.swp
 
-# npm
+# Optional npm cache directory
 .npm
-
-# TypeScript
-*.tsbuildinfo
 
 # Optional eslint cache
 .eslintcache
 
-# Cypress
-cypress/videos/
-cypress/screenshots/
-
-# Jest coverage output
-coverage/
-
-# JSDoc generated documentation
-docs/
-
-# Swagger generated files
-swagger.json
-swagger.yaml
-
-# SonarQube scanner working directory
-.scannerwork/
-
-# Zipped files
-*.zip
-*.gz
-*.tar
-*.rar
-*.7z
-
-# Rotating log files
-*.log.*
-
-# MongoDB data directory
-/data/db
-
-# Vite build output
-dist-ssr/
-
-# Yarn
+# Yarn integrity file
 .yarn-integrity
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
 
-# dotenv environment variable files
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# Next.js build output
+.next
 
-# Serverless directories
-.serverless/
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
 
-# FuseBox cache
-.fusebox/
+# Vite
+/frontend/.vite/
 
-# DynamoDB Local files
-.dynamodb/
+# Backend specific
+/backend/logs/
+/backend/dist/
 
-# TernJS port file
-.tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
+# Misc
+*.pem
