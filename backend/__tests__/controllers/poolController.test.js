@@ -283,7 +283,9 @@ describe('Pool Controller', () => {
 
       PoolService.getUserPoolsWithEntries.mockResolvedValue(mockPoolsWithEntries);
 
-      const res = await request(app).get('/api/v1/pools/user/entries');
+      const res = await request(app)
+        .get('/api/v1/pools/user/entries')
+        .set('Authorization', 'Bearer fake-token');
 
       expect(res.statusCode).toBe(200);
       expect(res.body).toEqual({
@@ -303,7 +305,9 @@ describe('Pool Controller', () => {
 
       PoolService.getPoolEntries.mockResolvedValue(mockEntries);
 
-      const res = await request(app).get('/api/v1/pools/pool1/entries');
+      const res = await request(app)
+        .get('/api/v1/pools/pool1/entries')
+        .set('Authorization', 'Bearer fake-token');
 
       expect(res.statusCode).toBe(200);
       expect(res.body).toEqual({
