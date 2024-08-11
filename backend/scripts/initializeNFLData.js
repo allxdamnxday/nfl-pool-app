@@ -56,7 +56,7 @@ async function initializeNFLData() {
 
   const fromDate = currentDate;
   const toDate = new Date(currentDate);
-  toDate.setDate(toDate.getDate() + 28); // 4 weeks from now
+  toDate.setDate(toDate.getDate() + 154); // 22 weeks from now
 
   logger.info(`Fetching games from ${fromDate.toISOString()} to ${toDate.toISOString()}`);
 

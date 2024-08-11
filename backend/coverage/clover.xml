@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1723309112380" clover="3.2.0">
-  <project timestamp="1723309112380" name="All files">
-    <metrics statements="860" coveredstatements="723" conditionals="221" coveredconditionals="154" methods="149" coveredmethods="123" elements="1230" coveredelements="1000" complexity="0" loc="860" ncloc="860" packages="9" files="33" classes="33"/>
+<coverage generated="1723342586404" clover="3.2.0">
+  <project timestamp="1723342586404" name="All files">
+    <metrics statements="909" coveredstatements="751" conditionals="225" coveredconditionals="152" methods="155" coveredmethods="124" elements="1289" coveredelements="1027" complexity="0" loc="909" ncloc="909" packages="9" files="37" classes="37"/>
     <package name="__tests__">
       <metrics statements="103" coveredstatements="78" conditionals="40" coveredconditionals="31" methods="35" coveredmethods="17"/>
       <file name="mockDataFactory.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\__tests__\mockDataFactory.js">
@@ -140,11 +140,11 @@
       <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="rundownApi.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\config\rundownApi.js">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="2" count="2" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
       </file>
     </package>
     <package name="controllers">
-      <metrics statements="121" coveredstatements="113" conditionals="4" coveredconditionals="2" methods="30" coveredmethods="28"/>
+      <metrics statements="145" coveredstatements="130" conditionals="6" coveredconditionals="3" methods="36" coveredmethods="31"/>
       <file name="entries.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\entries.js">
         <metrics statements="25" coveredstatements="25" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="6"/>
         <line num="6" count="1" type="stmt"/>
@@ -173,8 +173,34 @@
         <line num="114" count="2" type="stmt"/>
         <line num="115" count="2" type="stmt"/>
       </file>
+      <file name="games.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\games.js">
+        <metrics statements="23" coveredstatements="19" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="4"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
+        <line num="81" count="1" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+        <line num="83" count="1" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="113" count="1" type="stmt"/>
+        <line num="114" count="1" type="stmt"/>
+        <line num="115" count="1" type="stmt"/>
+        <line num="146" count="1" type="stmt"/>
+        <line num="147" count="1" type="stmt"/>
+        <line num="148" count="1" type="stmt"/>
+        <line num="149" count="1" type="stmt"/>
+        <line num="180" count="1" type="stmt"/>
+        <line num="181" count="0" type="stmt"/>
+        <line num="182" count="0" type="stmt"/>
+        <line num="209" count="1" type="stmt"/>
+        <line num="210" count="0" type="stmt"/>
+        <line num="211" count="0" type="stmt"/>
+      </file>
       <file name="picks.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\picks.js">
-        <metrics statements="14" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="4"/>
+        <metrics statements="15" coveredstatements="15" conditionals="2" coveredconditionals="1" methods="4" coveredmethods="4"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
@@ -182,16 +208,17 @@
         <line num="6" count="1" type="stmt"/>
         <line num="13" count="1" type="stmt"/>
         <line num="14" count="2" type="stmt"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="21" count="1" type="stmt"/>
-        <line num="22" count="2" type="stmt"/>
-        <line num="29" count="1" type="stmt"/>
-        <line num="35" count="1" type="stmt"/>
-        <line num="36" count="2" type="stmt"/>
-        <line num="37" count="1" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="39" count="2" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
       </file>
       <file name="pools.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\controllers\pools.js">
-        <metrics statements="42" coveredstatements="42" conditionals="0" coveredconditionals="0" methods="12" coveredmethods="12"/>
+        <metrics statements="42" coveredstatements="39" conditionals="0" coveredconditionals="0" methods="12" coveredmethods="11"/>
         <line num="6" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
@@ -221,9 +248,9 @@
         <line num="137" count="1" type="stmt"/>
         <line num="138" count="1" type="stmt"/>
         <line num="149" count="1" type="stmt"/>
-        <line num="150" count="1" type="stmt"/>
-        <line num="151" count="1" type="stmt"/>
-        <line num="152" count="1" type="stmt"/>
+        <line num="150" count="0" type="stmt"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
         <line num="163" count="1" type="stmt"/>
         <line num="164" count="1" type="stmt"/>
         <line num="165" count="1" type="stmt"/>
@@ -261,48 +288,48 @@
         <line num="88" count="1" type="stmt"/>
         <line num="89" count="1" type="stmt"/>
         <line num="100" count="1" type="stmt"/>
-        <line num="101" count="0" type="stmt"/>
-        <line num="102" count="0" type="stmt"/>
-        <line num="115" count="1" type="stmt"/>
-        <line num="116" count="1" type="stmt"/>
-        <line num="117" count="1" type="stmt"/>
-        <line num="118" count="1" type="stmt"/>
-        <line num="129" count="1" type="stmt"/>
-        <line num="130" count="1" type="stmt"/>
-        <line num="131" count="1" type="stmt"/>
-        <line num="134" count="1" type="stmt"/>
+        <line num="101" count="1" type="stmt"/>
+        <line num="102" count="1" type="stmt"/>
+        <line num="119" count="1" type="stmt"/>
+        <line num="120" count="1" type="stmt"/>
+        <line num="121" count="1" type="stmt"/>
+        <line num="122" count="1" type="stmt"/>
+        <line num="133" count="1" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
         <line num="135" count="0" type="stmt"/>
-        <line num="136" count="0" type="stmt"/>
-        <line num="138" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="138" count="1" type="stmt"/>
         <line num="139" count="0" type="stmt"/>
-        <line num="142" count="0" type="stmt"/>
-        <line num="144" count="0" type="stmt"/>
+        <line num="140" count="0" type="stmt"/>
+        <line num="142" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="143" count="0" type="stmt"/>
+        <line num="146" count="0" type="stmt"/>
+        <line num="148" count="0" type="stmt"/>
       </file>
     </package>
     <package name="middleware">
       <metrics statements="17" coveredstatements="14" conditionals="12" coveredconditionals="6" methods="4" coveredmethods="3"/>
       <file name="async.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\middleware\async.js">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
-        <line num="12" count="36" type="stmt"/>
-        <line num="13" count="49" type="stmt"/>
-        <line num="15" count="4" type="stmt"/>
+        <line num="12" count="42" type="stmt"/>
+        <line num="13" count="53" type="stmt"/>
+        <line num="15" count="5" type="stmt"/>
       </file>
       <file name="error.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\middleware\error.js">
         <metrics statements="14" coveredstatements="11" conditionals="12" coveredconditionals="6" methods="2" coveredmethods="1"/>
-        <line num="6" count="4" type="stmt"/>
-        <line num="12" count="4" type="stmt"/>
-        <line num="27" count="4" type="stmt"/>
-        <line num="28" count="11" type="stmt"/>
-        <line num="30" count="11" type="stmt"/>
-        <line num="33" count="11" type="stmt"/>
-        <line num="35" count="11" type="cond" truecount="1" falsecount="1"/>
+        <line num="6" count="5" type="stmt"/>
+        <line num="12" count="5" type="stmt"/>
+        <line num="27" count="5" type="stmt"/>
+        <line num="28" count="13" type="stmt"/>
+        <line num="30" count="13" type="stmt"/>
+        <line num="33" count="13" type="stmt"/>
+        <line num="35" count="13" type="cond" truecount="1" falsecount="1"/>
         <line num="36" count="0" type="stmt"/>
         <line num="37" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="42" count="11" type="cond" truecount="1" falsecount="1"/>
+        <line num="42" count="13" type="cond" truecount="1" falsecount="1"/>
         <line num="43" count="0" type="stmt"/>
-        <line num="46" count="11" type="stmt"/>
-        <line num="48" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="55" count="4" type="stmt"/>
+        <line num="46" count="13" type="stmt"/>
+        <line num="48" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="5" type="stmt"/>
       </file>
     </package>
     <package name="models">
@@ -318,11 +345,11 @@
       </file>
       <file name="Game.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\models\Game.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="5" count="6" type="stmt"/>
-        <line num="95" count="6" type="stmt"/>
-        <line num="192" count="6" type="stmt"/>
-        <line num="193" count="6" type="stmt"/>
-        <line num="195" count="6" type="stmt"/>
+        <line num="5" count="7" type="stmt"/>
+        <line num="96" count="7" type="stmt"/>
+        <line num="194" count="7" type="stmt"/>
+        <line num="195" count="7" type="stmt"/>
+        <line num="197" count="7" type="stmt"/>
       </file>
       <file name="Pick.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\models\Pick.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -404,7 +431,7 @@
       </file>
     </package>
     <package name="routes">
-      <metrics statements="54" coveredstatements="54" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <metrics statements="67" coveredstatements="67" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="entries.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\routes\entries.js">
         <metrics statements="12" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="2" count="1" type="stmt"/>
@@ -419,6 +446,22 @@
         <line num="202" count="1" type="stmt"/>
         <line num="246" count="1" type="stmt"/>
         <line num="249" count="1" type="stmt"/>
+      </file>
+      <file name="games.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\routes\games.js">
+        <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
       </file>
       <file name="picks.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\routes\picks.js">
         <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -459,21 +502,21 @@
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
-        <line num="13" count="1" type="stmt"/>
-        <line num="15" count="1" type="stmt"/>
-        <line num="17" count="1" type="stmt"/>
-        <line num="58" count="1" type="stmt"/>
-        <line num="87" count="1" type="stmt"/>
-        <line num="120" count="1" type="stmt"/>
-        <line num="169" count="1" type="stmt"/>
-        <line num="206" count="1" type="stmt"/>
-        <line num="248" count="1" type="stmt"/>
-        <line num="283" count="1" type="stmt"/>
-        <line num="285" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="59" count="1" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+        <line num="123" count="1" type="stmt"/>
+        <line num="172" count="1" type="stmt"/>
+        <line num="209" count="1" type="stmt"/>
+        <line num="251" count="1" type="stmt"/>
+        <line num="286" count="1" type="stmt"/>
+        <line num="288" count="1" type="stmt"/>
       </file>
     </package>
     <package name="services">
-      <metrics statements="468" coveredstatements="370" conditionals="153" coveredconditionals="106" methods="74" coveredmethods="69"/>
+      <metrics statements="473" coveredstatements="361" conditionals="153" coveredconditionals="102" methods="73" coveredmethods="66"/>
       <file name="baseService.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\services\baseService.js">
         <metrics statements="35" coveredstatements="35" conditionals="13" coveredconditionals="13" methods="6" coveredmethods="6"/>
         <line num="6" count="5" type="stmt"/>
@@ -570,7 +613,7 @@
         <line num="274" count="1" type="stmt"/>
       </file>
       <file name="pickService.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\services\pickService.js">
-        <metrics statements="78" coveredstatements="35" conditionals="28" coveredconditionals="11" methods="5" coveredmethods="3"/>
+        <metrics statements="81" coveredstatements="31" conditionals="32" coveredconditionals="11" methods="5" coveredmethods="2"/>
         <line num="6" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
@@ -603,55 +646,58 @@
         <line num="88" count="1" type="stmt"/>
         <line num="98" count="1" type="stmt"/>
         <line num="99" count="1" type="stmt"/>
-        <line num="121" count="1" type="stmt"/>
-        <line num="122" count="1" type="stmt"/>
-        <line num="123" count="1" type="stmt"/>
-        <line num="124" count="1" type="stmt"/>
-        <line num="126" count="0" type="stmt"/>
+        <line num="121" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="124" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="125" count="0" type="stmt"/>
         <line num="127" count="0" type="stmt"/>
-        <line num="148" count="1" type="stmt"/>
-        <line num="149" count="1" type="stmt"/>
-        <line num="150" count="1" type="stmt"/>
-        <line num="151" count="1" type="stmt"/>
-        <line num="153" count="0" type="stmt"/>
-        <line num="154" count="0" type="stmt"/>
-        <line num="181" count="0" type="stmt"/>
-        <line num="183" count="0" type="stmt"/>
-        <line num="184" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="130" count="0" type="stmt"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="152" count="1" type="stmt"/>
+        <line num="153" count="1" type="stmt"/>
+        <line num="154" count="1" type="stmt"/>
+        <line num="155" count="1" type="stmt"/>
+        <line num="157" count="0" type="stmt"/>
+        <line num="158" count="0" type="stmt"/>
         <line num="185" count="0" type="stmt"/>
-        <line num="186" count="0" type="stmt"/>
-        <line num="189" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="187" count="0" type="stmt"/>
+        <line num="188" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="189" count="0" type="stmt"/>
         <line num="190" count="0" type="stmt"/>
-        <line num="191" count="0" type="stmt"/>
+        <line num="193" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="194" count="0" type="stmt"/>
-        <line num="195" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="196" count="0" type="stmt"/>
-        <line num="197" count="0" type="stmt"/>
+        <line num="195" count="0" type="stmt"/>
+        <line num="198" count="0" type="stmt"/>
+        <line num="199" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="200" count="0" type="stmt"/>
-        <line num="201" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="202" count="0" type="stmt"/>
-        <line num="203" count="0" type="stmt"/>
+        <line num="201" count="0" type="stmt"/>
+        <line num="204" count="0" type="stmt"/>
+        <line num="205" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="206" count="0" type="stmt"/>
         <line num="207" count="0" type="stmt"/>
-        <line num="209" count="0" type="stmt"/>
-        <line num="215" count="0" type="stmt"/>
-        <line num="216" count="0" type="stmt"/>
-        <line num="237" count="0" type="stmt"/>
-        <line num="239" count="0" type="stmt"/>
-        <line num="240" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="211" count="0" type="stmt"/>
+        <line num="213" count="0" type="stmt"/>
+        <line num="219" count="0" type="stmt"/>
+        <line num="220" count="0" type="stmt"/>
         <line num="241" count="0" type="stmt"/>
-        <line num="242" count="0" type="stmt"/>
-        <line num="245" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="243" count="0" type="stmt"/>
+        <line num="244" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="245" count="0" type="stmt"/>
         <line num="246" count="0" type="stmt"/>
-        <line num="247" count="0" type="stmt"/>
+        <line num="249" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="250" count="0" type="stmt"/>
-        <line num="251" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="252" count="0" type="stmt"/>
-        <line num="253" count="0" type="stmt"/>
+        <line num="251" count="0" type="stmt"/>
+        <line num="254" count="0" type="stmt"/>
+        <line num="255" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="256" count="0" type="stmt"/>
-        <line num="260" count="1" type="stmt"/>
+        <line num="257" count="0" type="stmt"/>
+        <line num="260" count="0" type="stmt"/>
+        <line num="264" count="1" type="stmt"/>
       </file>
       <file name="poolService.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\services\poolService.js">
-        <metrics statements="113" coveredstatements="88" conditionals="40" coveredconditionals="29" methods="17" coveredmethods="16"/>
+        <metrics statements="103" coveredstatements="80" conditionals="36" coveredconditionals="25" methods="14" coveredmethods="13"/>
         <line num="5" count="2" type="stmt"/>
         <line num="6" count="2" type="stmt"/>
         <line num="7" count="2" type="stmt"/>
@@ -742,29 +788,19 @@
         <line num="315" count="2" type="stmt"/>
         <line num="321" count="0" type="stmt"/>
         <line num="322" count="0" type="stmt"/>
-        <line num="334" count="1" type="stmt"/>
-        <line num="335" count="1" type="stmt"/>
-        <line num="336" count="1" type="stmt"/>
-        <line num="337" count="1" type="stmt"/>
-        <line num="339" count="1" type="stmt"/>
-        <line num="340" count="2" type="stmt"/>
-        <line num="341" count="4" type="cond" truecount="2" falsecount="0"/>
-        <line num="343" count="2" type="stmt"/>
-        <line num="350" count="0" type="stmt"/>
-        <line num="351" count="0" type="stmt"/>
-        <line num="363" count="1" type="stmt"/>
-        <line num="364" count="1" type="stmt"/>
-        <line num="365" count="1" type="stmt"/>
-        <line num="393" count="1" type="stmt"/>
-        <line num="395" count="0" type="stmt"/>
-        <line num="396" count="0" type="stmt"/>
-        <line num="408" count="1" type="stmt"/>
-        <line num="409" count="1" type="stmt"/>
-        <line num="410" count="1" type="stmt"/>
-        <line num="411" count="1" type="stmt"/>
-        <line num="413" count="0" type="stmt"/>
-        <line num="414" count="0" type="stmt"/>
-        <line num="419" count="2" type="stmt"/>
+        <line num="397" count="1" type="stmt"/>
+        <line num="398" count="1" type="stmt"/>
+        <line num="399" count="1" type="stmt"/>
+        <line num="446" count="1" type="stmt"/>
+        <line num="448" count="0" type="stmt"/>
+        <line num="449" count="0" type="stmt"/>
+        <line num="461" count="1" type="stmt"/>
+        <line num="462" count="1" type="stmt"/>
+        <line num="463" count="1" type="stmt"/>
+        <line num="464" count="1" type="stmt"/>
+        <line num="466" count="0" type="stmt"/>
+        <line num="467" count="0" type="stmt"/>
+        <line num="472" count="2" type="stmt"/>
       </file>
       <file name="requestService.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\services\requestService.js">
         <metrics statements="80" coveredstatements="78" conditionals="26" coveredconditionals="25" methods="10" coveredmethods="10"/>
@@ -816,50 +852,50 @@
         <line num="146" count="1" type="stmt"/>
         <line num="147" count="1" type="stmt"/>
         <line num="148" count="2" type="stmt"/>
-        <line num="154" count="2" type="stmt"/>
-        <line num="157" count="1" type="stmt"/>
+        <line num="155" count="2" type="stmt"/>
         <line num="158" count="1" type="stmt"/>
-        <line num="160" count="3" type="stmt"/>
+        <line num="159" count="1" type="stmt"/>
         <line num="161" count="3" type="stmt"/>
-        <line num="181" count="3" type="stmt"/>
-        <line num="182" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="183" count="1" type="stmt"/>
+        <line num="162" count="3" type="stmt"/>
+        <line num="182" count="3" type="stmt"/>
+        <line num="183" count="3" type="cond" truecount="2" falsecount="0"/>
         <line num="184" count="1" type="stmt"/>
-        <line num="187" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="188" count="1" type="stmt"/>
-        <line num="191" count="1" type="stmt"/>
+        <line num="185" count="1" type="stmt"/>
+        <line num="188" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="189" count="1" type="stmt"/>
         <line num="192" count="1" type="stmt"/>
-        <line num="194" count="1" type="stmt"/>
+        <line num="193" count="1" type="stmt"/>
         <line num="195" count="1" type="stmt"/>
-        <line num="210" count="3" type="stmt"/>
+        <line num="196" count="1" type="stmt"/>
         <line num="211" count="3" type="stmt"/>
-        <line num="216" count="3" type="cond" truecount="4" falsecount="0"/>
-        <line num="217" count="3" type="stmt"/>
-        <line num="230" count="1" type="stmt"/>
-        <line num="249" count="2" type="stmt"/>
-        <line num="250" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="251" count="1" type="stmt"/>
+        <line num="212" count="3" type="stmt"/>
+        <line num="217" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="218" count="3" type="stmt"/>
+        <line num="231" count="1" type="stmt"/>
+        <line num="250" count="2" type="stmt"/>
+        <line num="251" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="252" count="1" type="stmt"/>
-        <line num="254" count="1" type="stmt"/>
-        <line num="268" count="1" type="stmt"/>
-        <line num="287" count="2" type="stmt"/>
-        <line num="288" count="2" type="cond" truecount="2" falsecount="0"/>
-        <line num="289" count="1" type="stmt"/>
+        <line num="253" count="1" type="stmt"/>
+        <line num="255" count="1" type="stmt"/>
+        <line num="269" count="1" type="stmt"/>
+        <line num="288" count="2" type="stmt"/>
+        <line num="289" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="290" count="1" type="stmt"/>
-        <line num="292" count="1" type="stmt"/>
-        <line num="296" count="2" type="stmt"/>
+        <line num="291" count="1" type="stmt"/>
+        <line num="293" count="1" type="stmt"/>
+        <line num="297" count="2" type="stmt"/>
       </file>
       <file name="rundownApiService.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\services\rundownApiService.js">
-        <metrics statements="24" coveredstatements="19" conditionals="3" coveredconditionals="2" methods="7" coveredmethods="7"/>
-        <line num="5" count="2" type="stmt"/>
-        <line num="6" count="2" type="stmt"/>
-        <line num="7" count="2" type="stmt"/>
-        <line num="14" count="2" type="stmt"/>
+        <metrics statements="33" coveredstatements="19" conditionals="3" coveredconditionals="2" methods="8" coveredmethods="7"/>
+        <line num="5" count="3" type="stmt"/>
+        <line num="6" count="3" type="stmt"/>
+        <line num="7" count="3" type="stmt"/>
+        <line num="14" count="3" type="stmt"/>
         <line num="15" count="2" type="cond" truecount="1" falsecount="1"/>
         <line num="17" count="0" type="stmt"/>
         <line num="19" count="2" type="stmt"/>
-        <line num="26" count="2" type="stmt"/>
-        <line num="38" count="2" type="stmt"/>
+        <line num="26" count="3" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
         <line num="48" count="1" type="stmt"/>
         <line num="49" count="1" type="stmt"/>
         <line num="50" count="1" type="stmt"/>
@@ -874,111 +910,136 @@
         <line num="128" count="2" type="stmt"/>
         <line num="153" count="0" type="stmt"/>
         <line num="154" count="0" type="stmt"/>
-        <line num="159" count="2" type="stmt"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="160" count="0" type="stmt"/>
+        <line num="162" count="0" type="stmt"/>
+        <line num="163" count="0" type="stmt"/>
+        <line num="164" count="0" type="stmt"/>
+        <line num="165" count="0" type="stmt"/>
+        <line num="167" count="0" type="stmt"/>
+        <line num="169" count="0" type="stmt"/>
+        <line num="172" count="0" type="stmt"/>
+        <line num="176" count="3" type="stmt"/>
       </file>
       <file name="seasonService.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\services\seasonService.js">
-        <metrics statements="84" coveredstatements="74" conditionals="19" coveredconditionals="10" methods="20" coveredmethods="19"/>
+        <metrics statements="87" coveredstatements="77" conditionals="19" coveredconditionals="10" methods="21" coveredmethods="20"/>
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
         <line num="10" count="1" type="stmt"/>
         <line num="11" count="1" type="stmt"/>
-        <line num="19" count="1" type="stmt"/>
-        <line num="20" count="4" type="stmt"/>
-        <line num="32" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="21" count="4" type="stmt"/>
         <line num="33" count="1" type="stmt"/>
-        <line num="34" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="54" count="1" type="stmt"/>
-        <line num="56" count="11" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="55" count="1" type="stmt"/>
         <line num="57" count="11" type="stmt"/>
         <line num="58" count="11" type="stmt"/>
         <line num="59" count="11" type="stmt"/>
-        <line num="61" count="11" type="stmt"/>
+        <line num="60" count="11" type="stmt"/>
         <line num="62" count="11" type="stmt"/>
-        <line num="64" count="11" type="stmt"/>
+        <line num="63" count="11" type="stmt"/>
         <line num="65" count="11" type="stmt"/>
-        <line num="67" count="11" type="cond" truecount="2" falsecount="0"/>
-        <line num="68" count="2" type="stmt"/>
-        <line num="69" count="2" type="stmt"/>
-        <line num="72" count="9" type="stmt"/>
-        <line num="73" count="9" type="stmt"/>
-        <line num="74" count="9" type="stmt"/>
-        <line num="76" count="9" type="stmt"/>
-        <line num="77" count="9" type="stmt"/>
-        <line num="78" count="9" type="stmt"/>
-        <line num="80" count="9" type="stmt"/>
-        <line num="87" count="1" type="stmt"/>
-        <line num="88" count="3" type="stmt"/>
-        <line num="89" count="3" type="cond" truecount="1" falsecount="1"/>
-        <line num="97" count="1" type="stmt"/>
-        <line num="98" count="2" type="cond" truecount="1" falsecount="1"/>
-        <line num="100" count="2" type="stmt"/>
+        <line num="66" count="11" type="stmt"/>
+        <line num="68" count="11" type="cond" truecount="2" falsecount="0"/>
+        <line num="69" count="3" type="stmt"/>
+        <line num="70" count="3" type="stmt"/>
+        <line num="73" count="8" type="stmt"/>
+        <line num="74" count="8" type="stmt"/>
+        <line num="75" count="8" type="stmt"/>
+        <line num="77" count="8" type="stmt"/>
+        <line num="78" count="8" type="stmt"/>
+        <line num="79" count="8" type="stmt"/>
+        <line num="81" count="8" type="stmt"/>
+        <line num="88" count="1" type="stmt"/>
+        <line num="89" count="3" type="stmt"/>
+        <line num="90" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="98" count="1" type="stmt"/>
+        <line num="99" count="2" type="cond" truecount="1" falsecount="1"/>
         <line num="101" count="2" type="stmt"/>
-        <line num="103" count="2" type="stmt"/>
-        <line num="110" count="2" type="stmt"/>
-        <line num="111" count="4" type="stmt"/>
-        <line num="112" count="2" type="stmt"/>
-        <line num="113" count="4" type="stmt"/>
-        <line num="143" count="4" type="cond" truecount="1" falsecount="1"/>
-        <line num="152" count="1" type="stmt"/>
-        <line num="153" count="1" type="cond" truecount="4" falsecount="1"/>
-        <line num="154" count="0" type="stmt"/>
-        <line num="157" count="1" type="stmt"/>
+        <line num="102" count="2" type="stmt"/>
+        <line num="104" count="2" type="stmt"/>
+        <line num="111" count="2" type="stmt"/>
+        <line num="112" count="4" type="stmt"/>
+        <line num="113" count="2" type="stmt"/>
+        <line num="114" count="4" type="stmt"/>
+        <line num="133" count="4" type="stmt"/>
+        <line num="147" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="150" count="2" type="stmt"/>
         <line num="158" count="1" type="stmt"/>
-        <line num="159" count="1" type="stmt"/>
-        <line num="161" count="1" type="stmt"/>
-        <line num="169" count="1" type="stmt"/>
-        <line num="171" count="1" type="stmt"/>
-        <line num="172" count="1" type="stmt"/>
-        <line num="174" count="1" type="stmt"/>
+        <line num="159" count="1" type="cond" truecount="4" falsecount="1"/>
+        <line num="160" count="0" type="stmt"/>
+        <line num="163" count="1" type="stmt"/>
+        <line num="164" count="1" type="stmt"/>
+        <line num="165" count="1" type="stmt"/>
+        <line num="167" count="1" type="stmt"/>
         <line num="175" count="1" type="stmt"/>
-        <line num="177" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="178" count="0" type="stmt"/>
-        <line num="179" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="180" count="0" type="stmt"/>
-        <line num="182" count="0" type="stmt"/>
-        <line num="190" count="1" type="stmt"/>
-        <line num="191" count="1" type="stmt"/>
-        <line num="192" count="1" type="stmt"/>
-        <line num="193" count="1" type="stmt"/>
-        <line num="195" count="1" type="stmt"/>
-        <line num="203" count="1" type="stmt"/>
-        <line num="204" count="1" type="stmt"/>
-        <line num="206" count="1" type="stmt"/>
-        <line num="208" count="0" type="stmt"/>
-        <line num="209" count="0" type="stmt"/>
-        <line num="219" count="1" type="stmt"/>
-        <line num="220" count="2" type="stmt"/>
-        <line num="221" count="2" type="stmt"/>
-        <line num="226" count="0" type="stmt"/>
-        <line num="227" count="0" type="stmt"/>
-        <line num="235" count="1" type="stmt"/>
-        <line num="236" count="1" type="stmt"/>
-        <line num="237" count="1" type="stmt"/>
-        <line num="238" count="1" type="stmt"/>
-        <line num="239" count="1" type="stmt"/>
+        <line num="177" count="1" type="stmt"/>
+        <line num="178" count="1" type="stmt"/>
+        <line num="180" count="1" type="stmt"/>
+        <line num="181" count="1" type="stmt"/>
+        <line num="183" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="184" count="0" type="stmt"/>
+        <line num="185" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="186" count="0" type="stmt"/>
+        <line num="188" count="0" type="stmt"/>
+        <line num="196" count="1" type="stmt"/>
+        <line num="197" count="1" type="stmt"/>
+        <line num="198" count="1" type="stmt"/>
+        <line num="199" count="1" type="stmt"/>
+        <line num="201" count="1" type="stmt"/>
+        <line num="209" count="1" type="stmt"/>
+        <line num="210" count="1" type="stmt"/>
+        <line num="212" count="1" type="stmt"/>
+        <line num="214" count="0" type="stmt"/>
+        <line num="215" count="0" type="stmt"/>
+        <line num="225" count="1" type="stmt"/>
+        <line num="226" count="2" type="stmt"/>
+        <line num="227" count="2" type="stmt"/>
+        <line num="232" count="0" type="stmt"/>
+        <line num="233" count="0" type="stmt"/>
+        <line num="241" count="1" type="stmt"/>
+        <line num="242" count="1" type="stmt"/>
         <line num="243" count="1" type="stmt"/>
         <line num="244" count="1" type="stmt"/>
         <line num="245" count="1" type="stmt"/>
-        <line num="246" count="1" type="stmt"/>
         <line num="249" count="1" type="stmt"/>
+        <line num="250" count="1" type="stmt"/>
+        <line num="251" count="1" type="stmt"/>
+        <line num="252" count="1" type="stmt"/>
+        <line num="255" count="1" type="stmt"/>
       </file>
     </package>
     <package name="utils">
-      <metrics statements="12" coveredstatements="12" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <metrics statements="19" coveredstatements="19" conditionals="6" coveredconditionals="3" methods="2" coveredmethods="2"/>
       <file name="errorResponse.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\errorResponse.js">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-        <line num="18" count="40" type="stmt"/>
-        <line num="19" count="40" type="stmt"/>
-        <line num="23" count="12" type="stmt"/>
+        <line num="18" count="41" type="stmt"/>
+        <line num="19" count="41" type="stmt"/>
+        <line num="23" count="13" type="stmt"/>
       </file>
       <file name="logger.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\logger.js">
         <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>
-        <line num="5" count="6" type="stmt"/>
-        <line num="11" count="6" type="stmt"/>
-        <line num="23" count="6" type="cond" truecount="1" falsecount="1"/>
-        <line num="24" count="6" type="stmt"/>
-        <line num="29" count="6" type="stmt"/>
+        <line num="5" count="7" type="stmt"/>
+        <line num="11" count="7" type="stmt"/>
+        <line num="23" count="7" type="cond" truecount="1" falsecount="1"/>
+        <line num="24" count="7" type="stmt"/>
+        <line num="29" count="7" type="stmt"/>
+      </file>
+      <file name="logoHelper.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\logoHelper.js">
+        <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="4" type="stmt"/>
+        <line num="5" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="8" count="1" type="stmt"/>
+      </file>
+      <file name="teamLogoMap.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\teamLogoMap.js">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
       </file>
       <file name="testLogger.js" path="E:\CODE\NFLPOOL\nfl-atlas\nfl-pool-app\backend\utils\testLogger.js">
         <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>

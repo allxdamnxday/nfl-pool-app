@@ -100,31 +100,35 @@ class PickService {
   }
 
   /**
-   * Get picks for a specific week
+   * Get a pick for a specific week
    * @async
    * @param {string} entryId - The ID of the entry
-   * @param {number} entryNumber - The entry number (1, 2, or 3)
+   * @param {number|string} entryNumber - The entry number (1, 2, or 3), or undefined
    * @param {number} week - The NFL week number (1-18)
-   * @returns {Promise<Array<Object>>} Array of pick objects for the specified week
-   * @throws {ErrorResponse} If there's an error retrieving the picks
+   * @returns {Promise<Object>} Pick object for the specified week
+   * @throws {ErrorResponse} If there's an error retrieving the pick
    * 
    * @example
    * try {
-   *   const weekPicks = await pickService.getPicksForWeek('entry123', 1, 5);
-   *   console.log('Picks for week 5:', weekPicks);
-   *   // Output: Picks for week 5: [{ _id: '...', entry: 'entry123', entryNumber: 1, team: 'Patriots', week: 5 }]
+   *   const pick = await pickService.getPickForWeek('entry123', 1, 5);
+   *   console.log('Pick for week 5:', pick);
+   *   // Output: Pick for week 5: { _id: '...', entry: 'entry123', entryNumber: 1, team: 'Patriots', week: 5 }
    * } catch (error) {
-   *   console.error('Error fetching picks for week:', error.message);
+   *   console.error('Error fetching pick for week:', error.message);
    * }
    */
-  async getPicksForWeek(entryId, entryNumber, week) {
-    logger.info(`Fetching picks for entry ${entryId}, number ${entryNumber}, week ${week}`);
+  async getPickForWeek(entryId, entryNumber, week) {
+    logger.info(`Fetching pick for entry ${entryId}, number ${entryNumber}, week ${week}`);
     try {
-      const picks = await Pick.find({ entry: entryId, entryNumber, week: parseInt(week) });
-      return picks;
+      const query = { entry: entryId, week: parseInt(week) };
+      if (entryNumber !== 'undefined' && entryNumber !== undefined) {
+        query.entryNumber = parseInt(entryNumber);
+      }
+      const pick = await Pick.findOne(query);
+      return pick; // This will be null if no pick is found
     } catch (error) {
-      logger.error(`Error fetching picks for entry ${entryId}, week ${week}: ${error.message}`);
-      throw new ErrorResponse(`Error fetching picks: ${error.message}`, 500);
+      logger.error(`Error fetching pick for entry ${entryId}, entryNumber ${entryNumber}, week ${week}: ${error.message}`);
+      throw new ErrorResponse(`Error fetching pick: ${error.message}`, 500);
     }
   }
 
@@ -147,7 +151,7 @@ class PickService {
   async getPicksForEntry(entryId) {
     logger.info(`Fetching all picks for entry ${entryId}`);
     try {
-      const picks = await Pick.find({ entry: entryId });
+      const picks = await Pick.find({ entry: entryId }).sort({ week: 1 });
       return picks;
     } catch (error) {
       logger.error(`Error fetching all picks for entry ${entryId}: ${error.message}`);

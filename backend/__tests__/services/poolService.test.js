@@ -165,55 +165,54 @@ describe('PoolService', () => {
     });
   });
 
-  describe('getUserPools', () => {
-    it('should return pools for a user with active entry count', async () => {
-      const user = await User.create(createUser());
-      const pool1 = await Pool.create(createPool(user._id));
-      const pool2 = await Pool.create(createPool(user._id));
-      await Entry.create(createEntry(user._id, pool1._id, createObjectId(), { status: 'active' }));
-      await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
-
-      const userPools = await PoolService.getUserPools(user._id);
-
-      expect(userPools).toHaveLength(2);
-      expect(userPools[0].activeEntries).toBe(1);
-      expect(userPools[1].activeEntries).toBe(0);
-    });
-  });
-
   describe('getUserPoolsWithEntries', () => {
-    it('should return pools with active entries for a user', async () => {
+    it('should return pools with entries and creator information for a user', async () => {
       const user = await User.create(createUser());
+      const otherUser = await User.create(createUser());
       const pool1 = await Pool.create(createPool(user._id));
-      const pool2 = await Pool.create(createPool(user._id));
+      const pool2 = await Pool.create(createPool(otherUser._id));
       const entry1 = await Entry.create(createEntry(user._id, pool1._id, createObjectId(), { status: 'active' }));
-      await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
+      const entry2 = await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
 
-      await Pool.findByIdAndUpdate(pool1._id, { $push: { participants: user._id } });
-      await Pool.findByIdAndUpdate(pool2._id, { $push: { participants: user._id } });
-
-      const poolsWithEntries = await PoolService.getUserPoolsWithEntries(user._id);
+      const poolsWithEntries = await PoolService.getUserPoolsWithEntries(user._id.toString());
 
       expect(poolsWithEntries).toHaveLength(2);
+      
+      // Check pool1 (user is creator)
+      expect(poolsWithEntries[0]._id.toString()).toBe(pool1._id.toString());
+      expect(poolsWithEntries[0].isCreator).toBe(true);
       expect(poolsWithEntries[0].activeEntries).toBe(1);
-      expect(poolsWithEntries[0].userEntryId.toString()).toBe(entry1._id.toString());
+      expect(poolsWithEntries[0].entries).toHaveLength(1);
+      expect(poolsWithEntries[0].entries[0]._id.toString()).toBe(entry1._id.toString());
+
+      // Check pool2 (user is not creator)
+      expect(poolsWithEntries[1]._id.toString()).toBe(pool2._id.toString());
+      expect(poolsWithEntries[1].isCreator).toBe(false);
       expect(poolsWithEntries[1].activeEntries).toBe(0);
-      expect(poolsWithEntries[1].userEntryId).toBeUndefined();
+      expect(poolsWithEntries[1].entries).toHaveLength(1);
+      expect(poolsWithEntries[1].entries[0]._id.toString()).toBe(entry2._id.toString());
     });
-  });
 
-  describe('getUserActivePools', () => {
-    it('should return only active pools for a user', async () => {
+    it('should only return pools where the user has entries', async () => {
       const user = await User.create(createUser());
-      const pool1 = await Pool.create(createPool(user._id, { status: 'active' }));
-      const pool2 = await Pool.create(createPool(user._id, { status: 'completed' }));
+      const pool1 = await Pool.create(createPool(user._id));
+      const pool2 = await Pool.create(createPool(user._id));
       await Entry.create(createEntry(user._id, pool1._id, createObjectId(), { status: 'active' }));
-      await Entry.create(createEntry(user._id, pool2._id, createObjectId(), { status: 'eliminated' }));
+      // No entry created for pool2
 
-      const activePools = await PoolService.getUserActivePools(user._id);
+      const poolsWithEntries = await PoolService.getUserPoolsWithEntries(user._id.toString());
 
-      expect(activePools).toHaveLength(1);
-      expect(activePools[0]._id.toString()).toBe(pool1._id.toString());
+      expect(poolsWithEntries).toHaveLength(1);
+      expect(poolsWithEntries[0]._id.toString()).toBe(pool1._id.toString());
+    });
+
+    it('should handle a user with no entries', async () => {
+      const user = await User.create(createUser());
+      await Pool.create(createPool(user._id)); // Create a pool but no entries
+
+      const poolsWithEntries = await PoolService.getUserPoolsWithEntries(user._id.toString());
+
+      expect(poolsWithEntries).toHaveLength(0);
     });
   });
 

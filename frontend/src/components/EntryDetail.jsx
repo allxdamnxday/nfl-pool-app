@@ -106,7 +106,7 @@ function EntryDetail() {
         )}
 
         <div className="mt-8 flex justify-center space-x-4">
-          {!entry.status === 'eliminated' && (
+          {entry.status === 'active' && (
             <button 
               onClick={handlePickEmClick}
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full transition-colors duration-200"

@@ -1,0 +1,183 @@
+/**
+ * PoolService Documentation
+ * 
+ * This service provides functions to interact with pool-related data in the backend.
+ * It utilizes the Pool model, which represents a pool in the NFL pool application.
+ */
+
+const poolService = {
+  /**
+   * Get user pools with entries
+   * @param {string} userId - The ID of the user
+   * @returns {Promise<Array<PoolWithEntries>>} Array of pool objects with user-specific information
+   * 
+   * @typedef {Object} PoolWithEntries
+   * @property {string} _id - Pool ID
+   * @property {string} name - Pool name (max 50 characters)
+   * @property {number} season - Season year (2020 or later)
+   * @property {number} currentWeek - Current week of the pool (1-18)
+   * @property {('pending'|'active'|'completed'|'open')} status - Pool status
+   * @property {number} maxParticipants - Maximum number of participants (2-10000)
+   * @property {number} entryFee - Entry fee amount (non-negative)
+   * @property {number} prizeAmount - Total prize amount (non-negative)
+   * @property {string} creator - ID of the user who created the pool
+   * @property {string[]} participants - Array of participant user IDs
+   * @property {string[]} eliminatedUsers - Array of eliminated user IDs
+   * @property {string} description - Pool description (max 500 characters)
+   * @property {Date} startDate - Start date of the pool
+   * @property {Date} endDate - End date of the pool
+   * @property {number} maxEntries - Maximum entries per user (1-30000)
+   * @property {number} prizePot - Total prize pot (non-negative)
+   * @property {number} numberOfWeeks - Number of weeks for the pool (1-18)
+   * @property {boolean} isCreator - Indicates if the user created this pool
+   * @property {number} activeEntries - Number of active entries for this user in this pool
+   * @property {Array<Entry>} entries - Array of user's entries in this pool
+   * 
+   * @example
+   * const userPools = await poolService.getUserPoolsWithEntries(userId);
+   * userPools.forEach(pool => {
+   *   console.log(`Pool: ${pool.name}, Season: ${pool.season}, Status: ${pool.status}`);
+   *   console.log(`User is creator: ${pool.isCreator}, Active entries: ${pool.activeEntries}`);
+   * });
+   */
+  getUserPoolsWithEntries: async function(userId) {
+    // Implementation details
+  },
+
+  /**
+   * Get available (open) pools for a user
+   * @param {string} userId - The ID of the user
+   * @returns {Promise<Array<Pool>>} Array of available pool objects
+   * 
+   * @example
+   * const availablePools = await poolService.getAvailablePools(userId);
+   */
+  getAvailablePools: async function(userId) {
+    // Implementation details
+  },
+
+  /**
+   * Create a new pool
+   * @param {string} userId - The ID of the user creating the pool
+   * @param {Object} poolData - Pool details
+   * @param {string} poolData.name - The name of the pool (required, max 50 characters)
+   * @param {number} poolData.season - The season year (required, 2020 or later)
+   * @param {number} poolData.maxParticipants - Maximum number of participants (required, 2-10000)
+   * @param {number} poolData.entryFee - Entry fee (required, non-negative)
+   * @param {number} poolData.prizeAmount - Prize amount (required, non-negative)
+   * @param {string} poolData.description - Pool description (required, max 500 characters)
+   * @param {Date} poolData.startDate - Start date of the pool (required)
+   * @param {Date} poolData.endDate - End date of the pool (required)
+   * @param {number} poolData.maxEntries - Maximum entries per user (required, 1-30000)
+   * @param {number} poolData.prizePot - Total prize pot (required, non-negative)
+   * @param {number} poolData.numberOfWeeks - Number of weeks for the pool (required, 1-18)
+   * @returns {Promise<Pool>} The newly created pool object
+   * 
+   * @example
+   * const newPoolData = {
+   *   name: 'NFL 2023 Survivor Pool',
+   *   season: 2023,
+   *   maxParticipants: 100,
+   *   entryFee: 50,
+   *   prizeAmount: 4500,
+   *   description: 'Join our exciting NFL 2023 Survivor Pool!',
+   *   startDate: new Date('2023-09-07'),
+   *   endDate: new Date('2024-01-07'),
+   *   maxEntries: 3,
+   *   prizePot: 5000,
+   *   numberOfWeeks: 17
+   * };
+   * const newPool = await poolService.createPool(userId, newPoolData);
+   */
+  createPool: async function(userId, poolData) {
+    // Implementation details
+  },
+
+  /**
+   * Update an existing pool
+   * @param {string} poolId - The ID of the pool to update
+   * @param {string} userId - The ID of the user making the update
+   * @param {Object} updateData - The data to update in the pool
+   * @returns {Promise<Pool>} The updated pool object
+   * 
+   * @example
+   * const updateData = { status: 'active', currentWeek: 2 };
+   * const updatedPool = await poolService.updatePool(poolId, userId, updateData);
+   */
+  updatePool: async function(poolId, userId, updateData) {
+    // Implementation details
+  },
+
+  /**
+   * Delete a pool
+   * @param {string} poolId - The ID of the pool to delete
+   * @param {string} userId - The ID of the user attempting to delete the pool
+   * @returns {Promise<void>}
+   * 
+   * @example
+   * await poolService.deletePool(poolId, userId);
+   */
+  deletePool: async function(poolId, userId) {
+    // Implementation details
+  },
+
+  /**
+   * Get statistics for a specific pool
+   * @param {string} poolId - The ID of the pool
+   * @returns {Promise<Object>} Object containing pool statistics
+   * @property {number} totalParticipants - Total number of participants
+   * @property {number} eliminatedParticipants - Number of eliminated participants
+   * @property {number} currentWeek - Current week of the pool
+   * @property {number} remainingWeeks - Number of weeks remaining in the pool
+   * 
+   * @example
+   * const poolStats = await poolService.getPoolStats(poolId);
+   * console.log(`Total participants: ${poolStats.totalParticipants}`);
+   * console.log(`Current week: ${poolStats.currentWeek}`);
+   */
+  getPoolStats: async function(poolId) {
+    // Implementation details
+  },
+
+  /**
+   * Update the status of a pool
+   * @param {string} poolId - The ID of the pool
+   * @param {('pending'|'active'|'completed'|'open')} newStatus - The new status
+   * @returns {Promise<Pool>} The updated pool object
+   * 
+   * @example
+   * const updatedPool = await poolService.updatePoolStatus(poolId, 'active');
+   */
+  updatePoolStatus: async function(poolId, newStatus) {
+    // Implementation details
+  },
+
+  /**
+   * Get all entries for a specific pool
+   * @param {string} poolId - The ID of the pool
+   * @returns {Promise<Array<Entry>>} Array of entry objects for the specified pool
+   * 
+   * @example
+   * const entries = await poolService.getPoolEntries(poolId);
+   * entries.forEach(entry => {
+   *   console.log(`Entry ID: ${entry._id}, User: ${entry.user}, Status: ${entry.status}`);
+   * });
+   */
+  getPoolEntries: async function(poolId) {
+    // Implementation details
+  }
+};
+
+/**
+ * Note: All these functions may throw errors, so be sure to implement
+ * proper error handling in your front-end application.
+ * 
+ * The Pool model has relationships with other models:
+ * - Many-to-one relationship with User (via 'creator' field)
+ * - Many-to-many relationship with User (via 'participants' and 'eliminatedUsers' fields)
+ * - One-to-many relationship with Pick (via 'picks' virtual)
+ * - One-to-many relationship with Entry (via 'entries' virtual)
+ * - One-to-many relationship with Request (via 'requests' virtual)
+ */
+
+module.exports = poolService;

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.87% </span>
+                <span class="strong">38.27% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>35/78</span>
+                <span class='fraction'>31/81</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">39.28% </span>
+                <span class="strong">34.37% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>11/28</span>
+                <span class='fraction'>11/32</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">60% </span>
+                <span class="strong">40% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>3/5</span>
+                <span class='fraction'>2/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">44.87% </span>
+                <span class="strong">38.27% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>35/78</span>
+                <span class='fraction'>31/81</span>
             </div>
         
             
@@ -322,7 +322,11 @@
 <a name='L257'></a><a href='#L257'>257</a>
 <a name='L258'></a><a href='#L258'>258</a>
 <a name='L259'></a><a href='#L259'>259</a>
-<a name='L260'></a><a href='#L260'>260</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L260'></a><a href='#L260'>260</a>
+<a name='L261'></a><a href='#L261'>261</a>
+<a name='L262'></a><a href='#L262'>262</a>
+<a name='L263'></a><a href='#L263'>263</a>
+<a name='L264'></a><a href='#L264'>264</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -442,10 +446,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -683,31 +691,35 @@ class PickService {
   }
 &nbsp;
   /**
-   * Get picks for a specific week
+   * Get a pick for a specific week
    * @async
    * @param {string} entryId - The ID of the entry
-   * @param {number} entryNumber - The entry number (1, 2, or 3)
+   * @param {number|string} entryNumber - The entry number (1, 2, or 3), or undefined
    * @param {number} week - The NFL week number (1-18)
-   * @returns {Promise&lt;Array&lt;Object&gt;&gt;} Array of pick objects for the specified week
-   * @throws {ErrorResponse} If there's an error retrieving the picks
+   * @returns {Promise&lt;Object&gt;} Pick object for the specified week
+   * @throws {ErrorResponse} If there's an error retrieving the pick
    * 
    * @example
    * try {
-   *   const weekPicks = await pickService.getPicksForWeek('entry123', 1, 5);
-   *   console.log('Picks for week 5:', weekPicks);
-   *   // Output: Picks for week 5: [{ _id: '...', entry: 'entry123', entryNumber: 1, team: 'Patriots', week: 5 }]
+   *   const pick = await pickService.getPickForWeek('entry123', 1, 5);
+   *   console.log('Pick for week 5:', pick);
+   *   // Output: Pick for week 5: { _id: '...', entry: 'entry123', entryNumber: 1, team: 'Patriots', week: 5 }
    * } catch (error) {
-   *   console.error('Error fetching picks for week:', error.message);
+   *   console.error('Error fetching pick for week:', error.message);
    * }
    */
-  async getPicksForWeek(entryId, entryNumber, week) {
-    logger.info(`Fetching picks for entry ${entryId}, number ${entryNumber}, week ${week}`);
-    try {
-      const picks = await Pick.find({ entry: entryId, entryNumber, week: parseInt(week) });
-      return picks;
+<span class="fstat-no" title="function not covered" >  as</span>ync getPickForWeek(entryId, entryNumber, week) {
+<span class="cstat-no" title="statement not covered" >    logger.info(`Fetching pick for entry ${entryId}, number ${entryNumber}, week ${week}`);</span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+      const query = <span class="cstat-no" title="statement not covered" >{ entry: entryId, week: parseInt(week) };</span>
+<span class="cstat-no" title="statement not covered" >      if (entryNumber !== 'undefined' &amp;&amp; entryNumber !== undefined) {</span>
+<span class="cstat-no" title="statement not covered" >        query.entryNumber = parseInt(entryNumber);</span>
+      }
+      const pick = <span class="cstat-no" title="statement not covered" >await Pick.findOne(query);</span>
+<span class="cstat-no" title="statement not covered" >      return pick; </span>// This will be null if no pick is found
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error(`Error fetching picks for entry ${entryId}, week ${week}: ${error.message}`);</span>
-<span class="cstat-no" title="statement not covered" >      throw new ErrorResponse(`Error fetching picks: ${error.message}`, 500);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error(`Error fetching pick for entry ${entryId}, entryNumber ${entryNumber}, week ${week}: ${error.message}`);</span>
+<span class="cstat-no" title="statement not covered" >      throw new ErrorResponse(`Error fetching pick: ${error.message}`, 500);</span>
     }
   }
 &nbsp;
@@ -847,7 +859,7 @@ module.exports = new PickService();</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-08-10T16:58:32.295Z
+                at 2024-08-11T02:16:26.329Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -120,7 +120,7 @@ describe('PickService', () => {
     });
   });
 
-  describe('getPicksForWeek', () => {
+  describe('getPickForWeek', () => {
     it('should return picks for a specific week', async () => {
       const user = await User.create(createUser());
       const pool = await Pool.create(createPool(user._id));
@@ -138,11 +138,11 @@ describe('PickService', () => {
       }));
       await Pick.create(createPick(entry._id, { week: 5, team: 'Patriots', entryNumber: entry.entryNumber }));
 
-      const picks = await PickService.getPicksForWeek(entry._id, entry.entryNumber, 5);
+      const pick = await PickService.getPickForWeek(entry._id, entry.entryNumber, 5);
 
-      expect(picks).toHaveLength(1);
-      expect(picks[0].team).toBe('Patriots');
-      expect(picks[0].week).toBe(5);
+      expect(pick).toBeDefined();
+      expect(pick.team).toBe('Patriots');
+      expect(pick.week).toBe(5);
     });
   });
 

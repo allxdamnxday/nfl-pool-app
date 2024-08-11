@@ -6,40 +6,7 @@ import { FaCalendarAlt, FaClock, FaChevronLeft, FaChevronRight, FaFootballBall }
 import defaultLogo from '/logos/default-team-logo.png';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogoSpinner } from './CustomComponents';
-const teamLogoMap = {
-'ARI': 'ARI.png',
-'ATL': 'ATL.png',
-'BAL': 'BAL.png',
-'BUF': 'BUF.png',
-'CAR': 'CAR.png',
-'CHI': 'CHI.png',
-'CIN': 'CIN.png',
-'CLE': 'CLE.png',
-'DAL': 'DAL.png',
-'DEN': 'DEN.png',
-'DET': 'DET.png',
-'GB': 'GB.png',
-'HOU': 'HOU.png',
-'IND': 'IND.png',
-'JAX': 'JAX.png',
-'KC': 'KC.png',
-'LAC': 'LAC.png',
-'LAR': 'LAR.png',
-'LAS': 'LAS.png',
-'MIA': 'MIA.png',
-'MIN': 'MIN.png',
-'NE': 'NE.png',
-'NO': 'NO.png',
-'NYG': 'NYG.png',
-'NYJ': 'NYJ.png',
-'PHI': 'PHI.png',
-'PIT': 'PIT.png',
-'SEA': 'SEA.png',
-'SF': 'SF.png',
-'TB': 'TB.png',
-'TEN': 'TEN.png',
-'WSH': 'WSH.png',
-};
+import getTeamLogo from './getTeamLogo';
 
 function Picks() {
   const navigate = useNavigate();
@@ -52,13 +19,6 @@ function Picks() {
   const showToast = useToast();
   const [currentWeek, setCurrentWeek] = useState(parseInt(week) || 1);
   const totalWeeks = 18; // Adjust this based on your NFL season structure
-
-  const getTeamLogo = (team) => {
-    if (team && team.abbreviation && teamLogoMap[team.abbreviation]) {
-      return `/img/nfl_logos/${teamLogoMap[team.abbreviation]}`;
-    }
-    return defaultLogo;
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -223,7 +183,8 @@ function GameCard({ game, currentPick, onPickClick }) {
       </div>
       <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
         <TeamButton
-          team={game.away_team}
+          team={game}
+          isAwayTeam={true}
           record={game.teams_normalized.find(t => t.is_away)?.record || '0-0'}
           isSelected={currentPick === game.away_team}
           onClick={() => onPickClick(game.away_team)}
@@ -239,7 +200,8 @@ function GameCard({ game, currentPick, onPickClick }) {
           </motion.div>
         </div>
         <TeamButton
-          team={game.home_team}
+          team={game}
+          isAwayTeam={false}
           record={game.teams_normalized.find(t => !t.is_away)?.record || '0-0'}
           isSelected={currentPick === game.home_team}
           onClick={() => onPickClick(game.home_team)}
@@ -249,7 +211,7 @@ function GameCard({ game, currentPick, onPickClick }) {
   );
 }
 
-function TeamButton({ team, record, isSelected, onClick }) {
+function TeamButton({ team, isAwayTeam, record, isSelected, onClick }) {
   return (
     <motion.button
       whileHover={{ scale: 1.05 }}
@@ -260,12 +222,12 @@ function TeamButton({ team, record, isSelected, onClick }) {
       }`}
     >
       <img
-        src={getTeamLogo(team)}
-        alt={`${team.name} logo`}
+        src={getTeamLogo(team, isAwayTeam)}
+        alt={`${isAwayTeam ? team.away_team : team.home_team} logo`}
         className="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-1 sm:mb-2"
         onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}
       />
-      <span className="font-bold text-xs sm:text-sm mb-1 text-center">{team}</span>
+      <span className="font-bold text-xs sm:text-sm mb-1 text-center">{isAwayTeam ? team.away_team : team.home_team}</span>
       <span className={`text-xs px-2 py-1 rounded-full ${isSelected ? 'bg-white text-purple-600' : 'bg-gray-800 text-white'}`}>
         {record}
       </span>
@@ -326,7 +288,7 @@ function PickStatus({ currentPick }) {
           <div className="flex items-center space-x-2">
             <span className="font-bold text-purple-400">Current Pick:</span>
             <img
-              src={getTeamLogo({ abbreviation: currentPick.split(' ')[0].substring(0, 3).toUpperCase() })}
+              src={getTeamLogo(currentPick)}
               alt={`${currentPick} logo`}
               className="w-8 h-8 object-contain"
               onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}

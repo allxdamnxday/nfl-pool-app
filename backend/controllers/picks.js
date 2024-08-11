@@ -11,10 +11,13 @@ exports.getPicksForPool = asyncHandler(async (req, res, next) => {
 });
 
 exports.getPickForWeek = asyncHandler(async (req, res, next) => {
-  const pick = await pickService.getPickForWeek(req.params.entryId, req.params.entryNumber, req.params.week);
+  const { entryId, entryNumber, week } = req.params;
+  const pick = await pickService.getPickForWeek(entryId, entryNumber, week);
+  
   res.status(200).json({
     success: true,
-    data: pick
+    data: pick,
+    message: pick ? 'Pick found' : 'No pick made for this week yet'
   });
 });
 

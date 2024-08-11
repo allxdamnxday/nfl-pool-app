@@ -367,6 +367,9 @@ class PoolService extends BaseService {
    *         prizeAmount:
    *           type: number
    *           description: The total prize amount for the pool
+   *         isCreator:
+   *           type: boolean
+   *           description: Indicates if the user is the creator of the pool
    *         activeEntries:
    *           type: number
    *           description: The number of active entries the user has in this pool
@@ -396,6 +399,7 @@ class PoolService extends BaseService {
   async getUserPoolsWithEntries(userId) {
     logger.info(`Fetching pools with entries for user ${userId}`);
     try {
+      const userObjectId = mongoose.Types.ObjectId(userId);
       const userPools = await Pool.aggregate([
         {
           $lookup: {
@@ -407,7 +411,7 @@ class PoolService extends BaseService {
                   $expr: {
                     $and: [
                       { $eq: ['$pool', '$$poolId'] },
-                      { $eq: ['$user', mongoose.Types.ObjectId(userId)] }
+                      { $eq: ['$user', userObjectId] }
                     ]
                   }
                 }
@@ -430,6 +434,7 @@ class PoolService extends BaseService {
             status: 1,
             entryFee: 1,
             prizeAmount: 1,
+            isCreator: { $eq: ['$creator', userObjectId] },
             activeEntries: {
               $size: {
                 $filter: {
