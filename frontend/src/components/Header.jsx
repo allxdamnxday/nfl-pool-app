@@ -27,16 +27,16 @@ function Header() {
       <nav className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-purple-600 flex items-center">
-            <img src="/img/Logo_FBE@2x.png" alt="NFL Survivor Pool" className="h-8 w-auto mr-2" />
-            <span className="hidden sm:inline">NFL Survivor Pool</span>
-            <span className="sm:hidden">NFL Pool</span>
+            <img src="/img/Logo_FBE@2x.png" alt="Football Eliminator" className="h-8 w-auto mr-2" />
+            <span className="hidden sm:inline">Football Eliminator</span>
+            <span className="sm:hidden">FBE</span>
           </Link>
           <div className="hidden md:flex space-x-4 items-center">
             {user && (
               <>
                 <Link to="/dashboard" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Pools</Link>
                 <Link to="/entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Entries</Link>
-                <Link to="/picks" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
+                <Link to="/user-entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
                 <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
                   <FaUserFriends className="mr-2" />
                   Invite Friends

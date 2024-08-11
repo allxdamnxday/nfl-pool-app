@@ -9,7 +9,7 @@ function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="text-gray-600 text-sm mb-4 sm:mb-0">
-            © 2024 NFL Survivor Pool. All rights reserved.
+            © 2024 Football Eliminator. All rights reserved.
           </div>
           <nav className="flex space-x-4">
             <Link to="/about" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">About</Link>
