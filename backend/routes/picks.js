@@ -2,7 +2,7 @@ const express = require('express');
 const { 
   getPicksForPool,
   getPickForWeek,
-  updatePick,
+  addOrUpdatePick,
   deletePick
 } = require('../controllers/picks');
 const { protect } = require('../middleware/auth');
@@ -187,8 +187,7 @@ router.route('/pool/:poolId')
  */
 router.route('/:entryId/:entryNumber?/:week')
   .get(protect, getPickForWeek)
-  .put(protect, updatePick)
+  .put(protect, checkGameStart, addOrUpdatePick)
   .delete(protect, deletePick);
 
 module.exports = router;
-

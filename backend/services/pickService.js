@@ -23,19 +23,20 @@ class PickService {
    * @param {string} userId - The ID of the user making the pick
    * @param {string} team - The team picked (e.g., "Patriots", "49ers")
    * @param {number} week - The NFL week number (1-18)
+   * @param {Object} game - The game object found by the checkGameStart middleware
    * @returns {Promise<Object>} The created or updated pick object
-   * @throws {ErrorResponse} If entry is not found, user is not authorized, pick is invalid, or game has already started
+   * @throws {ErrorResponse} If entry is not found, user is not authorized, pick is invalid
    * 
    * @example
    * try {
-   *   const pick = await pickService.addOrUpdatePick('entry123', 1, 'user456', 'Patriots', 5);
+   *   const pick = await pickService.addOrUpdatePick('entry123', 1, 'user456', 'Patriots', 5, game);
    *   console.log('Pick added/updated:', pick);
    *   // Output: Pick added/updated: { _id: '...', entry: 'entry123', entryNumber: 1, team: 'Patriots', week: 5 }
    * } catch (error) {
    *   console.error('Error adding/updating pick:', error.message);
    * }
    */
-  async addOrUpdatePick(entryId, entryNumber, userId, team, week) {
+  async addOrUpdatePick(entryId, entryNumber, userId, team, week, game) {
     logger.info(`Attempting to add/update pick for entry ${entryId}, user ${userId}, team ${team}, week ${week}`);
     
     const entry = await Entry.findById(entryId).populate('pool');
@@ -65,32 +66,13 @@ class PickService {
       throw new ErrorResponse(`You already have a ${team} pick this season for this entry, please choose another team`, 400);
     }
 
-    const game = await Game.findOne({
-      'schedule.week': week,
-      $or: [
-        { away_team: team },
-        { home_team: team },
-        { 'teams_normalized.name': team }
-      ]
-    });
-
-    if (!game) {
-      logger.error(`No game found for team ${team} in week ${week}`);
-      throw new ErrorResponse(`No game found for team ${team} in week ${week}`, 404);
-    }
-
-    const now = moment.utc();  // Get current time in UTC
-    if (now.isAfter(moment(game.event_date))) {  // Compare UTC times
-      logger.warn(`Attempted to update pick after game start for entry ${entryId}, week ${week}`);
-      throw new ErrorResponse(`Cannot update pick after game has started`, 400);
-    }
-
+    const now = moment.utc();
     const pick = await Pick.findOneAndUpdate(
       { entry: entryId, entryNumber, week: parseInt(week) },
       { 
         team: team,
-        pickMadeAt: now.toDate(),  // Store as UTC Date object
-        game: game._id  // Add this line to associate the pick with the game
+        pickMadeAt: now.toDate(),
+        game: game._id
       },
       { upsert: true, new: true }
     );

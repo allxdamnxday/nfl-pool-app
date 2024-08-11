@@ -441,35 +441,38 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
  * @throws {ErrorResponse} 400 - Invalid or expired token
  */
 exports.verifyEmail = asyncHandler(async (req, res, next) => {
-  const { token } = req.params;
+  try {
+    const { token } = req.params;
 
-  // Find user by verification token and check if it's expired
-  const user = await User.findOne({
-    verificationToken: token,
-    verificationTokenExpire: { $gt: Date.now() }
-  });
-
-  if (!user) {
-    return next(new ErrorResponse('Invalid token', 400));
-  }
-
-  if (user.isEmailVerified) {
-    return res.status(200).json({
-      success: true,
-      message: 'Email already verified'
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpire: { $gt: Date.now() }
     });
+
+    if (!user) {
+      return next(new ErrorResponse('Invalid or expired token', 400));
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(200).json({
+        success: true,
+        message: 'Email already verified'
+      });
+    }
+
+    user.isEmailVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpire = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Email verified successfully'
+    });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    next(new ErrorResponse('An error occurred during email verification', 500));
   }
-
-  // Update user
-  user.isEmailVerified = true;
-  user.verificationToken = undefined;
-  user.verificationTokenExpire = undefined;
-  await user.save();
-
-  res.status(200).json({
-    success: true,
-    message: 'Email verified successfully'
-  });
 });
 
 /**

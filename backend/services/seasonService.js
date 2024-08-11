@@ -40,17 +40,6 @@ const getSetting = async (key) => {
  * @param {Date} date - The date to calculate the week for.
  * @param {number} seasonYear - The year of the NFL season.
  * @returns {number} The calculated NFL week number.
- * 
- * Math explanation:
- * 1. Set season start to September 1st of the given year: new Date(seasonYear, 8, 1)
- * 2. Adjust to the first Thursday after Sept 1st: (4 - seasonStart.getDay() + 7) % 7
- *    - 4 represents Thursday (0-indexed week starting with Sunday)
- *    - Add 7 and use modulo to ensure positive result
- * 3. Calculate time difference in milliseconds: date.getTime() - seasonStart.getTime()
- * 4. Convert milliseconds to days: timeDiff / (1000 * 3600 * 24)
- *    - 1000 ms/s * 3600 s/h * 24 h/day
- * 5. Calculate weeks: Math.floor(dayDiff / 7)
- * 6. Add 1 to start week numbering at 1 instead of 0
  */
 const calculateNFLWeek = (date, seasonYear) => {
   // Create dates in Eastern Time
@@ -70,6 +59,19 @@ const calculateNFLWeek = (date, seasonYear) => {
     return 0; // Before season starts
   }
 
+  // Check if the input date is in the next year
+  if (inputDate.getFullYear() > seasonYear) {
+    // If it's after February, it's for the next season
+    if (inputDate.getMonth() > 1) {
+      console.log('Date is in the next season');
+      return 0;
+    }
+    // Otherwise, it's still part of the current season (January-February)
+    const nextYearStart = new Date(seasonYear + 1, 0, 1);
+    const weeksInNextYear = Math.floor((inputDate - nextYearStart) / (7 * 24 * 60 * 60 * 1000));
+    return Math.min(18 + weeksInNextYear, 22); // Add weeks in next year, cap at 22 (18 regular + 4 postseason)
+  }
+
   const timeDiff = inputDate.getTime() - seasonStart.getTime();
   const dayDiff = timeDiff / (1000 * 3600 * 24);
   const weekNumber = Math.floor(dayDiff / 7) + 1;
@@ -78,7 +80,7 @@ const calculateNFLWeek = (date, seasonYear) => {
   console.log(`Day difference: ${dayDiff}`);
   console.log(`Calculated week number: ${weekNumber}`);
 
-  return weekNumber;
+  return Math.min(weekNumber, 22); // Cap at 22 weeks (18 regular season + 4 postseason)
 };
 
 /**
@@ -246,10 +248,18 @@ const getCurrentWeekGames = async () => {
 };
 
 // New utility function
-const getCurrentNFLWeek = async () => {
+const getCurrentNFLWeek = () => {
   const currentDate = new Date();
-  const seasonYear = getCurrentSeasonYear();
-  return calculateNFLWeek(currentDate, seasonYear);
+  let seasonYear = currentDate.getMonth() >= 8 ? currentDate.getFullYear() : currentDate.getFullYear() - 1;
+  let week = calculateNFLWeek(currentDate, seasonYear);
+  
+  // If it's the offseason (week 0), use the next season year
+  if (week === 0 && currentDate.getMonth() > 1) {
+    seasonYear++;
+    week = 1; // Assume week 1 for the upcoming season
+  }
+
+  return { week, seasonYear };
 };
 
 module.exports = {

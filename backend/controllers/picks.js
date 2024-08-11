@@ -21,13 +21,14 @@ exports.getPickForWeek = asyncHandler(async (req, res, next) => {
   });
 });
 
-exports.updatePick = asyncHandler(async (req, res, next) => {
-  const pick = await pickService.updatePick(
+exports.addOrUpdatePick = asyncHandler(async (req, res, next) => {
+  const pick = await pickService.addOrUpdatePick(
     req.params.entryId,
     parseInt(req.params.entryNumber),
-    parseInt(req.params.week),
     req.user.id,
-    req.body
+    req.body.team,
+    parseInt(req.params.week),
+    req.game // This is the game object added by the checkGameStart middleware
   );
   res.status(200).json({
     success: true,
