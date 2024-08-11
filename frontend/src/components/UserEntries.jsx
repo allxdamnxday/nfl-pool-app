@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCalendarAlt, FaClock, FaChevronLeft, FaChevronRight, FaFootballBall, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaChevronLeft, FaChevronRight, FaFootballBall, FaMapMarkerAlt, FaTv } from 'react-icons/fa';
 import { getUserEntriesWithPicks } from '../services/entryService';
 import { useToast } from '../contexts/ToastContext';
 import { LogoSpinner } from './CustomComponents';
@@ -102,6 +102,7 @@ function UserEntries() {
                 week={week}
                 pick={entries[currentEntry]?.picks.find(p => p.week === week)}
                 entryId={entries[currentEntry]?._id}
+                entryNumber={entries[currentEntry]?.entryNumber}
               />
             ))}
           </motion.div>
@@ -146,7 +147,27 @@ function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName, e
   );
 }
 
-function WeekCard({ week, pick, entryId }) {
+function WeekCard({ week, pick, entryId, entryNumber }) {
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? 'TBD' : format(date, 'MMM d, yyyy h:mm a');
+  };
+
+  const getGameStatus = (game) => {
+    if (!game) return 'Pending';
+    if (game.schedule && game.schedule.season_type) {
+      return game.schedule.season_type;
+    }
+    return 'Scheduled';
+  };
+
+  const getVenue = (game) => {
+    if (game && game.schedule && game.schedule.event_name) {
+      return game.schedule.event_name.split(' - ')[0];
+    }
+    return 'Venue TBA';
+  };
+
   return (
     <motion.div 
       whileHover={{ scale: 1.02 }}
@@ -159,7 +180,7 @@ function WeekCard({ week, pick, entryId }) {
           Week {week}
         </h3>
         <Link 
-          to={`/entries/${entryId}/picks/${week}`}
+          to={`/entries/${entryId}/${entryNumber}/picks/${week}`}
           className={`font-bold py-2 px-4 rounded-full text-sm transition-colors duration-200 ${
             pick 
               ? 'bg-purple-600 hover:bg-purple-700 text-white' 
@@ -169,24 +190,33 @@ function WeekCard({ week, pick, entryId }) {
           {pick ? 'Change Pick' : 'Make Pick'}
         </Link>
       </div>
-      {pick && (
+      {pick && pick.game && (
         <div className="text-gray-700">
-          <p className="font-semibold">{pick.team}</p>
-          {pick.game && (
-            <div className="mt-2">
+          <p className="font-semibold">{pick.team || 'Team Not Selected'}</p>
+          <div className="mt-2 space-y-1">
+            <p className="text-sm flex items-center text-gray-500">
+              <FaCalendarAlt className="mr-2" />
+              {formatDate(pick.game.event_date)}
+            </p>
+            <p className="text-sm flex items-center text-gray-500">
+              <FaFootballBall className="mr-2" />
+              {pick.game.away_team} vs {pick.game.home_team}
+            </p>
+            <p className="text-sm flex items-center text-gray-500">
+              <FaMapMarkerAlt className="mr-2" />
+              {getVenue(pick.game)}
+            </p>
+            {pick.game.schedule && pick.game.schedule.league_name && (
               <p className="text-sm flex items-center text-gray-500">
-                <FaCalendarAlt className="mr-2" />
-                {new Date(pick.game.event_date).toLocaleDateString()}
+                <FaTv className="mr-2" />
+                {pick.game.schedule.league_name}
               </p>
-              <p className="text-sm flex items-center text-gray-500">
-                {pick.game.away_team} vs {pick.game.home_team}
-              </p>
-            </div>
-          )}
-          <p className="text-sm flex items-center text-gray-500">
-            <FaClock className="mr-2" />
-            {pick.result || 'Pending'}
-          </p>
+            )}
+            <p className="text-sm flex items-center text-gray-500">
+              <FaClock className="mr-2" />
+              {getGameStatus(pick.game)}
+            </p>
+          </div>
         </div>
       )}
     </motion.div>

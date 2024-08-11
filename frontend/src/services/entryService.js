@@ -37,7 +37,7 @@ export const getEntriesForPool = async (poolId) => {
   }
 };
 
-export const addOrUpdatePick = async (entryId, entryNumber, team, week) => {
+export const addOrUpdatePick = async (entryId, team, week) => {
   try {
     const response = await api.post(`${API_URL}/${entryId}/picks`, { team, week });
     logger.info('Pick added or updated:', response.data);

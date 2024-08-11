@@ -275,24 +275,16 @@ function ConfirmationModal({ selectedTeam, onConfirm, onCancel }) {
 }
 
 function PickStatus({ currentPick }) {
-  const isString = (value) => typeof value === 'string';
-
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-sm border-t border-gray-200">
       <div className="flex justify-between items-center max-w-3xl mx-auto">
-        <span className="text-gray-300 flex items-center">
+        <span className="text-gray-700 flex items-center">
           <FaFootballBall className="mr-2 text-purple-400" />
           {currentPick ? '1/1 picks made' : '0/1 picks made'}
         </span>
-        {currentPick && isString(currentPick) && (
+        {currentPick && (
           <div className="flex items-center space-x-2">
             <span className="font-bold text-purple-400">Current Pick:</span>
-            <img
-              src={getTeamLogo(currentPick)}
-              alt={`${currentPick} logo`}
-              className="w-8 h-8 object-contain"
-              onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}
-            />
             <span className="font-semibold">{currentPick}</span>
           </div>
         )}
