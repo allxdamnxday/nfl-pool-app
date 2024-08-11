@@ -24,8 +24,8 @@ exports.getPickForWeek = asyncHandler(async (req, res, next) => {
 exports.updatePick = asyncHandler(async (req, res, next) => {
   const pick = await pickService.updatePick(
     req.params.entryId,
-    req.params.entryNumber,
-    req.params.week,
+    parseInt(req.params.entryNumber),
+    parseInt(req.params.week),
     req.user.id,
     req.body
   );

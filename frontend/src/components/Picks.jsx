@@ -58,7 +58,7 @@ function Picks() {
       const weekNumber = parseInt(currentWeek) || 1;
       await addOrUpdatePick(entryId, entryNumber, selectedTeam, weekNumber);
       showToast('Pick submitted successfully', 'success');
-      setCurrentPick(selectedTeam); // Ensure currentPick is set as a string
+      setCurrentPick(selectedTeam);
       setShowConfirmation(false);
       navigate('/user-entries');
     } catch (error) {

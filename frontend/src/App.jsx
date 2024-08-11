@@ -65,7 +65,7 @@ const AnimatedRoutes = () => {
             } 
           />
           <Route 
-            path="/entries/:entryId/picks" 
+            path="/entries/:entryId/:entryNumber/picks" 
             element={
               <ProtectedRoute>
                 <Picks />
@@ -73,7 +73,7 @@ const AnimatedRoutes = () => {
             } 
           />
           <Route 
-            path="/entries/:entryId/picks/:week" 
+            path="/entries/:entryId/:entryNumber/picks/:week" 
             element={
               <ProtectedRoute>
                 <Picks />

@@ -21,12 +21,13 @@ const logger = require('../utils/logger');
 const checkGameStart = async (req, res, next) => {
   try {
     const { entryId } = req.params;
-    const { team, week } = req.body;
+    const { team } = req.body;
+    let { week } = req.params;  // Get week from params instead of body
 
     logger.info(`Checking game start for entry ${entryId}, team ${team}, week ${week}`);
 
     const { week: currentWeek, seasonYear } = await seasonService.getCurrentNFLWeek();
-    const weekToCheck = (week && week > 0) ? week : currentWeek;
+    const weekToCheck = (week && week > 0) ? parseInt(week) : currentWeek;
 
     const entry = await Entry.findById(entryId);
     if (!entry) {

@@ -45,7 +45,11 @@ function MakePick() {
       showToast('Pick submitted successfully!', 'success');
       navigate(`/pools/${id}`);
     } catch (err) {
-      showToast('Failed to submit pick. Please try again.', 'error');
+      if (err.response && err.response.data && err.response.data.message) {
+        showToast(err.response.data.message, 'error');
+      } else {
+        showToast('Failed to submit pick. Please try again.', 'error');
+      }
     }
   };
 

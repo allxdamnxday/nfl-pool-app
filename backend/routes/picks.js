@@ -185,62 +185,10 @@ router.route('/pool/:poolId')
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.route('/:entryId/:entryNumber/:week')
+router.route('/:entryId/:entryNumber?/:week')
   .get(protect, getPickForWeek)
-  .put(protect, checkGameStart, updatePick)
+  .put(protect, updatePick)
   .delete(protect, deletePick);
 
 module.exports = router;
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Pick:
- *       type: object
- *       properties:
- *         _id:
- *           type: string
- *         entry:
- *           type: string
- *         entryNumber:
- *           type: integer
- *         team:
- *           type: string
- *         week:
- *           type: integer
- *   responses:
- *     UnauthorizedError:
- *       description: Unauthorized access
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               success:
- *                 type: boolean
- *               error:
- *                 type: string
- *     NotFoundError:
- *       description: Resource not found
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               success:
- *                 type: boolean
- *               error:
- *                 type: string
- *     BadRequestError:
- *       description: Bad request
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               success:
- *                 type: boolean
- *               error:
- *                 type: string
- */

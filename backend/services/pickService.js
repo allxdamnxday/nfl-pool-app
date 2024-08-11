@@ -182,7 +182,7 @@ class PickService {
    * }
    */
   async updatePick(entryId, entryNumber, week, userId, updateData) {
-    logger.info(`Attempting to update pick for entry ${entryId}, user ${userId}, week ${week}`);
+    logger.info(`Attempting to update or create pick for entry ${entryId}, user ${userId}, week ${week}`);
     
     const entry = await Entry.findById(entryId);
     if (!entry) {
@@ -195,28 +195,38 @@ class PickService {
       throw new ErrorResponse(`User not authorized to update this pick`, 401);
     }
 
-    const existingPick = await Pick.findOne({ entry: entryId, entryNumber, week: parseInt(week) }).populate('game');
-    if (!existingPick) {
-      logger.error(`No pick found for entry ${entryId}, number ${entryNumber}, week ${week}`);
-      throw new ErrorResponse(`No pick found for entry ${entryId}, number ${entryNumber}, week ${week}`, 404);
+    // Find the game for the given week and team
+    const game = await Game.findOne({
+      'schedule.week': week,
+      $or: [
+        { away_team: updateData.team },
+        { home_team: updateData.team },
+        { 'teams_normalized.name': updateData.team }
+      ]
+    });
+
+    if (!game) {
+      logger.error(`No game found for team ${updateData.team} in week ${week}`);
+      throw new ErrorResponse(`No game found for team ${updateData.team} in week ${week}`, 404);
     }
 
-    const now = moment.utc();  // Get current time in UTC
-    if (now.isAfter(moment(existingPick.game.event_date))) {  // Compare UTC times
+    const now = moment.utc();
+    if (now.isAfter(moment(game.event_date))) {
       logger.warn(`Attempted to update pick after game start for entry ${entryId}, week ${week}`);
       throw new ErrorResponse(`Cannot update pick after game has started`, 400);
     }
 
-    // Include pickMadeAt in the update data
-    updateData.pickMadeAt = now.toDate();  // Store as UTC Date object
+    // Include pickMadeAt and game in the update data
+    updateData.pickMadeAt = now.toDate();
+    updateData.game = game._id;
 
     const updatedPick = await Pick.findOneAndUpdate(
       { entry: entryId, entryNumber, week: parseInt(week) },
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true, upsert: true } // Add upsert: true
     );
 
-    logger.info(`Successfully updated pick for entry ${entryId}, week ${week}`);
+    logger.info(`Successfully updated or created pick for entry ${entryId}, week ${week}`);
     return updatedPick;
   }
 
