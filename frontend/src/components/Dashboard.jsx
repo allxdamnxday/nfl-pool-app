@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { getUserPoolsWithEntries } from '../services/poolService';
-import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek } from 'react-icons/fa';
+import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign, FaTrophy } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 
 function Dashboard() {
@@ -20,10 +20,11 @@ function Dashboard() {
       try {
         setLoading(true);
         setError(null);
-        const userPools = await getUserPoolsWithEntries();
-        setPools(userPools);
+        const userPoolsWithEntries = await getUserPoolsWithEntries();
+        console.log('User pools with entries:', userPoolsWithEntries);
+        setPools(userPoolsWithEntries);
       } catch (error) {
-        console.error('Failed to fetch user pools:', error);
+        console.error('Failed to fetch user pools with entries:', error);
         setError('Failed to load your pools. Please try again later.');
         showToast('Failed to load your pools. Please try again later.', 'error');
       } finally {
@@ -59,7 +60,7 @@ function Dashboard() {
           <h2 className="text-3xl sm:text-4xl font-semibold mb-6 sm:mb-8 text-gray-800">Your Pools</h2>
           {pools.length === 0 ? (
             <div className="bg-white rounded-lg p-8 shadow-sm text-center border border-gray-100">
-              <p className="mb-6 text-2xl text-gray-600">You're not in any pools yet. Ready to join the action?</p>
+              <p className="mb-6 text-2xl text-gray-600">You're not in any pools. Ready to join the action?</p>
               <Link 
                 to="/pools" 
                 className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 ease-in-out inline-block"
@@ -84,8 +85,19 @@ function Dashboard() {
                   <p className="text-gray-600 mb-3">
                     <FaCalendarWeek className="inline-block mr-2 text-yellow-500" /> Current Week: {pool.currentWeek}
                   </p>
-                  <p className="text-gray-600 mb-5">
+                  <p className="text-gray-600 mb-3">
                     <FaUsers className="inline-block mr-2 text-green-500" /> Active Entries: {pool.activeEntries}
+                  </p>
+                  <p className="text-gray-600 mb-3">
+                    <FaDollarSign className="inline-block mr-2 text-green-500" /> Entry Fee: ${pool.entryFee}
+                  </p>
+                  <p className="text-gray-600 mb-3">
+                    <FaTrophy className="inline-block mr-2 text-yellow-500" /> Prize: ${pool.prizeAmount}
+                  </p>
+                  <p className="text-gray-600 mb-5">
+                    Status: <span className={`font-semibold ${pool.status === 'active' ? 'text-green-600' : 'text-yellow-600'}`}>
+                      {pool.status.charAt(0).toUpperCase() + pool.status.slice(1)}
+                    </span>
                   </p>
                   <Link 
                     to={`/pool-entries/${pool._id}`} 

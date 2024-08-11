@@ -17,11 +17,10 @@ export const getAvailablePools = async () => {
 
 export const getUserActivePools = async () => {
   try {
-    const response = await api.get(`${API_URL}/user/active`);
-    logger.info('User active pools retrieved:', response.data);
+    const response = await api.get('/pools/user/active');
     return response.data.data;
   } catch (error) {
-    logger.error('Error fetching user active pools:', error);
+    console.error('Error fetching user active pools:', error);
     throw error;
   }
 };
@@ -107,7 +106,7 @@ export const getUserPoolsWithEntries = async () => {
   try {
     const response = await api.get(`${API_URL}/user/entries`);
     logger.info('User pools with entries retrieved:', response.data);
-    return response.data.data;
+    return response.data.data; // Assuming the API returns { data: PoolWithEntries[] }
   } catch (error) {
     logger.error('Error fetching user pools with entries:', error);
     throw error;

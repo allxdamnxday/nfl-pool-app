@@ -148,8 +148,9 @@ class RequestService extends BaseService {
         const entry = await Entry.create({
           user: request.user,
           pool: request.pool,
-          entryNumber: i + 1, // Assuming entryNumber starts from 1
-          request: request._id
+          entryNumber: i + 1,
+          request: request._id,
+          status: 'active'  // Explicitly set the status to 'active'
         });
         entries.push(entry);
       }

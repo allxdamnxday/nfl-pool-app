@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const currentUser = await getCurrentUser();
+        console.log('Current user object:', currentUser); // Add this line
         setUser(currentUser);
         logger.info('User loaded successfully', currentUser);
         console.log('User loaded:', currentUser);
@@ -37,6 +38,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const loggedInUser = await loginService(email, password);
+      console.log('Logged in user object:', loggedInUser); // Add this line
       setUser(loggedInUser);
       logger.info('User logged in successfully', loggedInUser);
       console.log('User logged in:', loggedInUser);
@@ -76,7 +78,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user: user ? { ...user, id: user._id || user.id } : null, 
+      login, 
+      register, 
+      logout, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );

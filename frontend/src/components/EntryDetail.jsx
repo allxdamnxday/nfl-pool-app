@@ -63,11 +63,11 @@ function EntryDetail() {
             <div className="bg-gray-100 p-4 rounded-lg">
               <p className="text-sm text-gray-600">Status</p>
               <p className="text-lg font-semibold text-gray-800 flex items-center">
-                {entry.isActive ? 
+                {entry.status === 'active' ? 
                   <FaCheckCircle className="mr-2 text-green-500" /> : 
                   <FaTimesCircle className="mr-2 text-red-500" />
                 }
-                {entry.isActive ? 'Active' : 'Inactive'}
+                {entry.status === 'active' ? 'Active' : 'Inactive'}
               </p>
             </div>
             <div className="bg-gray-100 p-4 rounded-lg">
@@ -80,11 +80,11 @@ function EntryDetail() {
             <div className="bg-gray-100 p-4 rounded-lg">
               <p className="text-sm text-gray-600">Entry Status</p>
               <p className="text-lg font-semibold text-gray-800 flex items-center">
-                {entry.isEliminated ? 
+                {entry.status === 'eliminated' ? 
                   <FaTimesCircle className="mr-2 text-red-500" /> : 
                   <FaCheckCircle className="mr-2 text-green-500" />
                 }
-                {entry.isEliminated ? 'Eliminated' : 'Still In'}
+                {entry.status === 'eliminated' ? 'Eliminated' : 'Still In'}
               </p>
             </div>
           </div>
@@ -106,7 +106,7 @@ function EntryDetail() {
         )}
 
         <div className="mt-8 flex justify-center space-x-4">
-          {!entry.isEliminated && (
+          {!entry.status === 'eliminated' && (
             <button 
               onClick={handlePickEmClick}
               className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full transition-colors duration-200"

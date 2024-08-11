@@ -64,8 +64,8 @@ function Entries() {
                 {entry.pool?.name || 'Unknown Pool'}
               </h2>
               <p className="text-gray-600 mb-2 flex items-center">
-                <FaCheckCircle className={`mr-2 ${entry.isActive ? 'text-green-500' : 'text-red-500'}`} />
-                Status: {entry.isActive ? 'Active' : 'Inactive'}
+                <FaCheckCircle className={`mr-2 ${entry.status === 'active' ? 'text-green-500' : 'text-red-500'}`} />
+                Status: {entry.status === 'active' ? 'Active' : 'Inactive'}
               </p>
               <p className="text-gray-600 mb-2 flex items-center">
                 <FaCalendarAlt className="text-blue-500 mr-2" />
@@ -76,11 +76,11 @@ function Entries() {
                 Current Week: {entry.pool?.currentWeek || 'N/A'}
               </p>
               <p className="text-gray-600 mb-4 flex items-center">
-                {entry.isEliminated ? 
+                {entry.status === 'eliminated' ? 
                   <FaTimesCircle className="text-red-500 mr-2" /> : 
                   <FaCheckCircle className="text-green-500 mr-2" />
                 }
-                Status: {entry.isEliminated ? 'Eliminated' : 'Still In'}
+                Status: {entry.status === 'eliminated' ? 'Eliminated' : 'Still In'}
               </p>
               <Link 
                 to={`/entries/${entry._id}`} 

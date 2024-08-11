@@ -324,43 +324,77 @@ class PoolService extends BaseService {
   }
 
   /**
-   * Get all pools for a specific user with their active entries
+   * Get all pools with entries for a specific user
    * @async
+   * @function getUserPoolsWithEntries
    * @param {string} userId - The ID of the user
-   * @returns {Promise<Array<Object>>} Array of pools with active entries for the user
-   * @throws {ErrorResponse} If there's an error fetching the pools and entries
+   * @returns {Promise<Array<PoolWithEntries>>} Array of pools with entries for the user
+   * @throws {ErrorResponse} If there's an error fetching the pools with entries
+   * 
+   * @description This method retrieves all pools that the user has entries in, regardless of the pool's status.
+   * It includes detailed information about each pool and the user's entries in that pool.
+   * 
+   * @example
+   * // Example usage
+   * const userId = '5f9d7a3b9d3e2a1b8c7d6e5f';
+   * const poolsWithEntries = await poolService.getUserPoolsWithEntries(userId);
+   * 
+   * @swagger
+   * components:
+   *   schemas:
+   *     PoolWithEntries:
+   *       type: object
+   *       properties:
+   *         _id:
+   *           type: string
+   *           description: The unique identifier of the pool
+   *         name:
+   *           type: string
+   *           description: The name of the pool
+   *         season:
+   *           type: number
+   *           description: The season year of the pool
+   *         currentWeek:
+   *           type: number
+   *           description: The current week of the pool
+   *         status:
+   *           type: string
+   *           enum: [open, active, completed]
+   *           description: The current status of the pool
+   *         entryFee:
+   *           type: number
+   *           description: The entry fee for the pool
+   *         prizeAmount:
+   *           type: number
+   *           description: The total prize amount for the pool
+   *         activeEntries:
+   *           type: number
+   *           description: The number of active entries the user has in this pool
+   *         entries:
+   *           type: array
+   *           items:
+   *             $ref: '#/components/schemas/Entry'
+   *           description: Array of user's entries in this pool
+   *     Entry:
+   *       type: object
+   *       properties:
+   *         _id:
+   *           type: string
+   *           description: The unique identifier of the entry
+   *         status:
+   *           type: string
+   *           enum: [active, eliminated]
+   *           description: The current status of the entry
+   *         eliminatedWeek:
+   *           type: number
+   *           nullable: true
+   *           description: The week number when the entry was eliminated (null if still active)
+   *         entryNumber:
+   *           type: number
+   *           description: The entry number for this user in this pool
    */
   async getUserPoolsWithEntries(userId) {
     logger.info(`Fetching pools with entries for user ${userId}`);
-    try {
-      const pools = await Pool.find({ participants: userId });
-      const entries = await Entry.find({ user: userId });
-
-      return pools.map(pool => {
-        const activeEntries = entries.filter(entry => 
-          entry.pool.toString() === pool._id.toString() && entry.status === 'active'
-        );
-        return {
-          ...pool.toObject(),
-          activeEntries: activeEntries.length,
-          userEntryId: activeEntries.length > 0 ? activeEntries[0]._id : undefined
-        };
-      });
-    } catch (error) {
-      logger.error(`Error fetching pools with entries for user ${userId}: ${error.message}`);
-      throw new ErrorResponse(`Error fetching user pools with entries: ${error.message}`, 500);
-    }
-  }
-
-  /**
-   * Get all active pools for a specific user
-   * @async
-   * @param {string} userId - The ID of the user
-   * @returns {Promise<Array<Object>>} Array of active pools for the user
-   * @throws {ErrorResponse} If there's an error fetching the active pools
-   */
-  async getUserActivePools(userId) {
-    logger.info(`Fetching active pools for user ${userId}`);
     try {
       const userPools = await Pool.aggregate([
         {
@@ -373,27 +407,46 @@ class PoolService extends BaseService {
                   $expr: {
                     $and: [
                       { $eq: ['$pool', '$$poolId'] },
-                      { $eq: ['$user', mongoose.Types.ObjectId(userId)] },
-                      { $eq: ['$status', 'active'] }
+                      { $eq: ['$user', mongoose.Types.ObjectId(userId)] }
                     ]
                   }
                 }
               }
             ],
-            as: 'userEntry'
+            as: 'userEntries'
           }
         },
         {
           $match: {
-            status: 'active',
-            $expr: { $gt: [{ $size: '$userEntry' }, 0] }
+            $expr: { $gt: [{ $size: '$userEntries' }, 0] }
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            season: 1,
+            currentWeek: 1,
+            status: 1,
+            entryFee: 1,
+            prizeAmount: 1,
+            activeEntries: {
+              $size: {
+                $filter: {
+                  input: '$userEntries',
+                  as: 'entry',
+                  cond: { $eq: ['$$entry.status', 'active'] }
+                }
+              }
+            },
+            entries: '$userEntries'
           }
         }
       ]);
       return userPools;
     } catch (error) {
-      logger.error(`Error fetching active pools for user ${userId}: ${error.message}`);
-      throw new ErrorResponse(`Error fetching user active pools: ${error.message}`, 500);
+      logger.error(`Error fetching pools with entries for user ${userId}: ${error.message}`);
+      throw new ErrorResponse(`Error fetching user pools with entries: ${error.message}`, 500);
     }
   }
 
