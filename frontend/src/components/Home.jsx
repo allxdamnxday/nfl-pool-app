@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="text-center">
-      <h1 className="text-4xl font-bold mb-4">Welcome to NFL Pool</h1>
+      <h1 className="text-4xl font-bold mb-4">Welcome to Football Eliminator</h1>
       <p className="mb-4">Join the excitement of NFL survivor pools!</p>
       <div>
         <Link to="/register" className="bg-blue-500 text-white px-4 py-2 rounded mr-2">Sign Up</Link>

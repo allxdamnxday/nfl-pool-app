@@ -60,7 +60,7 @@ export const LogoSpinner = ({ size = 20 }) => (
     <div className="flex justify-center items-center">
       <motion.img
         src="/img/Logo_FBE@2x.png" // Adjust this path to your actual logo file
-        alt="NFL Survivor Pool Logo"
+        alt="Football Eliminator Logo"
         style={{
           width: `${size}px`,
           height: `${size}px`,
