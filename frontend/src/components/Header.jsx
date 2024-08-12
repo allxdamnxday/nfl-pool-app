@@ -38,17 +38,23 @@ function Header() {
                 <Link to="/entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Entries</Link>
                 <Link to="/user-entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
                 <Link to="/rules" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
+                {/* Commented out: Invite Friends button
                 <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
                   <FaUserFriends className="mr-2" />
                   Invite Friends
                 </button>
+                */}
+                {/* Commented out: Money display
                 <div className="text-green-600 flex items-center">
                   <FaDollarSign className="mr-1" />
                   0.00
                 </div>
+                */}
+                {/* Commented out: Add money button
                 <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">
                   <FaPlus />
                 </button>
+                */}
               </>
             )}
             {user ? (
