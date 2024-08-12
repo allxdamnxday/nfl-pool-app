@@ -16,7 +16,7 @@ function Home() {
       {/* Content */}
       <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <h1 className="text-4xl sm:text-5xl font-extrabold mb-4 text-purple-400">
-          Football Eliminator: Where Gridiron Glory Meets Survivor
+        The Jim Thomas Football Junkie Extravaganza
         </h1>
         <p className="text-xl sm:text-2xl mb-6">Think you can outlast 1,300+ football fanatics?</p>
         <p className="text-2xl sm:text-3xl font-bold mb-8">Prove it or lose your $60 buy-in trying!</p>
