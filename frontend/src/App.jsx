@@ -132,8 +132,8 @@ const AnimatedRoutes = () => {
               </ProtectedAdminRoute>
             }
           />
-          <Route path="/verify-email" element={<EmailVerification />} />
-          <Route path="/verify-email/:token" element={<EmailVerification />} />
+          <Route path="auth/verify-email" element={<EmailVerification />} />
+          <Route path="auth/verify-email/:token" element={<EmailVerification />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/about" element={<About />} />
         </Routes>

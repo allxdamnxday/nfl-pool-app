@@ -80,9 +80,6 @@ const blogs = require('./routes/blogs');
 const commentRoutes = require('./routes/commentRoutes');
 
 // Mount routers
-
-// Apply stricter rate limiting to auth routes etc if necessary
-//app.use('/api/v1/auth', authLimiter);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/season', seasonRoutes);
 app.use('/api/v1/pools', pools);
@@ -94,7 +91,24 @@ app.use('/api/v1/picks', pickRoutes);
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
-app.use('/api/v1/blogs', commentRoutes); // Use the commentRoutes here
+app.use('/api/v1/blogs', commentRoutes);
+
+// Serve static files and handle client-side routing in production
+if (process.env.NODE_ENV === 'production') {
+  console.log('Serving frontend from:', path.join(__dirname, '../frontend/dist'));
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+  app.get('*', (req, res) => {
+    console.log('Catch-all route hit, serving index.html');
+    const indexPath = path.resolve(__dirname, '../frontend', 'dist', 'index.html');
+    res.sendFile(indexPath, err => {
+      if (err) {
+        console.error('Error serving index.html:', err);
+        res.status(500).send('Error serving application');
+      }
+    });
+  });
+}
 
 // Use custom error handler
 app.use(errorHandler);
@@ -153,17 +167,6 @@ if (process.env.NODE_ENV !== 'test') {
 // Enable CORS for development
 if (process.env.NODE_ENV === 'development') {
   app.use(cors());
-}
-
-// Serve static files and handle client-side routing in production
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React frontend app
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-  // Anything that doesn't match the above, send back index.html
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
-  });
 }
 
 module.exports = { app, connectDB, startServer };

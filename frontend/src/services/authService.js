@@ -77,6 +77,16 @@ export const resetPassword = async (resettoken, password) => {
   }
 };
 
+export const verifyEmail = async (token) => {
+  try {
+    const response = await api.get(`${AUTH_URL}/verify-email/${token}`);
+    return response.data;
+  } catch (error) {
+    console.error('Email verification error:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
 export const resendVerificationEmail = async (email) => {
   try {
     const response = await api.post(`${AUTH_URL}/resend-verification`, { email });
