@@ -33,7 +33,7 @@ function Register() {
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-white mb-2">
-            ELIMINATOR HUB
+            FOOTBALL ELIMINATOR
           </h1>
           <h2 className="text-xl font-semibold text-purple-200">
             Create Your Account

@@ -100,7 +100,7 @@ function Dashboard() {
                     </span>
                   </p>
                   <Link 
-                    to={`/pool-entries/${pool._id}`} 
+                    to={`/entries?poolId=${pool._id}`} 
                     className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-full block text-center transition duration-300 ease-in-out"
                   >
                     View Entries
