@@ -32,10 +32,24 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [process.env.FRONTEND_URL, 'https://footballeliminator.com', 'https://www.footballeliminator.com'],
   credentials: true
 }));
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'", "https://api.footballeliminator.com"],
+        frameSrc: ["'self'"],
+        frameAncestors: ["'self'", "https://footballeliminator.com", "https://www.footballeliminator.com"],
+      },
+    },
+  })
+);
 app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
@@ -43,6 +57,8 @@ app.use(apiLimiter);
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
   next();
 });
 
