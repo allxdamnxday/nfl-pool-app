@@ -4,7 +4,7 @@ import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { FaFootballBall, FaUser, FaSignOutAlt, FaSearch, FaUserFriends, FaDollarSign, FaPlus } from 'react-icons/fa';
+import { FaFootballBall, FaUser, FaSignOutAlt, FaSearch, FaUserFriends, FaDollarSign, FaPlus, FaBars, FaTimes } from 'react-icons/fa';
 
 function Header() {
   const { user, logout } = useContext(AuthContext);
@@ -55,10 +55,14 @@ function Header() {
                   <FaPlus />
                 </button>
                 */}
+                <div className="flex items-center text-gray-600">
+                  <FaUser className="mr-2" />
+                  <span>{user.username}</span>
+                </div>
               </>
             )}
             {user ? (
-              <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
+              <button onClick={handleLogout} className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
                 <FaSignOutAlt className="mr-2" />
                 Logout
               </button>
@@ -69,33 +73,39 @@ function Header() {
               </>
             )}
           </div>
-          <div className="md:hidden">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 focus:outline-none">
-              <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                {isMenuOpen ? (
-                  <path fillRule="evenodd" clipRule="evenodd" d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.829z" />
-                ) : (
-                  <path fillRule="evenodd" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z" />
-                )}
-              </svg>
-            </button>
-          </div>
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} 
+            className="md:hidden bg-purple-100 p-2 rounded-full text-purple-600 hover:bg-purple-200 transition-colors duration-200"
+          >
+            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
         </div>
+        
         {isMenuOpen && (
-          <div className="mt-4 md:hidden">
+          <div className="md:hidden mt-4 bg-white rounded-lg shadow-lg overflow-hidden">
             {user ? (
               <>
-                <Link to="/dashboard" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">My Pools</Link>
-                <Link to="/entries" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">My Entries</Link>
-                <Link to="/picks" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
-                <Link to="/rules" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
-                <button onClick={handleLogout} className="block w-full text-left py-2 text-red-600 hover:text-red-700 transition-colors duration-200">Logout</button>
+                <Link to="/dashboard" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">My Pools</Link>
+                <Link to="/entries" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">My Entries</Link>
+                <Link to="/user-entries" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">My Picks</Link>
+                <Link to="/rules" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">Rules</Link>
+                <div className="px-4 py-3 text-gray-700 bg-gray-50 flex items-center">
+                  <FaUser className="mr-2 text-purple-600" />
+                  <span>{user.username}</span>
+                </div>
+                <button 
+                  onClick={handleLogout} 
+                  className="w-full px-4 py-3 text-left text-purple-600 hover:bg-purple-50 hover:text-purple-700 transition-colors duration-200 flex items-center bg-transparent border-none"
+                >
+                  <FaSignOutAlt className="mr-2" />
+                  Logout
+                </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="block py-2 text-purple-600 hover:text-purple-700 transition-colors duration-200">Login</Link>
-                <Link to="/register" className="block py-2 text-blue-600 hover:text-blue-700 transition-colors duration-200">Register</Link>
-                <Link to="/rules" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
+                <Link to="/login" className="block px-4 py-3 text-purple-600 hover:bg-purple-50 transition-colors duration-200 border-b border-gray-100">Login</Link>
+                <Link to="/register" className="block px-4 py-3 text-purple-600 hover:bg-purple-50 transition-colors duration-200 border-b border-gray-100">Register</Link>
+                <Link to="/rules" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200">Rules</Link>
               </>
             )}
           </div>
