@@ -8,7 +8,8 @@ import logger from '../utils/logger';
 import ErrorBoundary from '../ErrorBoundary';
 
 function AdminRequests() {
-  const [requests, setRequests] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [approvedRequests, setApprovedRequests] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const showToast = useToast();
 
@@ -23,21 +24,26 @@ function AdminRequests() {
       logger.info('Full response:', response);
 
       if (response.success && Array.isArray(response.data)) {
-        // Filter requests that are pending and have confirmed payments
-        const pendingRequests = response.data.filter(
+        const pending = response.data.filter(
           request => request.status === 'pending' && request.paymentStatus === 'confirmed'
         );
-        setRequests(pendingRequests);
-        logger.info(`Fetched ${pendingRequests.length} pending requests with confirmed payments out of ${response.count} total requests`);
+        const approved = response.data.filter(
+          request => request.status === 'approved'
+        );
+        setPendingRequests(pending);
+        setApprovedRequests(approved);
+        logger.info(`Fetched ${pending.length} pending requests and ${approved.length} approved requests`);
       } else {
         logger.error('Invalid response format:', response);
         showToast('Error: Received invalid data format', 'error');
-        setRequests([]);
+        setPendingRequests([]);
+        setApprovedRequests([]);
       }
     } catch (error) {
       logger.error('Failed to fetch requests:', error);
       showToast('Failed to fetch requests. Please try again later.', 'error');
-      setRequests([]);
+      setPendingRequests([]);
+      setApprovedRequests([]);
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +56,8 @@ function AdminRequests() {
         const { request, entries } = response.data;
         logger.info('Request approved successfully:', request, entries);
         showToast('Request approved successfully!', 'success');
-        setRequests(prevRequests => prevRequests.filter(r => r._id !== requestId));
+        setPendingRequests(prevRequests => prevRequests.filter(r => r._id !== requestId));
+        setApprovedRequests(prevRequests => [...prevRequests, request]);
       } else {
         throw new Error('Approval failed');
       }
@@ -66,7 +73,7 @@ function AdminRequests() {
       if (response.success) {
         logger.info('Request rejected successfully:', response.data);
         showToast('Request rejected successfully!', 'success');
-        setRequests(prevRequests => prevRequests.filter(r => r._id !== requestId));
+        setPendingRequests(prevRequests => prevRequests.filter(r => r._id !== requestId));
       } else {
         throw new Error('Rejection failed');
       }
@@ -118,11 +125,20 @@ function AdminRequests() {
     <ErrorBoundary>
       <div>
         <h2 className="text-3xl font-bold mb-6 text-gray-800">Pending Requests with Confirmed Payments</h2>
-        {requests.length === 0 ? (
+        {pendingRequests.length === 0 ? (
           <p className="text-xl text-gray-600">No pending requests with confirmed payments found.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {requests.map(request => renderRequestCard(request))}
+            {pendingRequests.map(request => renderRequestCard(request))}
+          </div>
+        )}
+
+        <h2 className="text-3xl font-bold mb-6 mt-12 text-gray-800">Approved Requests</h2>
+        {approvedRequests.length === 0 ? (
+          <p className="text-xl text-gray-600">No approved requests found.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {approvedRequests.map(request => renderRequestCard(request))}
           </div>
         )}
       </div>

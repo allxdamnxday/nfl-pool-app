@@ -93,22 +93,14 @@ app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
 app.use('/api/v1/blogs', commentRoutes);
 
-// Serve static files and handle client-side routing in production
-if (process.env.NODE_ENV === 'production') {
-  console.log('Serving frontend from:', path.join(__dirname, '../frontend/dist'));
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
-  app.get('*', (req, res) => {
-    console.log('Catch-all route hit, serving index.html');
-    const indexPath = path.resolve(__dirname, '../frontend', 'dist', 'index.html');
-    res.sendFile(indexPath, err => {
-      if (err) {
-        console.error('Error serving index.html:', err);
-        res.status(500).send('Error serving application');
-      }
-    });
-  });
-}
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 // Use custom error handler
 app.use(errorHandler);
