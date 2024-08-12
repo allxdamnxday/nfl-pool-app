@@ -22,13 +22,21 @@ async function connectToDatabase() {
 
 async function fetchAndSaveGames(fromDate, toDate) {
   try {
+    // Fetch the entire schedule for the date range in one call
     const schedule = await rundownApi.fetchNFLSchedule(fromDate);
-    const filteredSchedule = schedule.filter(game => new Date(game.event_date) <= toDate);
+    const filteredSchedule = schedule.filter(game => {
+      const gameDate = new Date(game.event_date);
+      return gameDate >= fromDate && gameDate <= toDate;
+    });
+
+    // Fetch all event details for the date range in one call
+    const allEvents = await rundownApi.fetchNFLEventsRange(fromDate, toDate);
+
+    // Create a map of event_id to event details for quick lookup
+    const eventMap = new Map(allEvents.map(event => [event.event_id, event]));
 
     for (const game of filteredSchedule) {
-      const eventDate = new Date(game.event_date);
-      const events = await rundownApi.fetchNFLEvents(eventDate);
-      const matchingEvent = events.find(event => event.event_id === game.event_id);
+      const matchingEvent = eventMap.get(game.event_id);
 
       if (matchingEvent) {
         const transformedGame = seasonService.transformGameData(matchingEvent);
@@ -50,13 +58,9 @@ async function fetchAndSaveGames(fromDate, toDate) {
 async function initializeNFLData() {
   await connectToDatabase();
 
-  const currentDate = new Date();
-  const currentYear = seasonService.getCurrentSeasonYear();
-  const currentWeek = await seasonService.getCurrentNFLWeek();
-
-  const fromDate = currentDate;
-  const toDate = new Date(currentDate);
-  toDate.setDate(toDate.getDate() + 154); // 22 weeks from now
+  const fromDate = new Date('2024-09-19T00:00:00Z'); // Start from September 19, 2024
+  const toDate = new Date(fromDate);
+  toDate.setDate(toDate.getDate() + 154); // 22 weeks from the start date
 
   logger.info(`Fetching games from ${fromDate.toISOString()} to ${toDate.toISOString()}`);
 

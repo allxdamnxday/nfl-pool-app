@@ -37,6 +37,7 @@ function Header() {
                 <Link to="/dashboard" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Pools</Link>
                 <Link to="/entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Entries</Link>
                 <Link to="/user-entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
+                <Link to="/rules" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
                 <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
                   <FaUserFriends className="mr-2" />
                   Invite Friends
@@ -66,7 +67,7 @@ function Header() {
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 focus:outline-none">
               <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
                 {isMenuOpen ? (
-                  <path fillRule="evenodd" clipRule="evenodd" d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.828z" />
+                  <path fillRule="evenodd" clipRule="evenodd" d="M18.278 16.864a1 1 0 0 1-1.414 1.414l-4.829-4.828-4.828 4.828a1 1 0 0 1-1.414-1.414l4.828-4.829-4.828-4.828a1 1 0 0 1 1.414-1.414l4.829 4.828 4.828-4.828a1 1 0 1 1 1.414 1.414l-4.828 4.829 4.828 4.829z" />
                 ) : (
                   <path fillRule="evenodd" d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z" />
                 )}
@@ -81,12 +82,14 @@ function Header() {
                 <Link to="/dashboard" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">My Pools</Link>
                 <Link to="/entries" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">My Entries</Link>
                 <Link to="/picks" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
+                <Link to="/rules" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
                 <button onClick={handleLogout} className="block w-full text-left py-2 text-red-600 hover:text-red-700 transition-colors duration-200">Logout</button>
               </>
             ) : (
               <>
                 <Link to="/login" className="block py-2 text-purple-600 hover:text-purple-700 transition-colors duration-200">Login</Link>
                 <Link to="/register" className="block py-2 text-blue-600 hover:text-blue-700 transition-colors duration-200">Register</Link>
+                <Link to="/rules" className="block py-2 text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
               </>
             )}
           </div>

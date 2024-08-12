@@ -29,6 +29,9 @@ import BlogPostList from './components/BlogPostList';
 import BlogPostDetail from './components/BlogPostDetail';
 import BlogPostCreate from './components/BlogPostCreate';
 import EmailVerification from './components/EmailVerification';
+import Rules from './components/Rules';
+import About from './components/About';
+import Home from './components/Home';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -37,7 +40,7 @@ const AnimatedRoutes = () => {
     <TransitionGroup>
       <CSSTransition key={location.pathname} classNames="page-transition" timeout={300}>
         <Routes location={location}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route 
@@ -131,6 +134,8 @@ const AnimatedRoutes = () => {
           />
           <Route path="/auth/verify-email" element={<EmailVerification />} />
           <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>
