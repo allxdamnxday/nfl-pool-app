@@ -45,18 +45,20 @@ class PoolService extends BaseService {
       const pools = await Pool.find({ status: 'open' });
       
       return Promise.all(pools.map(async (pool) => {
+        const activeEntries = await this.getPoolEntries(pool._id);
         const requests = await Request.find({ user: userId, pool: pool._id });
         const entries = await Entry.find({ user: userId, pool: pool._id });
         
         return {
           ...pool.toObject(),
+          activeEntries: activeEntries.length,
           userRequests: requests.length,
           userEntries: entries.length,
           canJoin: requests.length + entries.length < 3
         };
       }));
     } catch (error) {
-      logger.error(`Error fetching available pools for user ${userId}: ${error.message}`);
+      logger.error(`Error fetching available pools: ${error.message}`);
       throw new ErrorResponse(`Error fetching available pools: ${error.message}`, 500);
     }
   }
@@ -456,20 +458,20 @@ class PoolService extends BaseService {
   }
 
   /**
-   * Get all entries for a specific pool
+   * Get active entries for a specific pool
    * @async
    * @param {string} poolId - The ID of the pool
-   * @returns {Promise<Array<Object>>} Array of entries for the pool
-   * @throws {ErrorResponse} If there's an error fetching the entries
+   * @returns {Promise<Array<Object>>} Array of active entries for the pool
+   * @throws {ErrorResponse} If there's an error fetching the active entries
    */
   async getPoolEntries(poolId) {
-    logger.info(`Fetching entries for pool ${poolId}`);
+    logger.info(`Fetching active entries for pool ${poolId}`);
     try {
-      const entries = await Entry.find({ pool: poolId });
+      const entries = await Entry.find({ pool: poolId, status: 'active' });
       return entries;
     } catch (error) {
-      logger.error(`Error fetching entries for pool ${poolId}: ${error.message}`);
-      throw new ErrorResponse(`Error fetching pool entries: ${error.message}`, 500);
+      logger.error(`Error fetching active entries for pool ${poolId}: ${error.message}`);
+      throw new ErrorResponse(`Error fetching active pool entries: ${error.message}`, 500);
     }
   }
 }

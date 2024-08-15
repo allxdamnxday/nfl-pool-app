@@ -83,6 +83,9 @@ function PoolList() {
 }
 
 function PoolCard({ pool }) {
+  // Calculate adjusted prize amount (50/60 of the total collected)
+  const adjustedPrizeAmount = Math.floor((pool.activeEntries * pool.entryFee) * (50/60));
+
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-200 transition duration-300 ease-in-out hover:shadow-xl hover:scale-102">
       <div className="bg-gradient-to-r from-nfl-blue to-nfl-purple p-4">
@@ -94,11 +97,9 @@ function PoolCard({ pool }) {
       <div className="p-6">
         <div className="grid grid-cols-2 gap-4">
           <InfoItem icon={FaCalendarAlt} label="Season" value={pool.season} />
-          <InfoItem icon={FaCalendarAlt} label="Current Week" value={pool.currentWeek} />
           <InfoItem icon={FaDollarSign} label="Entry Fee" value={`$${pool.entryFee}`} />
-          <InfoItem icon={FaUsers} label="Active Entries" value={pool.activeEntries} />
           <InfoItem icon={FaClipboardList} label="Max Entries" value="3" />
-          <InfoItem icon={FaTrophy} label="Prize Pool" value={`$${pool.prizeAmount}`} />
+          <InfoItem icon={FaTrophy} label="Prize Pool" value={`$${adjustedPrizeAmount}`} />
         </div>
         <div className="mt-6">
           <Link 
@@ -107,6 +108,9 @@ function PoolCard({ pool }) {
           >
             View Pool Details
           </Link>
+        </div>
+        <div className="text-xs text-gray-500 mt-2">
+          *Prize pool is an estimate and may be subject to change.
         </div>
       </div>
     </div>
