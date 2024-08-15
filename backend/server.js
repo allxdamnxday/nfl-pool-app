@@ -41,9 +41,9 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://d2mpatx37cqexb.cloudfront.net"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "https://api.footballeliminator.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://d2mpatx37cqexb.cloudfront.net"],
+        imgSrc: ["'self'", "data:", "https:", "https://d2mpatx37cqexb.cloudfront.net"],
+        connectSrc: ["'self'", "https://api.footballeliminator.com", "https://d2mpatx37cqexb.cloudfront.net"],
         frameSrc: ["'self'"],
         frameAncestors: ["'self'", "https://footballeliminator.com", "https://www.footballeliminator.com"],
       },
