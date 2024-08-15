@@ -75,6 +75,13 @@ function Login() {
                 onChange={setPassword}
                 icon={FaLock}
               />
+              <div className="flex items-center justify-between">
+                <div className="text-sm">
+                  <Link to="/forgot-password" className="font-medium text-nfl-gold hover:text-white transition-colors">
+                    Forgot your password?
+                  </Link>
+                </div>
+              </div>
               <button
                 type="submit"
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-nfl-purple hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nfl-gold transition-colors duration-300 ease-in-out transform hover:scale-105"
