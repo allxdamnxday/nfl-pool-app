@@ -32,6 +32,8 @@ import EmailVerification from './components/EmailVerification';
 import Rules from './components/Rules';
 import About from './components/About';
 import Home from './components/Home';
+import OldBlog from './components/OldBlog';
+import { Helmet } from 'react-helmet';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -136,6 +138,7 @@ const AnimatedRoutes = () => {
           <Route path="auth/verify-email/:token" element={<EmailVerification />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<OldBlog />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

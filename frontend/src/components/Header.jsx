@@ -38,23 +38,14 @@ function Header() {
                 <Link to="/entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Entries</Link>
                 <Link to="/user-entries" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">My Picks</Link>
                 <Link to="/rules" className="text-gray-600 hover:text-purple-600 transition-colors duration-200">Rules</Link>
-                {/* Commented out: Invite Friends button
-                <button className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
-                  <FaUserFriends className="mr-2" />
-                  Invite Friends
-                </button>
-                */}
-                {/* Commented out: Money display
-                <div className="text-green-600 flex items-center">
-                  <FaDollarSign className="mr-1" />
-                  0.00
-                </div>
-                */}
-                {/* Commented out: Add money button
-                <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">
-                  <FaPlus />
-                </button>
-                */}
+                <a 
+                  href="https://footballeliminator.godaddysites.com/poorly-written-blog" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-600 hover:text-purple-600 transition-colors duration-200"
+                >
+                  Eric's Soap Box
+                </a>
                 <div className="flex items-center text-gray-600">
                   <FaUser className="mr-2" />
                   <span>{user.username}</span>
@@ -89,6 +80,14 @@ function Header() {
                 <Link to="/entries" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">My Entries</Link>
                 <Link to="/user-entries" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">My Picks</Link>
                 <Link to="/rules" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100">Rules</Link>
+                <a 
+                  href="https://footballeliminator.godaddysites.com/poorly-written-blog" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200 border-b border-gray-100"
+                >
+                  Eric's Blog
+                </a>
                 <div className="px-4 py-3 text-gray-700 bg-gray-50 flex items-center">
                   <FaUser className="mr-2 text-purple-600" />
                   <span>{user.username}</span>
@@ -106,6 +105,14 @@ function Header() {
                 <Link to="/login" className="block px-4 py-3 text-purple-600 hover:bg-purple-50 transition-colors duration-200 border-b border-gray-100">Login</Link>
                 <Link to="/register" className="block px-4 py-3 text-purple-600 hover:bg-purple-50 transition-colors duration-200 border-b border-gray-100">Register</Link>
                 <Link to="/rules" className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200">Rules</Link>
+                <a 
+                  href="https://footballeliminator.godaddysites.com/poorly-written-blog" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200"
+                >
+                  Blog
+                </a>
               </>
             )}
           </div>
