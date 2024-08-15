@@ -8,7 +8,8 @@ export default {
     extend: {
       colors: {
         'nfl-blue': '#013369',
-        'nfl-red': '#D50A0A',
+        'nfl-purple': '#4F2D7F', // New NFL-inspired purple
+        'nfl-gold': '#D3BC8D', // Complementary gold color
         'nfl-white': '#FFFFFF',
         'nfl-light-blue': '#1B48E0',
         'field-green': '#368356',
