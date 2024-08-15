@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
-import { FaUser, FaEnvelope, FaLock, FaUserPlus } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaUserPlus, FaExclamationTriangle } from 'react-icons/fa';
 
 function Register() {
   const [firstName, setFirstName] = useState('');
@@ -40,6 +40,16 @@ function Register() {
           </h2>
         </div>
         
+        {/* Add the banner here */}
+        <div className="mb-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md shadow-md">
+          <div className="flex items-center">
+            <FaExclamationTriangle className="flex-shrink-0 mr-2" />
+            <p className="text-sm">
+              We are currently experiencing issues sending emails to Yahoo addresses. Please use an alternative email provider if possible.
+            </p>
+          </div>
+        </div>
+
         <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-xl overflow-hidden">
           <div className="px-6 py-8 sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit}>
