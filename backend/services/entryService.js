@@ -31,7 +31,9 @@ class EntryService {
    */
   async getUserEntries(userId) {
     try {
-      return await Entry.find({ user: userId }).populate('pool', 'name currentWeek');
+      return await Entry.find({ user: userId })
+        .populate('pool', 'name currentWeek')
+        .select('entryNumber status picks');
     } catch (error) {
       throw new ErrorResponse(`Error fetching entries for user ${userId}: ${error.message}`, 500);
     }
