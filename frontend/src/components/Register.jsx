@@ -51,6 +51,16 @@ function Register() {
           </div>
         </div>
 
+        {/* New spam folder note */}
+        <div className="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md shadow-md">
+          <div className="flex items-center">
+            <FaEnvelope className="flex-shrink-0 mr-2" />
+            <p className="text-sm">
+              Please check your spam folder if you don't receive the verification email in your inbox.
+            </p>
+          </div>
+        </div>
+
         <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-xl overflow-hidden border border-nfl-gold">
           <div className="px-6 py-8 sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit}>

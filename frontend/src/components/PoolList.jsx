@@ -99,7 +99,11 @@ function PoolCard({ pool }) {
           <InfoItem icon={FaCalendarAlt} label="Season" value={pool.season} />
           <InfoItem icon={FaDollarSign} label="Entry Fee" value={`$${pool.entryFee}`} />
           <InfoItem icon={FaClipboardList} label="Max Entries" value="3" />
-          <InfoItem icon={FaTrophy} label="Prize Pool" value={`$${adjustedPrizeAmount}`} />
+          <InfoItem 
+            icon={FaTrophy} 
+            label="Prize Pool" 
+            value={`$${adjustedPrizeAmount}+`}
+          />
         </div>
         <div className="mt-6">
           <Link 

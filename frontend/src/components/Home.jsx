@@ -127,7 +127,7 @@ function Home() {
             {[
               {
                 title: "The Commissioner",
-                content: "Matthew Swartz – Eldest son of the longtime commissioner, Eric Swartz and a disgruntled Chargers fan. Known for speaking out against things he doesn&apos;t like, including Dean Spanos and all things Chiefs and Pat Mahomes (aka Kermit the Frog) related.",
+                content: "Matthew Swartz – Eldest son of the longtime commissioner, Eric Swartz and a disgruntled Chargers fan. Known for speaking out against things he doesn't like, including Dean Spanos and all things Chiefs and Pat Mahomes (aka Kermit the Frog) related.",
                 icon: "👑"
               },
               {

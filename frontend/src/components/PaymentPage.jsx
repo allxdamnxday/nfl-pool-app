@@ -164,7 +164,7 @@ function PaymentPage() {
           <div className="mt-8 bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4 rounded-r-lg" role="alert">
             <p className="font-bold flex items-center text-lg mb-2"><FaInfoCircle className="mr-2" /> Need help?</p>
             <p>If you're having trouble with your payment, please contact us at <a href="mailto:info@footballeliminator.com" className="text-purple-600 hover:underline">info@footballeliminator.com</a></p>
-            <p className="mt-2">For immediate assistance, use the live chat feature on our website.</p>
+            <p className="mt-2">For immediate assistance, use the <span className="text-purple-600">WhatsApp Us</span> chat feature.</p>
           </div>
 
           <div className="mt-6 text-sm text-gray-600 bg-white p-4 rounded-lg shadow-sm">
