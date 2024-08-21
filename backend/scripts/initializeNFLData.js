@@ -8,7 +8,7 @@ const logger = require('../utils/logger');
 
 async function connectToDatabase() {
   try {
-    console.log('MongoDB URI:', process.env.MONGODB_URI); // Add this line for debugging
+    console.log('MongoDB URI:', process.env.MONGODB_URI);
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -22,21 +22,13 @@ async function connectToDatabase() {
 
 async function fetchAndSaveGames(fromDate, toDate) {
   try {
-    // Fetch the entire schedule for the date range in one call
     const schedule = await rundownApi.fetchNFLSchedule(fromDate);
-    const filteredSchedule = schedule.filter(game => {
-      const gameDate = new Date(game.event_date);
-      return gameDate >= fromDate && gameDate <= toDate;
-    });
-
-    // Fetch all event details for the date range in one call
-    const allEvents = await rundownApi.fetchNFLEventsRange(fromDate, toDate);
-
-    // Create a map of event_id to event details for quick lookup
-    const eventMap = new Map(allEvents.map(event => [event.event_id, event]));
+    const filteredSchedule = schedule.filter(game => new Date(game.event_date) <= toDate);
 
     for (const game of filteredSchedule) {
-      const matchingEvent = eventMap.get(game.event_id);
+      const eventDate = new Date(game.event_date);
+      const events = await rundownApi.fetchNFLEvents(eventDate);
+      const matchingEvent = events.find(event => event.event_id === game.event_id);
 
       if (matchingEvent) {
         const transformedGame = seasonService.transformGameData(matchingEvent);
@@ -58,16 +50,39 @@ async function fetchAndSaveGames(fromDate, toDate) {
 async function initializeNFLData() {
   await connectToDatabase();
 
-  const fromDate = new Date('2024-09-19T00:00:00Z'); // Start from September 19, 2024
-  const toDate = new Date(fromDate);
-  toDate.setDate(toDate.getDate() + 154); // 22 weeks from the start date
+  const startDate = new Date('2024-10-01'); // Start from September 1st
+  const endDate = new Date('2025-02-09'); // Approximate end of NFL season
 
-  logger.info(`Fetching games from ${fromDate.toISOString()} to ${toDate.toISOString()}`);
+  logger.info(`Fetching NFL games from ${startDate.toISOString()} to ${endDate.toISOString()}`);
 
-  await fetchAndSaveGames(fromDate, toDate);
+  try {
+    const fullSchedule = await rundownApi.fetchNFLSchedule(startDate);
+    const filteredSchedule = fullSchedule.filter(game => new Date(game.event_date) <= endDate);
 
-  logger.info('NFL data initialization complete');
-  mongoose.disconnect();
+    for (const game of filteredSchedule) {
+      const eventDate = new Date(game.event_date);
+      const events = await rundownApi.fetchNFLEvents(eventDate);
+      const matchingEvent = events.find(event => event.event_id === game.event_id);
+
+      if (matchingEvent) {
+        const transformedGame = seasonService.transformGameData(matchingEvent);
+        if (transformedGame) {
+          await Game.findOneAndUpdate(
+            { event_id: transformedGame.event_id },
+            transformedGame,
+            { upsert: true, new: true }
+          );
+          logger.info(`Saved/updated game: ${transformedGame.event_id}`);
+        }
+      }
+    }
+
+    logger.info('NFL data initialization complete');
+  } catch (error) {
+    logger.error('Error initializing NFL data:', error);
+  } finally {
+    mongoose.disconnect();
+  }
 }
 
 initializeNFLData();
