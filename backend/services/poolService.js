@@ -11,6 +11,8 @@ const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
 const User = require('../models/User'); // Added this line at the top of the file
 const Pick = require('../models/Pick'); // Added this line for the new service
+const moment = require('moment');
+const { isPicksVisible, getVisibleWeeks } = require('./pickVisibilityService');
 
 /**
  * Service class for managing pools
@@ -484,20 +486,15 @@ class PoolService extends BaseService {
    * @throws {ErrorResponse} If there's an error fetching the picks
    */
   async getAllPoolPicks(poolId) {
-    // Log the start of the operation
     logger.info(`Fetching all picks for pool ${poolId}`);
-    
     try {
-      // Find all entries for the given pool and populate user information
       const entries = await Entry.find({ pool: poolId }).populate('user', 'username');
-      
-      // Use Promise.all to handle multiple asynchronous operations in parallel
+      const currentDate = moment().tz('America/Los_Angeles');
+      const visibleWeeks = getVisibleWeeks(currentDate);
+
       const picks = await Promise.all(entries.map(async (entry) => {
-        // For each entry, find all associated picks and populate game information
-        const entryPicks = await Pick.find({ entry: entry._id })
+        const entryPicks = await Pick.find({ entry: entry._id, week: { $in: visibleWeeks } })
           .populate('game', 'away_team home_team event_date schedule.week');
-        
-        // Return an object containing user info, entry info, and formatted picks
         return {
           userId: entry.user._id,
           username: entry.user.username,
@@ -512,11 +509,8 @@ class PoolService extends BaseService {
           }))
         };
       }));
-      
-      // Return the array of picks
-      return picks;
+      return { picks, visibleWeeks };
     } catch (error) {
-      // Log the error and throw a custom ErrorResponse
       logger.error(`Error fetching all picks for pool ${poolId}: ${error.message}`);
       throw new ErrorResponse(`Error fetching all pool picks: ${error.message}`, 500);
     }

@@ -57,20 +57,28 @@ export const AnimatedButton = ({ children, className, onClick, ...props }) => {
 };
 
 export const LogoSpinner = ({ size = 20 }) => (
-    <div className="flex justify-center items-center">
-      <motion.img
-        src="/img/Logo_FBE@2x.png" // Adjust this path to your actual logo file
-        alt="Football Eliminator Logo"
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-        }}
-        animate={{ rotate: 360 }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "linear"
-        }}
+  <div className="flex justify-center items-center">
+    <motion.svg
+      viewBox="0 0 24 24"
+      style={{
+        width: `${size}px`,
+        height: `${size}px`,
+      }}
+      animate={{ rotate: 360 }}
+      transition={{
+        duration: 2,
+        repeat: Infinity,
+        ease: "linear"
+      }}
+    >
+      <path
+        fill="currentColor"
+        d="M20.9,2.5c-0.7-0.7-2-1.1-3.7-1.1c-2.5,0-5.7,0.8-8.7,2.4C5.5,5.5,3,7.7,1.7,9.8c-1.7,2.7-1.5,4.8-0.6,5.7
+        c0.5,0.5,1.3,0.8,2.3,0.8c1.8,0,4.2-0.9,6.7-2.4c3-1.8,5.5-4,6.8-6.1C18.5,5.1,18.3,3,17.4,2.1C18.6,2.2,19.6,2.5,20,2.9
+        c0.4,0.4,0.9,1.5,0.4,3.6c-0.5,2.5-2.2,5.3-4.7,7.7c-3.9,3.9-9.1,6.4-11.9,5.7c-0.7-0.2-1.2-0.5-1.4-1c-0.3-0.6-0.1-1.5,0.5-2.4
+        c0.6-1,1.6-2,2.8-3c0.4-0.3,0.4-0.9,0.1-1.3c-0.3-0.4-0.9-0.4-1.3-0.1c-1.4,1.1-2.5,2.3-3.2,3.5c-0.9,1.5-1.1,3-0.5,4.2
+        c0.5,0.9,1.4,1.5,2.5,1.8c0.5,0.1,1.1,0.2,1.7,0.2c3.3,0,7.4-2.2,10.6-5.4c2.8-2.8,4.6-5.9,5.2-8.8C21.9,5.1,21.7,3.3,20.9,2.5z"
       />
-    </div>
-  );
+    </motion.svg>
+  </div>
+);

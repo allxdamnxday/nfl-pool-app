@@ -486,8 +486,8 @@ router.put('/:id/status', authorize('admin'), updatePoolStatus);
  */
 router.get('/:poolId/picks', protect, async (req, res, next) => {
   try {
-    const picks = await poolService.getAllPoolPicks(req.params.poolId);
-    res.status(200).json({ success: true, data: picks });
+    const { picks, visibleWeeks } = await poolService.getAllPoolPicks(req.params.poolId);
+    res.status(200).json({ success: true, data: { picks, visibleWeeks } });
   } catch (error) {
     next(error);
   }
