@@ -34,6 +34,8 @@ import About from './components/About';
 import Home from './components/Home';
 import OldBlog from './components/OldBlog';
 import { Helmet } from 'react-helmet';
+import PoolPicks from './components/PoolPicks';
+import ThankYouPage from './components/ThankYouPage';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -113,6 +115,7 @@ const AnimatedRoutes = () => {
               </ProtectedRoute>
             } 
           />
+          <Route path="/thank-you" element={<ThankYouPage />} />
           <Route 
             path="/admin/*" 
             element={
@@ -139,6 +142,7 @@ const AnimatedRoutes = () => {
           <Route path="/rules" element={<Rules />} />
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<OldBlog />} />
+          <Route path="/pools/:poolId/picks" element={<PoolPicks />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

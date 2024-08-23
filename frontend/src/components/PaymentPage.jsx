@@ -46,7 +46,7 @@ function PaymentPage() {
       
       setIsPaymentConfirmed(true);
       showToast('Payment confirmed and join request submitted successfully! Awaiting admin approval.', 'success');
-      navigate('/dashboard');
+      navigate('/thank-you'); // Navigate to Thank You page
     } catch (err) {
       logger.error(`Failed to submit join request or confirm payment: ${err.message}`, { poolId, numberOfEntries });
       showToast('Failed to complete the process. Please try again.', 'error');

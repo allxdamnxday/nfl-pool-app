@@ -15,6 +15,7 @@ const {
 } = require('../controllers/pools');
 
 const Pool = require('../models/Pool');
+const poolService = require('../services/poolService');
 
 const router = express.Router();
 
@@ -449,5 +450,47 @@ router.get('/:id/entries', getPoolEntries);
  *         description: Pool not found
  */
 router.put('/:id/status', authorize('admin'), updatePoolStatus);
+
+/**
+ * @swagger
+ * /api/v1/pools/{poolId}/picks:
+ *   get:
+ *     summary: Get all picks for a pool
+ *     tags: [Pools]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: poolId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of picks for the pool
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/PoolPick'
+ *       401:
+ *         description: Not authorized
+ *       404:
+ *         description: Pool not found
+ */
+router.get('/:poolId/picks', protect, async (req, res, next) => {
+  try {
+    const picks = await poolService.getAllPoolPicks(req.params.poolId);
+    res.status(200).json({ success: true, data: picks });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
