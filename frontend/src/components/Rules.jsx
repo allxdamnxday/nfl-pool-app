@@ -15,12 +15,12 @@ function Rules() {
 
         <h2 className="text-2xl font-semibold mb-4 mt-8">Deadline for Picks</h2>
         <p className="mb-4">
-          Picks are due by 1:00 PM PDT Sunday. THERE ARE NO LONGER DEFAULT PICKS. IF YOU DO NOT SELECT A PICK BY THIS TIME, YOU FORFEIT THAT PICK. We will monitor fringe cases, errors, and make exceptions at the commissioner&apos;s discretion if a pick does not go through. Please forward any errors with a screenshot to support@footballeliminator.com. This is a new rule for this season. We now allow you to preset picks all the way through week 18. We strongly encourage you to take advantage of this feature, be strategic about your picks early, and make adjustments as needed up to game time each week.
+          Picks are due by 1PM EST / 10 AM PST Sunday. THERE ARE NO LONGER DEFAULT PICKS. IF YOU DO NOT SELECT A PICK BY THIS TIME, YOU FORFEIT THAT PICK. We will monitor fringe cases, errors, and make exceptions at the commissioner's discretion if a pick does not go through. Please forward any errors with a screenshot to info@footballeliminator.com. This is a new rule for this season. We now allow you to preset picks all the way through week 18. We strongly encourage you to take advantage of this feature, be strategic about your picks early, and make adjustments as needed up to game time each week.
         </p>
 
         <h2 className="text-2xl font-semibold mb-4 mt-8">Weekly Picks & Results</h2>
         <p className="mb-4">
-          Weekly picks and results will be published on Tuesdays so that participants can see pool health and be strategic about modifying their picks for future weeks.
+          Weekly picks and results will be published on Sundays at 10 AM when your weekly pick must be submitted.
         </p>
 
         <h2 className="text-2xl font-semibold mb-4 mt-8">Prize Purse</h2>

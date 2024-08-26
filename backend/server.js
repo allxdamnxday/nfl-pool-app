@@ -1,5 +1,10 @@
 const dotenv = require('dotenv');
 const path = require('path');
+
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Now import other modules
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -14,22 +19,36 @@ const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
+const upload = require('./routes/upload');
+const fileUpload = require('express-fileupload');
 
-
-// Load environment variables from .env file
-dotenv.config({ path: path.join(__dirname, '.env') });
-
-// Log the environment variables to verify they are loaded correctly
+// Log all relevant environment variables
 console.log('Environment Variables:', {
   MONGODB_URI: process.env.MONGODB_URI,
   PORT: process.env.PORT,
   NODE_ENV: process.env.NODE_ENV,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? '[API_KEY_SET]' : undefined,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? '[API_SECRET_SET]' : undefined
+});
+
+// Initialize Cloudinary configuration
+const cloudinary = require('./config/cloudinary');
+
+// Test Cloudinary configuration
+cloudinary.api.ping((error, result) => {
+  if (error) {
+    console.error('Cloudinary configuration error:', error);
+  } else {
+    console.log('Cloudinary configuration is valid:', result);
+  }
 });
 
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 app.use(cors({
   origin: [process.env.FRONTEND_URL, 'https://footballeliminator.com', 'https://www.footballeliminator.com'],
@@ -54,6 +73,10 @@ app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
 app.use(apiLimiter);
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/'
+}));
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -92,6 +115,7 @@ app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
 app.use('/api/v1/blogs', commentRoutes);
+app.use('/api/v1/upload', upload);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

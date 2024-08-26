@@ -50,9 +50,7 @@ function Header() {
                 <NavLink to="/entries">My Entries</NavLink>
                 <NavLink to="/user-entries">My Picks</NavLink>
                 <NavLink to="/rules">Rules</NavLink>
-                <NavLink href="https://footballeliminator.godaddysites.com/poorly-written-blog" external>
-                  Eric's Soap Box
-                </NavLink>
+                <NavLink to="/blogs">Eric's Blog</NavLink>
                 <div className="flex items-center text-nfl-blue">
                   <FaUser className="mr-2" />
                   <span>{user.username}</span>

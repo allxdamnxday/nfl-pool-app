@@ -5,6 +5,7 @@ import { useToast } from '../contexts/ToastContext';
 import { getUserPoolsWithEntries } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
+import BlogPromotion from './BlogPromotion'; // Import the new component
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -77,6 +78,9 @@ function Dashboard() {
 
       {/* Content section with light background */}
       <div className="container mx-auto px-4 py-12">
+        {/* Add the BlogPromotion component here */}
+        <BlogPromotion />
+
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-semibold text-nfl-blue">Your Pools</h2>
           <Link 

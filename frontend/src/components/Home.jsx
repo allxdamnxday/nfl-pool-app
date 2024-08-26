@@ -108,6 +108,7 @@ function Home() {
               ["2018", "Laura Valan"],
               ["2017", "Sean Toohey/Brian Price"],
               ["2016", "Misha Freeman/Dereck Bowlen/Stan Felderman/John (Dad) Nelson"],
+              ["2015", "Leo Scholz (Sorry Leo, we will not forget you again!)"],
             ].map(([year, champions]) => (
               <div key={year} className="bg-gray-100 rounded-lg p-6 shadow-card hover:shadow-lg transition duration-300">
                 <span className="font-bold text-nfl-blue text-xl block mb-2">{year}</span>
