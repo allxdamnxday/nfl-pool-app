@@ -72,21 +72,19 @@ function Home() {
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0 md:mr-6 flex-1">
-                <h2 className="text-4xl font-extrabold mb-4 text-nfl-gold">Eric&apos;s Corner: The Blog Lives On!</h2>
+                <h2 className="text-4xl font-extrabold mb-4 text-nfl-gold">Eric's Corner: The Blog Lives On!</h2>
                 <p className="text-xl mb-6 text-nfl-white leading-relaxed">
                   Good news, football junkies! Eric Swartz is still gracing us with his... unique writing style. 
                   Brace yourselves for more questionable takes and grammar adventures!
                 </p>
               </div>
               <div className="flex-shrink-0">
-                <a 
-                  href="https://footballeliminator.godaddysites.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <Link 
+                  to="/blogs" 
                   className="bg-nfl-gold text-nfl-blue hover:bg-yellow-400 font-bold py-4 px-8 rounded-full text-xl transition duration-300 inline-block transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
                 >
-                  Read Eric&apos;s Blog
-                </a>
+                  Read Eric's Blog
+                </Link>
               </div>
             </div>
           </div>

@@ -103,7 +103,7 @@ function Header() {
                 <MobileNavLink to="/login">Login</MobileNavLink>
                 <MobileNavLink to="/register">Register</MobileNavLink>
                 <MobileNavLink to="/rules">Rules</MobileNavLink>
-                <MobileNavLink href="https://footballeliminator.godaddysites.com/poorly-written-blog" external>
+                <MobileNavLink to="/blogs">
                   Blog
                 </MobileNavLink>
               </>
