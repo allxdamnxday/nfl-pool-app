@@ -85,9 +85,7 @@ function Header() {
                 <MobileNavLink to="/entries">My Entries</MobileNavLink>
                 <MobileNavLink to="/user-entries">My Picks</MobileNavLink>
                 <MobileNavLink to="/rules">Rules</MobileNavLink>
-                <MobileNavLink href="https://footballeliminator.godaddysites.com/poorly-written-blog" external>
-                  Eric's Blog
-                </MobileNavLink>
+                <MobileNavLink to="/blogs">Eric's Blog</MobileNavLink>
                 <div className="px-4 py-3 text-nfl-blue bg-gray-100 flex items-center">
                   <FaUser className="mr-2" />
                   <span>{user.username}</span>
