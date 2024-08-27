@@ -36,6 +36,8 @@ import OldBlog from './components/OldBlog';
 import { Helmet } from 'react-helmet';
 import PoolPicks from './components/PoolPicks';
 import ThankYouPage from './components/ThankYouPage';
+import PoolPicksSelection from './components/PoolPicksSelection';
+import AccountSettings from './components/AccountSettings';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -95,10 +97,7 @@ const AnimatedRoutes = () => {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/pool-entries/:poolId" 
-            element={<PoolEntries />} 
-          />
+          <Route path="/pool-entries/:poolId" element={<PoolEntries />} />
           <Route 
             path="/pools/:poolId/join" 
             element={
@@ -143,6 +142,15 @@ const AnimatedRoutes = () => {
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<OldBlog />} />
           <Route path="/pools/:poolId/picks" element={<PoolPicks />} />
+          <Route path="/pool-picks-selection" element={<PoolPicksSelection />} />
+          <Route 
+            path="/account-settings" 
+            element={
+              <ProtectedRoute>
+                <AccountSettings />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

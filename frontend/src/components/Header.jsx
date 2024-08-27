@@ -1,36 +1,56 @@
 // frontend/src/components/Header.jsx
 
-import React, { useContext, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../contexts/AuthContext';
-import { useToast } from '../contexts/ToastContext';
-import { FaUser, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaUser, FaSignInAlt, FaUserPlus, FaBars, FaTrophy, FaClipboardList, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { CSSTransition } from 'react-transition-group';
+import { useAuth } from '../contexts/AuthContext';
 
 function Header() {
-  const { user, logout } = useContext(AuthContext);
-  const showToast = useToast();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isPoolsMenuOpen, setIsPoolsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const userDropdownRef = useRef(null);
+  const poolsDropdownRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+      if (poolsDropdownRef.current && !poolsDropdownRef.current.contains(event.target)) {
+        setIsPoolsMenuOpen(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target) && !event.target.closest('.mobile-menu-button')) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   const handleLogout = async () => {
     try {
       await logout();
-      showToast('Logged out successfully', 'success');
-      navigate('/');
+      navigate('/login');
     } catch (error) {
-      showToast('Failed to logout', 'error');
+      console.error('Logout failed', error);
     }
   };
 
   return (
-    <header className="bg-white shadow-md">
-      <nav className="container mx-auto px-4 py-4">
+    <header className="bg-white shadow-lg">
+      <nav className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-nfl-blue flex items-center">
-            <svg
-              viewBox="0 0 24 24"
-              className="w-6 h-6 mr-2 text-nfl-purple"
-            >
+          <Link to="/" className="flex items-center">
+            <svg className="w-8 h-8 mr-2 text-nfl-blue" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M20.9,2.5c-0.7-0.7-2-1.1-3.7-1.1c-2.5,0-5.7,0.8-8.7,2.4C5.5,5.5,3,7.7,1.7,9.8c-1.7,2.7-1.5,4.8-0.6,5.7
@@ -40,121 +60,200 @@ function Header() {
                 c0.5,0.9,1.4,1.5,2.5,1.8c0.5,0.1,1.1,0.2,1.7,0.2c3.3,0,7.4-2.2,10.6-5.4c2.8-2.8,4.6-5.9,5.2-8.8C21.9,5.1,21.7,3.3,20.9,2.5z"
               />
             </svg>
-            <span className="hidden sm:inline">Football Eliminator</span>
-            <span className="sm:hidden">FBE</span>
+            <span className="text-xl md:text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-nfl-blue to-nfl-purple">
+              Football Eliminator
+            </span>
           </Link>
-          <div className="hidden md:flex space-x-4 items-center">
-            {user && (
-              <>
-                <NavLink to="/dashboard">My Pools</NavLink>
-                <NavLink to="/entries">My Entries</NavLink>
-                <NavLink to="/user-entries">My Picks</NavLink>
-                <NavLink to="/rules">Rules</NavLink>
-                <NavLink to="/blogs">Eric's Blog</NavLink>
-                <div className="flex items-center text-nfl-blue">
-                  <FaUser className="mr-2" />
-                  <span>{user.username}</span>
-                </div>
-              </>
-            )}
-            {user ? (
-              <button onClick={handleLogout} className="bg-nfl-purple hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200 flex items-center">
-                <FaSignOutAlt className="mr-2" />
-                Logout
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="bg-nfl-purple hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200">Login</Link>
-                <Link to="/register" className="bg-nfl-gold hover:bg-yellow-500 text-nfl-blue font-bold py-2 px-4 rounded-full transition-colors duration-200">Register</Link>
-              </>
-            )}
-          </div>
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)} 
-            className="md:hidden bg-nfl-purple p-2 rounded-full text-white hover:bg-purple-700 transition-colors duration-200"
+          
+          {/* Mobile menu button */}
+          <button
+            onClick={toggleMobileMenu}
+            className="md:hidden text-nfl-purple hover:text-nfl-purple/80 mobile-menu-button"
           >
-            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            <FaBars className="h-6 w-6" />
           </button>
-        </div>
-        
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 bg-white rounded-lg shadow-lg overflow-hidden">
-            {user ? (
+
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
+            {isAuthenticated && (
               <>
-                <MobileNavLink to="/dashboard">My Pools</MobileNavLink>
-                <MobileNavLink to="/entries">My Entries</MobileNavLink>
-                <MobileNavLink to="/user-entries">My Picks</MobileNavLink>
-                <MobileNavLink to="/rules">Rules</MobileNavLink>
-                <MobileNavLink to="/blogs">Eric's Blog</MobileNavLink>
-                <div className="px-4 py-3 text-nfl-blue bg-gray-100 flex items-center">
-                  <FaUser className="mr-2" />
-                  <span>{user.username}</span>
-                </div>
-                <button 
-                  onClick={handleLogout} 
-                  className="w-full px-4 py-3 text-left text-nfl-purple hover:bg-gray-100 transition-colors duration-200 flex items-center"
-                >
-                  <FaSignOutAlt className="mr-2" />
-                  Logout
-                </button>
+                <PoolsMenu isOpen={isPoolsMenuOpen} setIsOpen={setIsPoolsMenuOpen} dropdownRef={poolsDropdownRef} />
+                <UserMenu isOpen={isUserMenuOpen} setIsOpen={setIsUserMenuOpen} dropdownRef={userDropdownRef} />
               </>
+            )}
+            <NavLink to="/rules">Rules</NavLink>
+            <NavLink to="/blogs">Eric's Blog</NavLink>
+            {isAuthenticated ? (
+              <LogoutButton onClick={handleLogout} />
             ) : (
               <>
-                <MobileNavLink to="/login">Login</MobileNavLink>
-                <MobileNavLink to="/register">Register</MobileNavLink>
-                <MobileNavLink to="/rules">Rules</MobileNavLink>
-                <MobileNavLink to="/blogs">
-                  Blog
-                </MobileNavLink>
+                <LoginButton />
+                <RegisterButton />
               </>
             )}
           </div>
-        )}
+        </div>
+
+        {/* Mobile menu */}
+        <CSSTransition
+          in={isMobileMenuOpen}
+          timeout={300}
+          classNames="mobile-menu"
+          unmountOnExit
+        >
+          <div ref={mobileMenuRef} className="md:hidden mt-4 space-y-2">
+            {isAuthenticated ? (
+              <>
+                <NavLink to="/pools" mobile>My Pools</NavLink>
+                <NavLink to="/entries" mobile>My Entries</NavLink>
+                <NavLink to="/user-entries" mobile>My Picks</NavLink>
+                <NavLink to="/pool-picks-selection" mobile>View Pool Picks</NavLink>
+              </>
+            ) : null}
+            <NavLink to="/rules" mobile>Rules</NavLink>
+            <NavLink to="/blogs" mobile>Eric's Blog</NavLink>
+            {isAuthenticated ? (
+              <LogoutButton onClick={handleLogout} mobile />
+            ) : (
+              <>
+                <LoginButton mobile />
+                <RegisterButton mobile />
+              </>
+            )}
+          </div>
+        </CSSTransition>
       </nav>
     </header>
   );
 }
 
-function NavLink({ to, href, children, external }) {
-  if (external) {
-    return (
-      <a 
-        href={href}
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="text-nfl-blue hover:text-nfl-purple transition-colors duration-200"
-      >
-        {children}
-      </a>
-    );
-  }
+function NavLink({ to, children, mobile }) {
+  const baseClasses = "text-nfl-blue hover:text-nfl-purple transition-colors duration-200 font-medium";
+  const mobileClasses = mobile ? "block py-2" : "relative group";
+  const desktopClasses = !mobile && "inline-block";
+
   return (
-    <Link to={to} className="text-nfl-blue hover:text-nfl-purple transition-colors duration-200">
+    <Link to={to} className={`${baseClasses} ${mobileClasses} ${desktopClasses}`}>
+      {children}
+      {!mobile && (
+        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-nfl-purple transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+      )}
+    </Link>
+  );
+}
+
+function PoolsMenu({ isOpen, setIsOpen, dropdownRef }) {
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center text-nfl-purple hover:text-nfl-purple/80 px-4 py-2 transition-colors duration-200"
+      >
+        <FaTrophy className="mr-2" />
+        <span className="font-medium">My Pools</span>
+        <FaChevronDown className={`ml-1 transition-transform duration-300 ease-in-out ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <CSSTransition
+        in={isOpen}
+        timeout={300}
+        classNames="dropdown"
+        unmountOnExit
+      >
+        <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl overflow-hidden z-10 border border-gray-200">
+          <div className="py-1">
+            <DropdownLink to="/dashboard" icon={FaTrophy}>My Pools</DropdownLink>
+            <DropdownLink to="/entries" icon={FaClipboardList}>My Entries</DropdownLink>
+            <DropdownLink to="/pool-picks-selection" icon={FaUser}>View Pool Picks</DropdownLink>
+          </div>
+        </div>
+      </CSSTransition>
+    </div>
+  );
+}
+
+function UserMenu({ isOpen, setIsOpen, dropdownRef }) {
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center text-nfl-purple hover:text-nfl-purple/80 px-4 py-2 transition-colors duration-200"
+      >
+        <FaUser className="mr-2" />
+        <span className="font-medium">Account</span>
+        <FaChevronDown className={`ml-1 transition-transform duration-300 ease-in-out ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <CSSTransition
+        in={isOpen}
+        timeout={300}
+        classNames="dropdown"
+        unmountOnExit
+      >
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl overflow-hidden z-10 border border-gray-200">
+          <div className="py-1">
+            <DropdownLink to="/dashboard" icon={FaUser}>My Profile</DropdownLink>
+            <DropdownLink to="/user-entries" icon={FaClipboardList}>My Picks</DropdownLink>
+            <DropdownLink to="/account-settings" icon={FaUser}>Account Settings</DropdownLink>
+          </div>
+        </div>
+      </CSSTransition>
+    </div>
+  );
+}
+
+function DropdownLink({ to, children, icon: Icon }) {
+  return (
+    <Link 
+      to={to} 
+      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-nfl-purple transition-colors duration-200 flex items-center transform hover:translate-x-1"
+    >
+      {Icon && <Icon className="mr-2 text-nfl-purple" />}
       {children}
     </Link>
   );
 }
 
-function MobileNavLink({ to, href, children, external }) {
-  if (external) {
-    return (
-      <a 
-        href={href}
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="block px-4 py-3 text-nfl-blue hover:bg-gray-100 hover:text-nfl-purple transition-colors duration-200 border-b border-gray-200"
-      >
-        {children}
-      </a>
-    );
-  }
+function LoginButton({ mobile }) {
+  const baseClasses = "bg-gradient-to-r from-nfl-blue to-nfl-purple hover:from-nfl-purple hover:to-nfl-blue text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center";
+  const mobileClasses = mobile ? "w-full justify-center" : "";
+
   return (
     <Link 
-      to={to} 
-      className="block px-4 py-3 text-nfl-blue hover:bg-gray-100 hover:text-nfl-purple transition-colors duration-200 border-b border-gray-200"
+      to="/login" 
+      className={`${baseClasses} ${mobileClasses}`}
     >
-      {children}
+      <FaSignInAlt className="mr-2" />
+      Login
     </Link>
+  );
+}
+
+function RegisterButton({ mobile }) {
+  const baseClasses = "bg-gradient-to-r from-nfl-purple to-purple-700 hover:from-purple-700 hover:to-nfl-purple text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center";
+  const mobileClasses = mobile ? "w-full justify-center" : "";
+
+  return (
+    <Link 
+      to="/register" 
+      className={`${baseClasses} ${mobileClasses}`}
+    >
+      <FaUserPlus className="mr-2" />
+      Register
+    </Link>
+  );
+}
+
+function LogoutButton({ onClick, mobile }) {
+  const baseClasses = "bg-gradient-to-r from-nfl-purple to-purple-700 hover:from-purple-700 hover:to-nfl-purple text-white font-bold py-2 px-6 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center";
+  const mobileClasses = mobile ? "w-full justify-center" : "";
+
+  return (
+    <button 
+      onClick={onClick} 
+      className={`${baseClasses} ${mobileClasses}`}
+    >
+      <FaSignOutAlt className="mr-2" />
+      Logout
+    </button>
   );
 }
 
