@@ -1,5 +1,10 @@
 const dotenv = require('dotenv');
 const path = require('path');
+
+// Load environment variables from .env file
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Now import other modules
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -14,35 +19,69 @@ const requestLogger = require('./middleware/requestLogger');
 const { validateRegister } = require('./middleware/validators');
 const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
+const upload = require('./routes/upload');
+const fileUpload = require('express-fileupload');
 
-
-// Load environment variables from .env file
-dotenv.config({ path: path.join(__dirname, '.env') });
-
-// Log the environment variables to verify they are loaded correctly
+// Log all relevant environment variables
 console.log('Environment Variables:', {
   MONGODB_URI: process.env.MONGODB_URI,
   PORT: process.env.PORT,
   NODE_ENV: process.env.NODE_ENV,
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? '[API_KEY_SET]' : undefined,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? '[API_SECRET_SET]' : undefined
+});
+
+// Initialize Cloudinary configuration
+const cloudinary = require('./config/cloudinary');
+
+// Test Cloudinary configuration
+cloudinary.api.ping((error, result) => {
+  if (error) {
+    console.error('Cloudinary configuration error:', error);
+  } else {
+    console.log('Cloudinary configuration is valid:', result);
+  }
 });
 
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [process.env.FRONTEND_URL, 'https://footballeliminator.com', 'https://www.footballeliminator.com'],
   credentials: true
 }));
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://d2mpatx37cqexb.cloudfront.net"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://d2mpatx37cqexb.cloudfront.net"],
+        imgSrc: ["'self'", "data:", "https:", "https://d2mpatx37cqexb.cloudfront.net"],
+        connectSrc: ["'self'", "https://api.footballeliminator.com", "https://d2mpatx37cqexb.cloudfront.net"],
+        frameSrc: ["'self'"],
+        frameAncestors: ["'self'", "https://footballeliminator.com", "https://www.footballeliminator.com"],
+      },
+    },
+  })
+);
 app.use(xss());
 app.use(hpp());
 app.use(requestLogger); // Use the request logger middleware
 app.use(apiLimiter);
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: '/tmp/'
+}));
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
   next();
 });
 
@@ -64,9 +103,6 @@ const blogs = require('./routes/blogs');
 const commentRoutes = require('./routes/commentRoutes');
 
 // Mount routers
-
-// Apply stricter rate limiting to auth routes etc if necessary
-//app.use('/api/v1/auth', authLimiter);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/season', seasonRoutes);
 app.use('/api/v1/pools', pools);
@@ -78,7 +114,17 @@ app.use('/api/v1/picks', pickRoutes);
 app.use('/api/v1/pools/:poolId/entries', entries);
 app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
-app.use('/api/v1/blogs', commentRoutes); // Use the commentRoutes here
+app.use('/api/v1/blogs', commentRoutes);
+app.use('/api/v1/upload', upload);
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 // Use custom error handler
 app.use(errorHandler);
@@ -137,17 +183,6 @@ if (process.env.NODE_ENV !== 'test') {
 // Enable CORS for development
 if (process.env.NODE_ENV === 'development') {
   app.use(cors());
-}
-
-// Serve static files and handle client-side routing in production
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React frontend app
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-  // Anything that doesn't match the above, send back index.html
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend', 'dist', 'index.html'));
-  });
 }
 
 module.exports = { app, connectDB, startServer };

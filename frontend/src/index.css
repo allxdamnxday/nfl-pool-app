@@ -28,7 +28,7 @@ h3 {
 }
 
 button, .button {
-  @apply bg-purple-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300 ease-in-out hover:bg-purple-700;
+  @apply font-bold py-2 px-4 rounded-full transition-colors duration-300 ease-in-out;
 }
 
 input[type="text"],
@@ -136,4 +136,58 @@ select {
 /* Add a new style for inputs with icons */
 .input-with-icon {
   @apply pl-10;
+}
+
+/* Add this at the end of your index.css file */
+.mobile-menu-enter {
+  max-height: 0;
+  opacity: 0;
+}
+
+.mobile-menu-enter-active {
+  max-height: 1000px;
+  opacity: 1;
+  transition: max-height 300ms ease-in-out, opacity 300ms ease-in-out;
+}
+
+.mobile-menu-exit {
+  max-height: 1000px;
+  opacity: 1;
+}
+
+.mobile-menu-exit-active {
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 300ms ease-in-out, opacity 300ms ease-in-out;
+}
+
+/* Dropdown menu animations */
+.dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.dropdown-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dropdown-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Parallax Scrolling Effect */
+.parallax {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }

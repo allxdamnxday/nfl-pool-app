@@ -59,9 +59,9 @@ export const getPickForWeek = async (entryId, entryNumber, week) => {
   }
 };
 
-export const getUserEntriesWithPicks = async (populate = '') => {
+export const getUserEntriesWithPicks = async () => {
   try {
-    const response = await api.get(`${API_URL}/user/with-picks`, { params: { populate } });
+    const response = await api.get(`${API_URL}/user/with-picks?populate=true`);
     logger.info('User entries with picks retrieved:', response.data);
     return response.data.data;
   } catch (error) {

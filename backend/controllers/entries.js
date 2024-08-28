@@ -105,14 +105,21 @@ exports.getPickForWeek = asyncHandler(async (req, res, next) => {
  * @access Private
  * 
  * @param {string} req.user.id - User ID (from auth middleware)
- * @param {string} [req.query.populate] - Fields to populate
+ * @param {string} [req.query.populate] - Populate picks.game data
  * 
  * @returns {Object} 200 - Array of user entries with picks
  */
 exports.getUserEntriesWithPicks = asyncHandler(async (req, res, next) => {
-  const { populate } = req.query;
-  const entries = await EntryService.getUserEntriesWithPicks(req.user.id, populate);
-  res.status(200).json({ success: true, count: entries.length, data: entries });
+  const userId = req.user.id;
+  const populate = req.query.populate === 'true' ? 'picks.game' : undefined;
+
+  const entries = await EntryService.getUserEntriesWithPicks(userId, populate);
+
+  res.status(200).json({
+    success: true,
+    count: entries.length,
+    data: entries
+  });
 });
 
 /**
@@ -141,5 +148,5 @@ exports.getUserEntriesWithPicks = asyncHandler(async (req, res, next) => {
  * }
  * 
  * // Get all entries for the current user with their picks
- * GET /api/v1/entries/with-picks?populate=picks,pool
+ * GET /api/v1/entries/user/with-picks?populate=true
  */

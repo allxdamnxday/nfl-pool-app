@@ -68,7 +68,6 @@ const PoolSchema = new mongoose.Schema({
   },
   prizeAmount: {
     type: Number,
-    required: [true, 'Please add a prize amount'],
     min: [0, 'Prize amount cannot be negative']
   },
   creator: {
@@ -105,7 +104,6 @@ const PoolSchema = new mongoose.Schema({
   },
   prizePot: {
     type: Number,
-    required: [true, 'Please add a prize pot amount'],
     min: [0, 'Prize pot cannot be negative']
   },
   numberOfWeeks: {

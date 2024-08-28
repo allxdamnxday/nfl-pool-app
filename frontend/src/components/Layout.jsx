@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
-import Footer from './Footer';  // Import the Footer component
+import Footer from './Footer';
+import WhatsAppWidget from './WhatsAppWidget';  // Import the WhatsAppWidget component
 
 function Layout({ children }) {
   return (
@@ -9,7 +10,8 @@ function Layout({ children }) {
       <main className="container mx-auto px-4 py-8 flex-grow">
         {children}
       </main>
-      <Footer />  {/* Use the Footer component here */}
+      <Footer />
+      <WhatsAppWidget />  {/* Add the WhatsAppWidget component here */}
     </div>
   );
 }

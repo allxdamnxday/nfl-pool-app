@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
-import { FaUser, FaEnvelope, FaLock, FaUserPlus } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock, FaUserPlus, FaExclamationTriangle, FaFootballBall } from 'react-icons/fa';
 
 function Register() {
   const [firstName, setFirstName] = useState('');
@@ -29,18 +29,38 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-indigo-700 to-blue-800 flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-nfl-blue via-nfl-purple to-nfl-light-blue flex flex-col justify-center items-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-extrabold text-white mb-2">
             FOOTBALL ELIMINATOR
           </h1>
-          <h2 className="text-xl font-semibold text-purple-200">
+          <h2 className="text-xl font-semibold text-nfl-gold">
             Create Your Account
           </h2>
         </div>
         
-        <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-xl overflow-hidden">
+        {/* Email provider warning */}
+        <div className="mb-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md shadow-md">
+          <div className="flex items-center">
+            <FaExclamationTriangle className="flex-shrink-0 mr-2" />
+            <p className="text-sm">
+              We are currently experiencing issues sending emails to Yahoo addresses. Please use an alternative email provider if possible.
+            </p>
+          </div>
+        </div>
+
+        {/* New spam folder note */}
+        <div className="mb-6 bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-md shadow-md">
+          <div className="flex items-center">
+            <FaEnvelope className="flex-shrink-0 mr-2" />
+            <p className="text-sm">
+              Please check your spam folder if you don't receive the verification email in your inbox.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white bg-opacity-10 backdrop-filter backdrop-blur-lg rounded-xl shadow-xl overflow-hidden border border-nfl-gold">
           <div className="px-6 py-8 sm:px-10">
             <form className="space-y-6" onSubmit={handleSubmit}>
               <InputField
@@ -85,17 +105,17 @@ function Register() {
               />
               <button
                 type="submit"
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-300 ease-in-out transform hover:scale-105"
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-nfl-purple hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-nfl-gold transition-colors duration-300 ease-in-out transform hover:scale-105"
               >
                 <FaUserPlus className="mr-2" />
                 Sign Up
               </button>
             </form>
           </div>
-          <div className="px-6 py-4 bg-purple-800 bg-opacity-50 sm:px-10">
-            <p className="text-xs text-center text-purple-200">
+          <div className="px-6 py-4 bg-nfl-blue bg-opacity-50 sm:px-10">
+            <p className="text-xs text-center text-nfl-gold">
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-white hover:text-purple-300 transition-colors">
+              <Link to="/login" className="font-medium text-white hover:text-nfl-gold transition-colors">
                 Log in here
               </Link>
             </p>
@@ -109,19 +129,19 @@ function Register() {
 function InputField({ id, label, type, value, onChange, icon: Icon }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-purple-200 mb-1">
+      <label htmlFor={id} className="block text-sm font-medium text-nfl-gold mb-1">
         {label}
       </label>
       <div className="mt-1 relative rounded-md shadow-sm">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Icon className="h-5 w-5 text-purple-400" aria-hidden="true" />
+          <Icon className="h-5 w-5 text-nfl-gold" aria-hidden="true" />
         </div>
         <input
           id={id}
           name={id}
           type={type}
           required
-          className="block w-full pl-10 pr-3 py-2 border border-purple-300 rounded-md leading-5 bg-white bg-opacity-10 placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm text-white"
+          className="block w-full pl-10 pr-3 py-2 border border-nfl-gold rounded-md leading-5 bg-white bg-opacity-10 placeholder-nfl-gold placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-nfl-gold focus:border-nfl-gold sm:text-sm text-white"
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />

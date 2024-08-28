@@ -134,3 +134,13 @@ export const updatePoolStatus = async (poolId, status) => {
     throw error;
   }
 };
+
+export const getAllPoolPicks = async (poolId) => {
+  try {
+    const response = await api.get(`/pools/${poolId}/picks`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching pool picks:', error);
+    throw error;
+  }
+};

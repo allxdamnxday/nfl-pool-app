@@ -63,7 +63,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   });
 
   // Create verification URL
-  const frontendUrl = process.env.FRONTEND_URL || 'https://nfl-pool-app-54b97bcc2195.herokuapp.com';
+  const frontendUrl = process.env.FRONTEND_URL || 'https://footballeliminator.com';
   const verificationUrl = `${frontendUrl}/auth/verify-email/${verificationToken}`;
 
   console.log('Verification URL:', verificationUrl); // Add this log

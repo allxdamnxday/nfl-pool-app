@@ -3,22 +3,27 @@ const mongoose = require('mongoose');
 const CommentSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'Please add a comment'],
+    trim: true,
+    maxlength: [1000, 'Comment cannot be more than 1000 characters']
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  post: {
+  blog: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'BlogPost',
+    ref: 'Blog',
     required: true
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  }],
+  replies: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Comment'
   }],
   createdAt: {
     type: Date,
@@ -27,7 +32,24 @@ const CommentSchema = new mongoose.Schema({
   updatedAt: {
     type: Date,
     default: Date.now
+  },
+  isEdited: {
+    type: Boolean,
+    default: false
+  },
+  status: {
+    type: String,
+    enum: ['active', 'hidden', 'deleted'],
+    default: 'active'
   }
+});
+
+CommentSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
+  if (!this.isNew) {
+    this.isEdited = true;
+  }
+  next();
 });
 
 module.exports = mongoose.model('Comment', CommentSchema);

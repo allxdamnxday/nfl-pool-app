@@ -8,7 +8,8 @@ const Entry = require('../models/Entry');
 const Game = require('../models/Game');
 const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
-const moment = require('moment');  // If not already using moment, consider adding it for easier time manipulations
+const moment = require('moment');
+const { isPicksVisible, getVisibleWeeks } = require('./pickVisibilityService');
 
 /**
  * Service class for managing picks

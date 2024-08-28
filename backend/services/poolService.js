@@ -10,6 +10,9 @@ const BaseService = require('./baseService');
 const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
 const User = require('../models/User'); // Added this line at the top of the file
+const Pick = require('../models/Pick'); // Added this line for the new service
+const moment = require('moment');
+const { isPicksVisible, getVisibleWeeks } = require('./pickVisibilityService');
 
 /**
  * Service class for managing pools
@@ -45,18 +48,20 @@ class PoolService extends BaseService {
       const pools = await Pool.find({ status: 'open' });
       
       return Promise.all(pools.map(async (pool) => {
+        const activeEntries = await this.getPoolEntries(pool._id);
         const requests = await Request.find({ user: userId, pool: pool._id });
         const entries = await Entry.find({ user: userId, pool: pool._id });
         
         return {
           ...pool.toObject(),
+          activeEntries: activeEntries.length,
           userRequests: requests.length,
           userEntries: entries.length,
           canJoin: requests.length + entries.length < 3
         };
       }));
     } catch (error) {
-      logger.error(`Error fetching available pools for user ${userId}: ${error.message}`);
+      logger.error(`Error fetching available pools: ${error.message}`);
       throw new ErrorResponse(`Error fetching available pools: ${error.message}`, 500);
     }
   }
@@ -456,20 +461,58 @@ class PoolService extends BaseService {
   }
 
   /**
-   * Get all entries for a specific pool
+   * Get active entries for a specific pool
    * @async
    * @param {string} poolId - The ID of the pool
-   * @returns {Promise<Array<Object>>} Array of entries for the pool
-   * @throws {ErrorResponse} If there's an error fetching the entries
+   * @returns {Promise<Array<Object>>} Array of active entries for the pool
+   * @throws {ErrorResponse} If there's an error fetching the active entries
    */
   async getPoolEntries(poolId) {
-    logger.info(`Fetching entries for pool ${poolId}`);
+    logger.info(`Fetching active entries for pool ${poolId}`);
     try {
-      const entries = await Entry.find({ pool: poolId });
+      const entries = await Entry.find({ pool: poolId, status: 'active' });
       return entries;
     } catch (error) {
-      logger.error(`Error fetching entries for pool ${poolId}: ${error.message}`);
-      throw new ErrorResponse(`Error fetching pool entries: ${error.message}`, 500);
+      logger.error(`Error fetching active entries for pool ${poolId}: ${error.message}`);
+      throw new ErrorResponse(`Error fetching active pool entries: ${error.message}`, 500);
+    }
+  }
+
+  /**
+   * Get all picks for a specific pool
+   * @async
+   * @param {string} poolId - The ID of the pool
+   * @returns {Promise<Array<Object>>} Array of pick objects with user and entry information
+   * @throws {ErrorResponse} If there's an error fetching the picks
+   */
+  async getAllPoolPicks(poolId) {
+    logger.info(`Fetching all picks for pool ${poolId}`);
+    try {
+      const entries = await Entry.find({ pool: poolId }).populate('user', 'username');
+      const currentDate = moment().tz('America/Los_Angeles');
+      const visibleWeeks = getVisibleWeeks(currentDate);
+
+      const picks = await Promise.all(entries.map(async (entry) => {
+        const entryPicks = await Pick.find({ entry: entry._id, week: { $in: visibleWeeks } })
+          .populate('game', 'away_team home_team event_date schedule.week');
+        return {
+          userId: entry.user._id,
+          username: entry.user.username,
+          entryId: entry._id,
+          picks: entryPicks.map(pick => ({
+            week: pick.game.schedule.week,
+            team: pick.team,
+            gameId: pick.game._id,
+            awayTeam: pick.game.away_team,
+            homeTeam: pick.game.home_team,
+            gameDate: pick.game.event_date
+          }))
+        };
+      }));
+      return { picks, visibleWeeks };
+    } catch (error) {
+      logger.error(`Error fetching all picks for pool ${poolId}: ${error.message}`);
+      throw new ErrorResponse(`Error fetching all pool picks: ${error.message}`, 500);
     }
   }
 }

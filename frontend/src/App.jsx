@@ -29,6 +29,15 @@ import BlogPostList from './components/BlogPostList';
 import BlogPostDetail from './components/BlogPostDetail';
 import BlogPostCreate from './components/BlogPostCreate';
 import EmailVerification from './components/EmailVerification';
+import Rules from './components/Rules';
+import About from './components/About';
+import Home from './components/Home';
+import OldBlog from './components/OldBlog';
+import { Helmet } from 'react-helmet';
+import PoolPicks from './components/PoolPicks';
+import ThankYouPage from './components/ThankYouPage';
+import PoolPicksSelection from './components/PoolPicksSelection';
+import AccountSettings from './components/AccountSettings';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -37,7 +46,7 @@ const AnimatedRoutes = () => {
     <TransitionGroup>
       <CSSTransition key={location.pathname} classNames="page-transition" timeout={300}>
         <Routes location={location}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route 
@@ -88,10 +97,7 @@ const AnimatedRoutes = () => {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/pool-entries/:poolId" 
-            element={<PoolEntries />} 
-          />
+          <Route path="/pool-entries/:poolId" element={<PoolEntries />} />
           <Route 
             path="/pools/:poolId/join" 
             element={
@@ -108,6 +114,7 @@ const AnimatedRoutes = () => {
               </ProtectedRoute>
             } 
           />
+          <Route path="/thank-you" element={<ThankYouPage />} />
           <Route 
             path="/admin/*" 
             element={
@@ -129,8 +136,21 @@ const AnimatedRoutes = () => {
               </ProtectedAdminRoute>
             }
           />
-          <Route path="/auth/verify-email" element={<EmailVerification />} />
-          <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
+          <Route path="auth/verify-email" element={<EmailVerification />} />
+          <Route path="auth/verify-email/:token" element={<EmailVerification />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<OldBlog />} />
+          <Route path="/pools/:poolId/picks" element={<PoolPicks />} />
+          <Route path="/pool-picks-selection" element={<PoolPicksSelection />} />
+          <Route 
+            path="/account-settings" 
+            element={
+              <ProtectedRoute>
+                <AccountSettings />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

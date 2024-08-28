@@ -8,7 +8,7 @@ const logger = require('../utils/logger');
 
 async function connectToDatabase() {
   try {
-    console.log('MongoDB URI:', process.env.MONGODB_URI); // Add this line for debugging
+    console.log('MongoDB URI:', process.env.MONGODB_URI);
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -50,20 +50,39 @@ async function fetchAndSaveGames(fromDate, toDate) {
 async function initializeNFLData() {
   await connectToDatabase();
 
-  const currentDate = new Date();
-  const currentYear = seasonService.getCurrentSeasonYear();
-  const currentWeek = await seasonService.getCurrentNFLWeek();
+  const startDate = new Date('2024-10-01'); // Start from September 1st
+  const endDate = new Date('2025-02-09'); // Approximate end of NFL season
 
-  const fromDate = currentDate;
-  const toDate = new Date(currentDate);
-  toDate.setDate(toDate.getDate() + 154); // 22 weeks from now
+  logger.info(`Fetching NFL games from ${startDate.toISOString()} to ${endDate.toISOString()}`);
 
-  logger.info(`Fetching games from ${fromDate.toISOString()} to ${toDate.toISOString()}`);
+  try {
+    const fullSchedule = await rundownApi.fetchNFLSchedule(startDate);
+    const filteredSchedule = fullSchedule.filter(game => new Date(game.event_date) <= endDate);
 
-  await fetchAndSaveGames(fromDate, toDate);
+    for (const game of filteredSchedule) {
+      const eventDate = new Date(game.event_date);
+      const events = await rundownApi.fetchNFLEvents(eventDate);
+      const matchingEvent = events.find(event => event.event_id === game.event_id);
 
-  logger.info('NFL data initialization complete');
-  mongoose.disconnect();
+      if (matchingEvent) {
+        const transformedGame = seasonService.transformGameData(matchingEvent);
+        if (transformedGame) {
+          await Game.findOneAndUpdate(
+            { event_id: transformedGame.event_id },
+            transformedGame,
+            { upsert: true, new: true }
+          );
+          logger.info(`Saved/updated game: ${transformedGame.event_id}`);
+        }
+      }
+    }
+
+    logger.info('NFL data initialization complete');
+  } catch (error) {
+    logger.error('Error initializing NFL data:', error);
+  } finally {
+    mongoose.disconnect();
+  }
 }
 
 initializeNFLData();
