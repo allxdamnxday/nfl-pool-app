@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import { TwitterShareButton, FacebookShareButton, TwitterIcon, FacebookIcon } from 'react-share';
 import { getBlogPost, likeBlogPost, getBlogComments, createComment, likeComment } from '../services/blogService';
 import { FaRegComment, FaRegEye, FaRegHeart, FaHeart, FaArrowLeft, FaCrown } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
@@ -71,6 +73,9 @@ function BlogPostDetail() {
     }
   };
 
+  // Get the current URL for sharing
+  const currentUrl = window.location.href;
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -85,6 +90,16 @@ function BlogPostDetail() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <Helmet>
+        <title>{blogPost.title} | Eric's Corner</title>
+        <meta name="description" content={blogPost.content.substring(0, 160)} />
+        <meta property="og:title" content={blogPost.title} />
+        <meta property="og:description" content={blogPost.content.substring(0, 160)} />
+        <meta property="og:image" content={blogPost.imageUrl} />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:type" content="article" />
+      </Helmet>
+
       <div className="relative bg-gradient-to-br from-nfl-blue to-nfl-purple text-white py-24">
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -147,17 +162,25 @@ function BlogPostDetail() {
               <span className="flex items-center"><FaRegEye className="mr-1" /> {blogPost.views}</span>
               <span className="flex items-center"><FaRegComment className="mr-1" /> {comments.length}</span>
             </div>
-            <button 
-              onClick={handleLike} 
-              className="flex items-center bg-transparent text-gray-500 hover:text-nfl-purple transition duration-300 hover:bg-transparent"
-            >
-              {user && blogPost.likes.includes(user._id) ? (
-                <FaHeart className="mr-1 text-xl text-nfl-purple" />
-              ) : (
-                <FaRegHeart className="mr-1 text-xl" />
-              )}
-              <span className="font-semibold">{blogPost.likes.length}</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <TwitterShareButton url={currentUrl} title={blogPost.title}>
+                <TwitterIcon size={32} round />
+              </TwitterShareButton>
+              <FacebookShareButton url={currentUrl} quote={blogPost.title}>
+                <FacebookIcon size={32} round />
+              </FacebookShareButton>
+              <button 
+                onClick={handleLike} 
+                className="flex items-center bg-transparent text-gray-500 hover:text-nfl-purple transition duration-300 hover:bg-transparent"
+              >
+                {user && blogPost.likes.includes(user._id) ? (
+                  <FaHeart className="mr-1 text-xl text-nfl-purple" />
+                ) : (
+                  <FaRegHeart className="mr-1 text-xl" />
+                )}
+                <span className="font-semibold">{blogPost.likes.length}</span>
+              </button>
+            </div>
           </div>
         </div>
 

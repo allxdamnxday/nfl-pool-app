@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { TwitterShareButton, FacebookShareButton, TwitterIcon, FacebookIcon } from 'react-share';
 import { getBlogPosts, getFeaturedBlogPosts, likeBlogPost } from '../services/blogService';
 import { FaRegComment, FaRegEye, FaRegHeart, FaHeart, FaCrown, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
@@ -58,58 +59,70 @@ function BlogPostList() {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  const renderBlogPost = (post) => (
-    <div key={post._id} className="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 ease-in-out hover:shadow-xl hover:scale-102 flex flex-col h-full">
-      <div className="p-6 flex flex-col h-full">
-        <div className="flex-none mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center">
-              <FaCrown className="text-nfl-gold mr-2" />
-              <span className="text-nfl-blue font-semibold">{post.author.username}</span>
+  const renderBlogPost = (post) => {
+    const postUrl = `${window.location.origin}/blog/${post._id}`;
+    
+    return (
+      <div key={post._id} className="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 ease-in-out hover:shadow-xl hover:scale-102 flex flex-col h-full">
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex-none mb-4">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center">
+                <FaCrown className="text-nfl-gold mr-2" />
+                <span className="text-nfl-blue font-semibold">{post.author.username}</span>
+              </div>
+              <div className="text-gray-500 text-xs">{new Date(post.createdAt).toLocaleDateString()} • {post.readTimeMinutes} min read</div>
             </div>
-            <div className="text-gray-500 text-xs">{new Date(post.createdAt).toLocaleDateString()} • {post.readTimeMinutes} min read</div>
+            <h3 className="text-xl font-bold text-nfl-blue line-clamp-2 h-14">{post.title}</h3>
           </div>
-          <h3 className="text-xl font-bold text-nfl-blue line-clamp-2 h-14">{post.title}</h3>
-        </div>
-        
-        <div className="flex-grow mb-4">
-          {post.imageUrl && (
-            <div className="aspect-w-16 aspect-h-9">
-              <img src={post.imageUrl} alt={post.title} className="object-cover rounded-lg w-full h-full" />
+          
+          <div className="flex-grow mb-4">
+            {post.imageUrl && (
+              <div className="aspect-w-16 aspect-h-9">
+                <img src={post.imageUrl} alt={post.title} className="object-cover rounded-lg w-full h-full" />
+              </div>
+            )}
+          </div>
+          
+          <p className="text-gray-700 mb-4 line-clamp-3">{stripHtmlAndTruncate(post.content, 150)}</p>
+          
+          <div className="mt-auto">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex space-x-4 text-gray-600 text-sm">
+                <span className="flex items-center"><FaRegEye className="mr-1" /> {post.views}</span>
+                <span className="flex items-center"><FaRegComment className="mr-1" /> {post.comments?.length || 0}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <TwitterShareButton url={postUrl} title={post.title}>
+                  <TwitterIcon size={24} round />
+                </TwitterShareButton>
+                <FacebookShareButton url={postUrl} quote={post.title}>
+                  <FacebookIcon size={24} round />
+                </FacebookShareButton>
+                <button 
+                  onClick={() => handleLike(post._id)} 
+                  className="flex items-center bg-transparent text-gray-500 hover:text-nfl-purple transition duration-300 hover:bg-transparent"
+                >
+                  {user && post.likes.includes(user._id) ? (
+                    <FaHeart className="mr-1 text-lg text-nfl-purple" />
+                  ) : (
+                    <FaRegHeart className="mr-1 text-lg" />
+                  )}
+                  <span className="font-semibold text-sm">{post.likes.length}</span>
+                </button>
+              </div>
             </div>
-          )}
-        </div>
-        
-        <p className="text-gray-700 mb-4 line-clamp-3">{stripHtmlAndTruncate(post.content, 150)}</p>
-        
-        <div className="mt-auto">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex space-x-4 text-gray-600 text-sm">
-              <span className="flex items-center"><FaRegEye className="mr-1" /> {post.views}</span>
-              <span className="flex items-center"><FaRegComment className="mr-1" /> {post.comments?.length || 0}</span>
-            </div>
-            <button 
-              onClick={() => handleLike(post._id)} 
-              className="flex items-center bg-transparent text-gray-500 hover:text-nfl-purple transition duration-300 hover:bg-transparent"
+            <Link 
+              to={`/blog/${post._id}`}
+              className="w-full bg-nfl-purple hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 inline-block text-center text-sm transform hover:scale-105 hover:shadow-neon"
             >
-              {user && post.likes.includes(user._id) ? (
-                <FaHeart className="mr-1 text-lg text-nfl-purple" />
-              ) : (
-                <FaRegHeart className="mr-1 text-lg" />
-              )}
-              <span className="font-semibold text-sm">{post.likes.length}</span>
-            </button>
+              Read More
+            </Link>
           </div>
-          <Link 
-            to={`/blog/${post._id}`}
-            className="w-full bg-nfl-purple hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 inline-block text-center text-sm transform hover:scale-105 hover:shadow-neon"
-          >
-            Read More
-          </Link>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading) {
     return (
