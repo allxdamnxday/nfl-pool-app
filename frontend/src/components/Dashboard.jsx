@@ -181,16 +181,10 @@ function SocialMediaFeed() {
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-2">Facebook</h3>
-          <iframe 
-            src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl%26id%3D61564423130144&show_text=true&width=500" 
+          <FacebookEmbed 
+            url="https://www.facebook.com/permalink.php?story_fbid=pfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl&id=61564423130144" 
             width="100%" 
-            height="599" 
-            style={{ border: 'none', overflow: 'hidden' }} 
-            scrolling="no" 
-            frameBorder="0" 
-            allowFullScreen={true} 
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          ></iframe>
+          />
         </div>
         <div>
           <h3 className="text-lg font-semibold mb-2">Instagram</h3>
