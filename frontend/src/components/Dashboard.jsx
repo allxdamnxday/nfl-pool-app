@@ -5,7 +5,8 @@ import { useToast } from '../contexts/ToastContext';
 import { getUserPoolsWithEntries } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
-import BlogPromotion from './BlogPromotion'; // Import the new component
+import BlogPromotion from './BlogPromotion';
+import { TwitterEmbed, FacebookEmbed, InstagramEmbed } from 'react-social-media-embed';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -109,6 +110,9 @@ function Dashboard() {
             ))}
           </div>
         )}
+
+        {/* Move SocialMediaFeed to the bottom */}
+        <SocialMediaFeed />
       </div>
     </div>
   );
@@ -162,6 +166,37 @@ function InfoItem({ icon: Icon, label, value }) {
       <Icon className="text-2xl mb-2 text-nfl-light-blue" />
       <span className="font-medium text-sm text-gray-600 mb-1">{label}</span>
       <span className="text-lg font-bold text-nfl-blue">{value}</span>
+    </div>
+  );
+}
+
+function SocialMediaFeed() {
+  return (
+    <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 mt-12">
+      <h2 className="text-2xl font-semibold text-nfl-blue mb-4">Latest Updates</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Twitter</h3>
+          <TwitterEmbed url="https://x.com/ELIMINATORCREW/status/1828610551892824459" width="100%" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Facebook</h3>
+          <iframe 
+            src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fpermalink.php%3Fstory_fbid%3Dpfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl%26id%3D61564423130144&show_text=true&width=500" 
+            width="100%" 
+            height="599" 
+            style={{ border: 'none', overflow: 'hidden' }} 
+            scrolling="no" 
+            frameBorder="0" 
+            allowFullScreen={true} 
+            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          ></iframe>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Instagram</h3>
+          <InstagramEmbed url="https://www.instagram.com/p/C_MfJETxV97/" width="100%" />
+        </div>
+      </div>
     </div>
   );
 }
