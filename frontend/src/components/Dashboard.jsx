@@ -175,24 +175,51 @@ function SocialMediaFeed() {
     <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 mt-12">
       <h2 className="text-2xl font-semibold text-nfl-blue mb-4">Latest Updates</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Twitter</h3>
+        <EmbedWrapper title="Twitter">
           <TwitterEmbed url="https://x.com/ELIMINATORCREW/status/1828610551892824459" width="100%" />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Facebook</h3>
+        </EmbedWrapper>
+        <EmbedWrapper title="Facebook">
           <FacebookEmbed 
             url="https://www.facebook.com/permalink.php?story_fbid=pfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl&id=61564423130144" 
             width="100%" 
           />
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Instagram</h3>
+        </EmbedWrapper>
+        <EmbedWrapper title="Instagram">
           <InstagramEmbed url="https://www.instagram.com/p/C_MfJETxV97/" width="100%" />
-        </div>
+        </EmbedWrapper>
       </div>
     </div>
   );
+}
+
+function EmbedWrapper({ title, children }) {
+  return (
+    <div>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <ErrorBoundary fallback={<div>Error loading {title} embed</div>}>
+        {children}
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+
+    return this.props.children;
+  }
 }
 
 export default Dashboard;
