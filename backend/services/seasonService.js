@@ -89,7 +89,21 @@ const calculateNFLWeek = (date, seasonYear) => {
  */
 const getCurrentSeasonYear = () => {
   const currentDate = new Date();
-  return currentDate.getMonth() < 2 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
+  
+  // If it's January or February, it's still the previous year's season
+  if (currentMonth < 2) {
+    return currentYear - 1;
+  }
+  // If it's March through July, it's the offseason, so we'll consider it the upcoming season
+  else if (currentMonth < 7) {
+    return currentYear;
+  }
+  // If it's August through December, it's the current season year
+  else {
+    return currentYear;
+  }
 };
 
 /**
@@ -250,14 +264,28 @@ const getCurrentWeekGames = async () => {
 // New utility function
 const getCurrentNFLWeek = () => {
   const currentDate = new Date();
-  let seasonYear = currentDate.getMonth() >= 8 ? currentDate.getFullYear() : currentDate.getFullYear() - 1;
+  let seasonYear = getCurrentSeasonYear();
   let week = calculateNFLWeek(currentDate, seasonYear);
   
-  // If it's the offseason (week 0), use the next season year
-  if (week === 0 && currentDate.getMonth() > 1) {
-    seasonYear++;
-    week = 1; // Assume week 1 for the upcoming season
+  console.log(`Current date: ${currentDate.toISOString()}`);
+  console.log(`Initial season year: ${seasonYear}`);
+  console.log(`Calculated week: ${week}`);
+
+  // If it's before the season start (week 0), use the current year
+  if (week === 0) {
+    // If it's after February, it's the upcoming season
+    if (currentDate.getMonth() > 1) {
+      seasonYear = currentDate.getFullYear();
+      week = 1; // Assume week 1 for the upcoming season
+    } else {
+      // It's January or February, so it's still the previous season
+      seasonYear = currentDate.getFullYear() - 1;
+      week = 18; // Assume last week of regular season
+    }
   }
+
+  console.log(`Final season year: ${seasonYear}`);
+  console.log(`Final week: ${week}`);
 
   return { week, seasonYear };
 };
