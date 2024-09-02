@@ -10,6 +10,7 @@ const rundownApi = require('./rundownApiService');
 const ErrorResponse = require('../utils/errorResponse');
 const logger = require('../utils/logger');
 const { getLogoUrl } = require('../utils/logoHelper');
+const moment = require('moment-timezone');
 
 /**
  * Updates a setting in the database.
@@ -290,6 +291,40 @@ const getCurrentNFLWeek = () => {
   return { week, seasonYear };
 };
 
+const fetchNFLEventsForSeason = async (startDate, numberOfWeeks = 18) => {
+  const events = [];
+  let currentDate = moment(startDate).startOf('day');
+  const endDate = moment(currentDate).add(numberOfWeeks, 'weeks');
+
+  while (currentDate.isBefore(endDate)) {
+    const dayOfWeek = currentDate.day();
+    
+    // Check if it's Thursday (4), Sunday (0), or Monday (1)
+    if (dayOfWeek === 4 || dayOfWeek === 0 || dayOfWeek === 1) {
+      try {
+        const formattedDate = currentDate.format('YYYY-MM-DD');
+        logger.info(`Fetching NFL events for ${formattedDate}`);
+        const dailyEvents = await rundownApi.fetchNFLEvents(formattedDate);
+        
+        // Filter events for the current date, ignoring time
+        const filteredEvents = dailyEvents.filter(event => {
+          const eventDate = moment(event.event_date).startOf('day');
+          return eventDate.isSame(currentDate, 'day');
+        });
+
+        events.push(...filteredEvents);
+      } catch (error) {
+        logger.error(`Error fetching NFL events for ${currentDate.format('YYYY-MM-DD')}:`, error.message);
+      }
+    }
+
+    // Move to the next day
+    currentDate.add(1, 'days');
+  }
+
+  return events;
+};
+
 module.exports = {
   initializeSeasonData,
   updateGameData,
@@ -300,5 +335,6 @@ module.exports = {
   calculateNFLWeek,
   getCurrentSeasonYear,
   transformGameData,
-  getCurrentNFLWeek
+  getCurrentNFLWeek,
+  fetchNFLEventsForSeason
 };

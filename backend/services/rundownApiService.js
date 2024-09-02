@@ -5,6 +5,7 @@
 const axios = require('axios');
 const config = require('../config/rundownApi');
 const logger = require('../utils/logger');
+const moment = require('moment-timezone');
 
 /**
  * Format a date to ISO 8601 string
@@ -41,7 +42,9 @@ const rundownApi = {
     SPORT_ID: {
       NFL: 2
     },
-    AFFILIATE_ID: 4 // Based on the response, affiliate_id is 4
+    AFFILIATE_ID: 1, // Replace with your actual affiliate ID
+    API_KEY: '1701031eb1mshc800e3940304359p1bd6ccjsn44c6f4718739', // Replace with your actual API key
+    API_HOST: 'therundown-therundown-v1.p.rapidapi.com'
   },
 
   fetchNFLSchedule: async (fromDate, limit = 400) => {
@@ -84,73 +87,37 @@ const rundownApi = {
   },
 
   fetchNFLEvents: async (date) => {
+    const options = {
+      method: 'GET',
+      url: `https://${rundownApi.config.API_HOST}/sports/${rundownApi.config.SPORT_ID.NFL}/events/${date}`,
+      params: {
+        include: 'scores',
+        affiliate_ids: `${rundownApi.config.AFFILIATE_ID},`,
+        offset: '0'
+      },
+      headers: {
+        'x-rapidapi-key': rundownApi.config.API_KEY,
+        'x-rapidapi-host': rundownApi.config.API_HOST
+      }
+    };
+
     try {
-      const url = `/sports/${rundownApi.config.SPORT_ID.NFL}/events/${formatDateISO8601(date)}`;
-      const response = await api.get(url, {
-        params: {
-          include: 'all_periods,scores',
-          affiliate_ids: rundownApi.config.AFFILIATE_ID.toString(),
-          offset: '0'
-        }
-      });
+      logger.info(`Making API request to: ${options.url}`);
+      const response = await axios.request(options);
+      logger.info(`Received ${response.data.events.length} events for ${date}`);
       
       return response.data.events.map(game => ({
         event_id: game.event_id,
-        event_uuid: game.event_uuid,
-        sport_id: game.sport_id,
         event_date: game.event_date,
-        rotation_number_away: game.rotation_number_away,
-        rotation_number_home: game.rotation_number_home,
-        score: {
-          event_status: game.score.event_status,
-          winner_away: game.score.winner_away,
-          winner_home: game.score.winner_home,
-          score_away: game.score.score_away,
-          score_home: game.score.score_home,
-          score_away_by_period: game.score.score_away_by_period,
-          score_home_by_period: game.score.score_home_by_period,
-          venue_name: game.score.venue_name,
-          venue_location: game.score.venue_location,
-          game_clock: game.score.game_clock,
-          display_clock: game.score.display_clock,
-          game_period: game.score.game_period,
-          broadcast: game.score.broadcast,
-          event_status_detail: game.score.event_status_detail,
-          updated_at: game.score.updated_at
-        },
-        teams: game.teams.map(team => ({
-          team_id: team.team_id,
-          team_normalized_id: team.team_normalized_id,
-          name: team.name,
-          is_away: team.is_away,
-          is_home: team.is_home
-        })),
-        teams_normalized: game.teams_normalized.map(team => ({
-          team_id: team.team_id,
-          name: team.name,
-          mascot: team.mascot,
-          abbreviation: team.abbreviation,
-          conference_id: team.conference_id,
-          division_id: team.division_id,
-          ranking: team.ranking,
-          record: team.record,
-          is_away: team.is_away,
-          is_home: team.is_home,
-          conference: team.conference,
-          division: team.division
-        })),
-        schedule: {
-          league_name: game.schedule.league_name,
-          conference_competition: game.schedule.conference_competition,
-          season_type: game.schedule.season_type,
-          season_year: game.schedule.season_year,
-          event_name: game.schedule.event_name,
-          attendance: game.schedule.attendance
-        },
-        lines: game.lines?.[rundownApi.config.AFFILIATE_ID]
+        teams_normalized: game.teams_normalized,
+        lines: game.lines?.[rundownApi.config.AFFILIATE_ID],
+        odds: game.lines?.[rundownApi.config.AFFILIATE_ID],
+        favored_team: game.lines?.[rundownApi.config.AFFILIATE_ID]?.spread?.point_spread_away < 0 
+          ? game.teams_normalized.find(t => t.is_away).name 
+          : game.teams_normalized.find(t => t.is_home).name
       }));
     } catch (error) {
-      logger.error('Error fetching NFL events:', error.message);
+      logger.error(`Error fetching NFL events for ${date}:`, error.message);
       throw error;
     }
   },
@@ -167,6 +134,31 @@ const rundownApi = {
         logger.error(`Error fetching NFL events for ${currentDate.toISOString()}:`, error.message);
       }
       currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return events;
+  },
+
+  fetchNFLEventsForSeason: async (startDate, numberOfGameDays = 50) => {
+    const events = [];
+    let currentDate = moment.tz(startDate, 'UTC');
+    let gameDaysCount = 0;
+
+    while (gameDaysCount < numberOfGameDays) {
+      const dayOfWeek = currentDate.day();
+      
+      // Check if it's Thursday (4), Sunday (0), or Monday (1)
+      if (dayOfWeek === 4 || dayOfWeek === 0 || dayOfWeek === 1) {
+        try {
+          const dailyEvents = await rundownApi.fetchNFLEvents(currentDate.toDate());
+          events.push(...dailyEvents);
+          gameDaysCount++;
+        } catch (error) {
+          logger.error(`Error fetching NFL events for ${currentDate.format()}:`, error.message);
+        }
+      }
+
+      currentDate.add(1, 'days');
     }
 
     return events;

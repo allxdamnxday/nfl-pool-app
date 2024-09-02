@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -6,7 +6,8 @@ import { getUserPoolsWithEntries } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 import BlogPromotion from './BlogPromotion';
-import { TwitterEmbed, FacebookEmbed, InstagramEmbed } from 'react-social-media-embed';
+import { TwitterTweetEmbed } from 'react-twitter-embed';
+import { TwitterEmbed, FacebookEmbed } from 'react-social-media-embed';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -176,16 +177,13 @@ function SocialMediaFeed() {
       <h2 className="text-2xl font-semibold text-nfl-blue mb-4">Latest Updates</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <EmbedWrapper title="Twitter">
-          <TwitterEmbed url="https://x.com/ELIMINATORCREW/status/1828610551892824459" width="100%" />
+          <TwitterEmbed url="https://twitter.com/ELIMINATORCREW/status/1830706194694185373" width={325} />
         </EmbedWrapper>
-        <EmbedWrapper title="Facebook">
-          <FacebookEmbed 
-            url="https://www.facebook.com/permalink.php?story_fbid=pfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl&id=61564423130144" 
-            width="100%" 
-          />
+        <EmbedWrapper title="Facebook Video">
+          <FacebookEmbed url="https://www.facebook.com/61564423130144/videos/1034796061530727/" width={325} />
         </EmbedWrapper>
-        <EmbedWrapper title="Instagram">
-          <InstagramEmbed url="https://www.instagram.com/p/C_MfJETxV97/" width="100%" />
+        <EmbedWrapper title="Facebook Post">
+          <FacebookEmbed url="https://www.facebook.com/permalink.php?story_fbid=pfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl&id=61564423130144" width={325} />
         </EmbedWrapper>
       </div>
     </div>
