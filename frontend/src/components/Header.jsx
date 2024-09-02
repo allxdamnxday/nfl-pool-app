@@ -104,7 +104,7 @@ function Header() {
           <div ref={mobileMenuRef} className="md:hidden mt-4 space-y-2">
             {isAuthenticated ? (
               <>
-                <NavLink to="/pools" mobile>My Pools</NavLink>
+                <NavLink to="/dashboard" mobile>My Pools</NavLink>
                 <NavLink to="/entries" mobile>My Entries</NavLink>
                 <NavLink to="/user-entries" mobile>My Picks</NavLink>
                 <NavLink to="/pool-picks-selection" mobile>View Pool Picks</NavLink>
