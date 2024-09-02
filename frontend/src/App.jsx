@@ -38,6 +38,9 @@ import PoolPicks from './components/PoolPicks';
 import ThankYouPage from './components/ThankYouPage';
 import PoolPicksSelection from './components/PoolPicksSelection';
 import AccountSettings from './components/AccountSettings';
+import Contact from './components/Contact';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -151,6 +154,9 @@ const AnimatedRoutes = () => {
               </ProtectedRoute>
             } 
           />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

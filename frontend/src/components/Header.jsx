@@ -108,6 +108,7 @@ function Header() {
                 <NavLink to="/entries" mobile>My Entries</NavLink>
                 <NavLink to="/user-entries" mobile>My Picks</NavLink>
                 <NavLink to="/pool-picks-selection" mobile>View Pool Picks</NavLink>
+                <NavLink to="/account-settings" mobile>Account Settings</NavLink>
               </>
             ) : null}
             <NavLink to="/rules" mobile>Rules</NavLink>
