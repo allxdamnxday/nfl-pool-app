@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { getUserPoolsWithEntries } from '../services/poolService';
-import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign } from 'react-icons/fa';
+import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign, FaInfoCircle } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 import BlogPromotion from './BlogPromotion';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
@@ -74,6 +74,24 @@ function Dashboard() {
               Your <span className="text-nfl-gold">Dashboard</span>
             </h1>
             <p className="text-2xl sm:text-3xl mb-8 drop-shadow-lg">Manage your pools and entries here</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Enhanced Notification Section */}
+      <div className="container mx-auto px-4 mt-8">
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-lg animate-pulse">
+          <div className="flex items-center">
+            <FaInfoCircle className="flex-shrink-0 mr-4 text-yellow-500 text-3xl" />
+            <div>
+              <h3 className="font-bold text-lg mb-2">Important Notice</h3>
+              <p className="text-base md:text-lg">
+                If you've completed payment through PayPal, Zelle, or Venmo and don't see your entries or can't make picks, please contact us at:{' '}
+                <a href="mailto:info@footballeliminator.com" className="font-bold underline hover:text-yellow-800">
+                  info@footballeliminator.com
+                </a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
