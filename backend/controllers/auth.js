@@ -37,7 +37,7 @@ exports.register = asyncHandler(async (req, res, next) => {
   }
 
   // Check if user already exists
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
   if (existingUser) {
     return next(new ErrorResponse('User with this email already exists', 400));
   }
@@ -56,7 +56,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     firstName,
     lastName,
     username,
-    email,
+    email: email.toLowerCase(),
     password,
     verificationToken,
     verificationTokenExpire: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
@@ -115,13 +115,16 @@ exports.register = asyncHandler(async (req, res, next) => {
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
+  // Convert email to lowercase before querying
+  const lowercaseEmail = email.toLowerCase();
+
   // Validate email & password
   if (!email || !password) {
     return next(new ErrorResponse('Please provide an email and password', 400));
   }
 
   // Check for user
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email: lowercaseEmail }).select('+password');
 
   if (!user) {
     return next(new ErrorResponse('Invalid credentials', 401));
