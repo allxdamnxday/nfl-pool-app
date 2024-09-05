@@ -14,7 +14,6 @@ function UserEntries() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentEntry, setCurrentEntry] = useState(0);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
   const showToast = useToast();
   const { user } = useAuth();
 
@@ -28,7 +27,6 @@ function UserEntries() {
           timestamp: Date.now()
         }
       });
-      console.log('Fetched entries:', response.data.data); // Log the fetched data
       setEntries(response.data.data);
       setError(null);
     } catch (error) {
@@ -48,21 +46,7 @@ function UserEntries() {
 
   useEffect(() => {
     fetchEntries();
-  }, [fetchEntries, updateTrigger]);
-
-  // Function to force update after returning from pick change
-  const forceUpdate = () => {
-    setUpdateTrigger(prev => prev + 1);
-  };
-
-  // Use this function when redirecting back from the pick change page
-  useEffect(() => {
-    const handleFocus = () => {
-      forceUpdate();
-    };
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, []);
+  }, [fetchEntries]);
 
   const handleRefresh = () => {
     fetchEntries();
@@ -158,7 +142,7 @@ function UserEntries() {
             <div className="space-y-6 mt-8">
               {Array.from({ length: 18 }, (_, i) => i + 1).map((week) => (
                 <WeekCard
-                  key={`${week}-${updateTrigger}`}
+                  key={week}
                   week={week}
                   pick={entries[currentEntry]?.picks.find(p => p.week === week)}
                   entryId={entries[currentEntry]?._id}

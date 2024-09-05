@@ -1,0 +1,45 @@
+{
+    "status": "approved",
+    "paymentStatus": "confirmed",
+    "user": {
+      "$oid": "66d7a64f8e70e100155d9fc3"
+    },
+    "pool": {
+      "$oid": "66b95e013dd3003d78ab01f7"
+    },
+    "numberOfEntries": 3,
+    "totalAmount": 180,
+    "createdAt": {
+      "$date": "2024-09-04T05:22:24.355Z"
+    },
+    "updatedAt": {
+      "$date": "2024-09-04T05:25:26.089Z"
+    },
+    "__v": 0,
+    "paymentType": "venmo",
+    "transactionId": "Bryan Hilton Venmo"
+  }
+
+
+
+  {
+    "status": "active",
+    "eliminatedWeek": null,
+    "user": {
+      "$oid": "66d536d06f279f0015ef0154"
+    },
+    "pool": {
+      "$oid": "66b95e013dd3003d78ab01f7"
+    },
+    "entryNumber": 3,
+    "request": {
+      "$oid": "66d53a6e6f279f0015ef0351"
+    },
+    "createdAt": {
+      "$date": "2024-09-04T18:09:45.529Z"
+    },
+    "updatedAt": {
+      "$date": "2024-09-04T18:09:45.529Z"
+    },
+    "__v": 0
+  }

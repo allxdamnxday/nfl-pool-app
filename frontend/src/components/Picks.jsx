@@ -228,9 +228,11 @@ function TeamButton({ team, isAwayTeam, record, isSelected, onClick }) {
         onError={(e) => { e.target.onerror = null; e.target.src = defaultLogo; }}
       />
       <span className="font-bold text-xs sm:text-sm mb-1 text-center">{isAwayTeam ? team.away_team : team.home_team}</span>
+      {/* Commented out record display
       <span className={`text-xs px-2 py-1 rounded-full ${isSelected ? 'bg-white text-purple-600' : 'bg-gray-800 text-white'}`}>
         {record}
       </span>
+      */}
     </motion.button>
   );
 }
