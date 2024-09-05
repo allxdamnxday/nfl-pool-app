@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import logger from '../utils/logger';
-import { FaEnvelope, FaLock, FaFootballBall } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaFootballBall, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { resendVerificationEmail } from '../services/authService';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showResendVerification, setShowResendVerification] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
   const showToast = useToast();
   const navigate = useNavigate();
@@ -70,10 +71,13 @@ function Login() {
               <InputField
                 id="password"
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={setPassword}
                 icon={FaLock}
+                showPasswordToggle={true}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
               />
               <div className="flex items-center justify-between">
                 <div className="text-sm">
@@ -118,7 +122,7 @@ function Login() {
   );
 }
 
-function InputField({ id, label, type, value, onChange, icon: Icon }) {
+function InputField({ id, label, type, value, onChange, icon: Icon, showPasswordToggle, showPassword, setShowPassword }) {
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-nfl-gold mb-1">
@@ -133,10 +137,23 @@ function InputField({ id, label, type, value, onChange, icon: Icon }) {
           name={id}
           type={type}
           required
-          className="block w-full pl-10 pr-3 py-2 border border-nfl-gold rounded-md leading-5 bg-white bg-opacity-10 placeholder-nfl-gold placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-nfl-gold focus:border-nfl-gold sm:text-sm text-white"
+          className="block w-full pl-10 pr-10 py-2 border border-nfl-gold rounded-md leading-5 bg-white bg-opacity-10 placeholder-nfl-gold placeholder-opacity-50 focus:outline-none focus:ring-2 focus:ring-nfl-gold focus:border-nfl-gold sm:text-sm text-white"
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
+        {showPasswordToggle && (
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? (
+              <FaEyeSlash className="h-5 w-5 text-nfl-gold" aria-hidden="true" />
+            ) : (
+              <FaEye className="h-5 w-5 text-nfl-gold" aria-hidden="true" />
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
