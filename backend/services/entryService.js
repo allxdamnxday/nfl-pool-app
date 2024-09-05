@@ -237,7 +237,14 @@ class EntryService {
       }
   
       const entries = await query.exec();
-      return entries;
+
+      // Add a timestamp to force React to recognize changes
+      const entriesWithTimestamp = entries.map(entry => ({
+        ...entry.toObject(),
+        _timestamp: Date.now()
+      }));
+
+      return entriesWithTimestamp;
     } catch (error) {
       throw new ErrorResponse(`Error fetching entries with picks for user ${userId}: ${error.message}`, 500);
     }

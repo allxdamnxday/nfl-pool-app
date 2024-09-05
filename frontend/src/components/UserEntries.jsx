@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCalendarAlt, FaClock, FaChevronLeft, FaChevronRight, FaFootballBall, FaTv } from 'react-icons/fa';
@@ -6,30 +6,68 @@ import { format } from 'date-fns';
 import { getUserEntriesWithPicks } from '../services/entryService';
 import { useToast } from '../contexts/ToastContext';
 import { LogoSpinner } from './CustomComponents';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api'; // Import the api instance
 
 function UserEntries() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentEntry, setCurrentEntry] = useState(0);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
   const showToast = useToast();
+  const { user } = useAuth();
+
+  const fetchEntries = useCallback(async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token'); // Or however you're storing the token
+      const response = await api.get('/entries/user/with-picks', {
+        params: { 
+          populate: 'true',
+          timestamp: Date.now()
+        }
+      });
+      console.log('Fetched entries:', response.data.data); // Log the fetched data
+      setEntries(response.data.data);
+      setError(null);
+    } catch (error) {
+      console.error('Failed to fetch entries:', error);
+      setError('Failed to load entries. Please try again later.');
+      showToast('Failed to load entries. Please try again later.', 'error');
+      
+      // If the error is due to an invalid token, you might want to redirect to login
+      if (error.response && error.response.status === 401) {
+        // Redirect to login page or refresh token
+        // For example: history.push('/login');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
 
   useEffect(() => {
-    const fetchEntries = async () => {
-      try {
-        const fetchedEntries = await getUserEntriesWithPicks();
-        setEntries(fetchedEntries);
-      } catch (error) {
-        console.error('Failed to fetch entries:', error);
-        setError('Failed to load entries. Please try again later.');
-        showToast('Failed to load entries. Please try again later.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchEntries();
-  }, [showToast]);
+  }, [fetchEntries, updateTrigger]);
+
+  // Function to force update after returning from pick change
+  const forceUpdate = () => {
+    setUpdateTrigger(prev => prev + 1);
+  };
+
+  // Use this function when redirecting back from the pick change page
+  useEffect(() => {
+    const handleFocus = () => {
+      forceUpdate();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
+  const handleRefresh = () => {
+    fetchEntries();
+    showToast('Refreshing entries...', 'info');
+  };
 
   const handleEntryChange = (direction) => {
     if (direction === 'prev' && currentEntry > 0) {
@@ -88,33 +126,50 @@ function UserEntries() {
               Your <span className="text-nfl-gold">Entries and Picks</span>
             </h1>
             <p className="text-2xl sm:text-3xl mb-8 drop-shadow-lg">Manage your active entries here</p>
+            <button
+              onClick={handleRefresh}
+              className="bg-nfl-gold hover:bg-yellow-500 text-nfl-blue font-bold py-2 px-4 rounded-full transition duration-300"
+            >
+              Refresh Entries
+            </button>
           </div>
         </div>
       </div>
 
       {/* Content Section */}
       <div className="container mx-auto px-4 py-12">
-        <EntrySelector 
-          currentEntry={currentEntry}
-          totalEntries={entries.length}
-          onEntryChange={handleEntryChange}
-          entryName={entries[currentEntry]?.pool.name}
-          entryNumber={entries[currentEntry]?.entryNumber}
-        />
-
-        <div className="space-y-6 mt-8">
-          {Array.from({ length: 18 }, (_, i) => i + 1).map((week) => (
-            <WeekCard
-              key={week}
-              week={week}
-              pick={entries[currentEntry]?.picks.find(p => p.week === week)}
-              entryId={entries[currentEntry]?._id}
+        {loading ? (
+          <div className="text-center">
+            <p className="text-xl text-gray-600">Loading entries...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center">
+            <p className="text-xl text-red-600">{error}</p>
+          </div>
+        ) : (
+          <>
+            <EntrySelector 
+              currentEntry={currentEntry}
+              totalEntries={entries.length}
+              onEntryChange={handleEntryChange}
+              entryName={entries[currentEntry]?.pool.name}
               entryNumber={entries[currentEntry]?.entryNumber}
             />
-          ))}
-        </div>
+            <div className="space-y-6 mt-8">
+              {Array.from({ length: 18 }, (_, i) => i + 1).map((week) => (
+                <WeekCard
+                  key={`${week}-${updateTrigger}`}
+                  week={week}
+                  pick={entries[currentEntry]?.picks.find(p => p.week === week)}
+                  entryId={entries[currentEntry]?._id}
+                  entryNumber={entries[currentEntry]?.entryNumber}
+                />
+              ))}
+            </div>
 
-        <PickStatus currentPick={entries[currentEntry]?.picks[entries[currentEntry]?.picks.length - 1]} />
+            <PickStatus currentPick={entries[currentEntry]?.picks[entries[currentEntry]?.picks.length - 1]} />
+          </>
+        )}
       </div>
     </div>
   );

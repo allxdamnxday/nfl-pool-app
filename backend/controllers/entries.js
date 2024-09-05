@@ -107,7 +107,7 @@ exports.getPickForWeek = asyncHandler(async (req, res, next) => {
  * @param {string} req.user.id - User ID (from auth middleware)
  * @param {string} [req.query.populate] - Populate picks.game data
  * 
- * @returns {Object} 200 - Array of user entries with picks
+ * @returns {Object} 200 - Array of user entries with picks and a timestamp
  */
 exports.getUserEntriesWithPicks = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
@@ -118,7 +118,8 @@ exports.getUserEntriesWithPicks = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     count: entries.length,
-    data: entries
+    data: entries,
+    timestamp: Date.now() // Added timestamp to the response
   });
 });
 
