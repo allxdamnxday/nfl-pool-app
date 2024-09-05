@@ -1,0 +1,45 @@
+{
+    "status": "active",
+    "eliminatedWeek": null,
+    "user": {
+      "$oid": "66ccb2d0bf50920015b65c27"
+    },
+    "pool": {
+      "$oid": "66b95e013dd3003d78ab01f7"
+    },
+    "entryNumber": 3,
+    "request": {
+      "$oid": "66d3cddadb5bb50015cc6d96"
+    },
+    "createdAt": {
+      "$date": "2024-09-03T18:09:45.529Z"
+    },
+    "updatedAt": {
+      "$date": "2024-09-03T18:09:45.529Z"
+    },
+    "__v": 0
+  }
+
+  
+  {
+    "status": "approved",
+    "paymentStatus": "confirmed",
+    "user": {
+      "$oid": "66d673cbd824990015e7c4a2"
+    },
+    "pool": {
+      "$oid": "66b95e013dd3003d78ab01f7"
+    },
+    "numberOfEntries": 2,
+    "totalAmount": 180,
+    "createdAt": {
+      "$date": "2024-09-04T05:22:24.355Z"
+    },
+    "updatedAt": {
+      "$date": "2024-09-04T05:25:26.089Z"
+    },
+    "__v": 0,
+    "paymentType": "venmo",
+    "transactionId": "4149502779432384666"
+  }
+  
