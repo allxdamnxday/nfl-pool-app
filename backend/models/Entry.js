@@ -81,6 +81,52 @@ EntrySchema.virtual('picks', {
   justOne: false
 });
 
+// Add the canUpdatePick method to the schema
+EntrySchema.methods.canUpdatePick = async function(week, team) {
+  const { getCurrentNFLWeek } = require('../services/seasonService');
+  const Game = mongoose.model('Game');
+
+  const { week: currentWeek, seasonYear } = getCurrentNFLWeek();
+
+  if (week > currentWeek) {
+    // Future week: Allow pick, but check if game exists
+    const game = await Game.findOne({
+      'schedule.week': week,
+      'schedule.season_year': seasonYear,
+      $or: [{ away_team: team }, { home_team: team }]
+    });
+
+    if (!game) {
+      return { canUpdate: false, reason: 'No game found for the selected team in this week' };
+    }
+    return { canUpdate: true, newGame: game };
+  } else if (week === currentWeek) {
+    // Current week: Check if game has started or is within 5 minutes of starting
+    const game = await Game.findOne({
+      'schedule.week': week,
+      'schedule.season_year': seasonYear,
+      $or: [{ away_team: team }, { home_team: team }]
+    });
+
+    if (!game) {
+      return { canUpdate: false, reason: 'No game found for the selected team in this week' };
+    }
+
+    const now = new Date();
+    const gameStart = new Date(game.event_date);
+    const timeDiff = gameStart.getTime() - now.getTime();
+    const minutesDiff = timeDiff / (1000 * 60);
+
+    if (minutesDiff < 5) {
+      return { canUpdate: false, reason: 'Game has started or is about to start' };
+    }
+    return { canUpdate: true, newGame: game };
+  } else {
+    // Past week: Disallow changes
+    return { canUpdate: false, reason: 'Cannot change picks for past weeks' };
+  }
+};
+
 /**
  * Entry model
  * @type {mongoose.Model}

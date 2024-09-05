@@ -150,8 +150,9 @@ class EntryService {
       throw new ErrorResponse(`User ${userId} is not authorized to update this entry`, 403);
     }
 
-    if (week < 1 || week > entry.pool.numberOfWeeks) {
-      throw new ErrorResponse(`Invalid week number`, 400);
+    const { canUpdate, reason, newGame } = await entry.canUpdatePick(week, team);
+    if (!canUpdate) {
+      throw new ErrorResponse(reason, 400);
     }
 
     // Check if the team has already been picked for this entry
@@ -168,7 +169,7 @@ class EntryService {
     // Update or create the pick
     const pick = await Pick.findOneAndUpdate(
       { entry: entryId, week: parseInt(week) },
-      { team: team },
+      { team: team, game: newGame._id },
       { upsert: true, new: true }
     );
 
