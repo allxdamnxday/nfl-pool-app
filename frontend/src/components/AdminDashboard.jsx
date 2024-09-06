@@ -11,6 +11,7 @@ import {
 
 function AdminDashboard() {
   const [loading, setLoading] = useState(false);
+  const [closingDate, setClosingDate] = useState('');
   const showToast = useToast();
 
   const handleSyncSchedule = async () => {
@@ -51,8 +52,8 @@ function AdminDashboard() {
   const handleRunClosingService = async () => {
     setLoading(true);
     try {
-      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
-      await runClosingService(today);
+      const dateToUse = closingDate || new Date().toISOString().split('T')[0];
+      await runClosingService(dateToUse);
       showToast('Closing service completed successfully', 'success');
     } catch (error) {
       showToast('Failed to run closing service', 'error');
@@ -85,13 +86,21 @@ function AdminDashboard() {
         >
           Initialize New Season
         </button>
-        <button 
-          onClick={handleRunClosingService} 
-          disabled={loading}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:bg-red-300"
-        >
-          Run Closing Service
-        </button>
+        <div className="flex items-center space-x-2">
+          <input
+            type="date"
+            value={closingDate}
+            onChange={(e) => setClosingDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+          <button 
+            onClick={handleRunClosingService} 
+            disabled={loading}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:bg-red-300"
+          >
+            Run Closing Service
+          </button>
+        </div>
       </div>
       {loading && <p className="mt-4">Loading...</p>}
     </div>
