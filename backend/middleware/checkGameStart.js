@@ -22,7 +22,7 @@ const moment = require('moment');
 const checkGameStart = async (req, res, next) => {
   try {
     const { entryId, week } = req.params;
-    const { team } = req.body;
+    const team = req.method === 'DELETE' ? null : req.body.team;
 
     logger.info(`Checking game start for entry ${entryId}, team ${team}, week ${week}`);
 
@@ -33,55 +33,60 @@ const checkGameStart = async (req, res, next) => {
       return next(new ErrorResponse('Invalid week number', 400));
     }
 
-    // Find the game for the new pick
-    const newGame = await Game.findOne({
-      'schedule.week': weekToCheck,
-      'schedule.season_year': seasonYear,
-      $or: [
-        { away_team: team },
-        { home_team: team },
-        { 'teams_normalized.name': team }
-      ]
-    });
+    // If it's a DELETE request, we don't need to check for a new game
+    if (req.method !== 'DELETE') {
+      // Find the game for the new pick
+      const newGame = await Game.findOne({
+        'schedule.week': weekToCheck,
+        'schedule.season_year': seasonYear,
+        $or: [
+          { away_team: team },
+          { home_team: team },
+          { 'teams_normalized.name': team }
+        ]
+      });
 
-    if (!newGame) {
-      logger.warn(`No game found for team ${team} in week ${weekToCheck} of season ${seasonYear}`);
-      return next(new ErrorResponse(`No game found for team ${team} in week ${weekToCheck}`, 404));
-    }
-
-    const newGameStart = moment(newGame.event_date);
-    const now = moment();
-
-    // Check if the pick is for a past week
-    if (weekToCheck < currentWeek) {
-      logger.warn(`Attempt to make a pick for a past week: ${weekToCheck}`);
-      return next(new ErrorResponse('Cannot make picks for past weeks', 400));
-    }
-
-    // Check if the pick is for the current week and if the game has started
-    if (weekToCheck === currentWeek && now.isAfter(newGameStart)) {
-      logger.warn(`Attempt to pick a game that has already started: ${team} in week ${weekToCheck}`);
-      return next(new ErrorResponse('Cannot pick a game that has already started', 400));
-    }
-
-    // Check if the user already has a pick for this week
-    const existingPick = await Pick.findOne({ entry: entryId, week: weekToCheck }).populate('game');
-
-    if (existingPick) {
-      const existingGameStart = moment(existingPick.game.event_date);
-
-      // If it's the current week and the existing pick's game has started, prevent changes
-      if (weekToCheck === currentWeek && now.isAfter(existingGameStart)) {
-        logger.warn(`Attempt to change pick after game start for entry ${entryId} in week ${weekToCheck}`);
-        return next(new ErrorResponse('Cannot change pick after the game has started', 400));
+      if (!newGame) {
+        logger.warn(`No game found for team ${team} in week ${weekToCheck} of season ${seasonYear}`);
+        return next(new ErrorResponse(`No game found for team ${team} in week ${weekToCheck}`, 404));
       }
+
+      const newGameStart = moment(newGame.event_date);
+      const now = moment();
+
+      // Check if the pick is for a past week
+      if (weekToCheck < currentWeek) {
+        logger.warn(`Attempt to make a pick for a past week: ${weekToCheck}`);
+        return next(new ErrorResponse('Cannot make picks for past weeks', 400));
+      }
+
+      // Check if the pick is for the current week and if the game has started
+      if (weekToCheck === currentWeek && now.isAfter(newGameStart)) {
+        logger.warn(`Attempt to pick a game that has already started: ${team} in week ${weekToCheck}`);
+        return next(new ErrorResponse('Cannot pick a game that has already started', 400));
+      }
+
+      // Check if the user already has a pick for this week
+      const existingPick = await Pick.findOne({ entry: entryId, week: weekToCheck }).populate('game');
+
+      if (existingPick) {
+        const existingGameStart = moment(existingPick.game.event_date);
+
+        // If it's the current week and the existing pick's game has started, prevent changes
+        if (weekToCheck === currentWeek && now.isAfter(existingGameStart)) {
+          logger.warn(`Attempt to change pick after game start for entry ${entryId} in week ${weekToCheck}`);
+          return next(new ErrorResponse('Cannot change pick after the game has started', 400));
+        }
+      }
+
+      // Add the game to the request object for use in the service
+      req.game = newGame;
+
+      logger.info(`Game start check passed for entry ${entryId}, team ${team}, week ${weekToCheck}`);
+      next();
+    } else {
+      next();
     }
-
-    // Add the game to the request object for use in the service
-    req.game = newGame;
-
-    logger.info(`Game start check passed for entry ${entryId}, team ${team}, week ${weekToCheck}`);
-    next();
   } catch (error) {
     logger.error(`Error in checkGameStart middleware: ${error.message}`);
     next(error);

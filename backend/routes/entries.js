@@ -10,6 +10,8 @@ const {
 } = require('../controllers/entries');
 const { protect, authorize } = require('../middleware/auth');
 const checkGameStart = require('../middleware/checkGameStart');
+const checkPickDeadline = require('../middleware/checkPickDeadline');
+const pickService = require('../services/pickService');
 
 const router = express.Router({ mergeParams: true });
 
@@ -245,5 +247,72 @@ router.route('/:entryId/picks')
  */
 router.route('/:entryId/:entryNumber/picks/:week')
   .get(protect, getPickForWeek);
+
+/**
+ * @swagger
+ * /api/v1/entries/{entryId}/{entryNumber}/picks/{week}:
+ *   delete:
+ *     summary: Delete a pick for a specific week
+ *     tags: [Entries]
+ *     parameters:
+ *       - in: path
+ *         name: entryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: entryNumber
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: week
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Pick deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *       400:
+ *         description: Bad request (e.g., game has already started)
+ *       401:
+ *         description: Not authorized
+ *       404:
+ *         description: Entry or pick not found
+ */
+router.delete('/:entryId/:entryNumber/picks/:week', 
+  protect, 
+  checkGameStart, 
+  checkPickDeadline,
+  async (req, res, next) => {
+    try {
+      const { entryId, entryNumber, week } = req.params;
+      const userId = req.user.id;
+
+      await pickService.deletePick(entryId, parseInt(entryNumber), parseInt(week), userId);
+
+      res.status(200).json({
+        success: true,
+        data: { message: 'Pick deleted successfully' }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 module.exports = router;
