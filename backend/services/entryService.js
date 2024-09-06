@@ -150,6 +150,11 @@ class EntryService {
       throw new ErrorResponse(`User ${userId} is not authorized to update this entry`, 403);
     }
 
+    // Check if the entry is eliminated
+    if (entry.status === 'eliminated') {
+      throw new ErrorResponse(`Cannot add or update pick for eliminated entry`, 400);
+    }
+
     const { canUpdate, reason, newGame } = await entry.canUpdatePick(week, team);
     if (!canUpdate) {
       throw new ErrorResponse(reason, 400);

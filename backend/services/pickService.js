@@ -51,6 +51,12 @@ class PickService {
       throw new ErrorResponse(`User ${userId} is not authorized to update this entry`, 403);
     }
 
+    // Check if the entry is eliminated
+    if (entry.status === 'eliminated') {
+      logger.warn(`Attempt to add/update pick for eliminated entry ${entryId}`);
+      throw new ErrorResponse(`Cannot add or update pick for eliminated entry`, 400);
+    }
+
     if (week < 1 || week > entry.pool.numberOfWeeks) {
       logger.warn(`Invalid week number ${week} for entry ${entryId}`);
       throw new ErrorResponse(`Invalid week number`, 400);

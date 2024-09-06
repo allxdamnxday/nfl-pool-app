@@ -162,12 +162,19 @@ async function updateRelatedModels(updatedGames) {
 
           // If the pick is incorrect, update the entry status
           if (!isCorrect) {
-            const entry = pick.entry;
-            entry.status = 'eliminated';
-            entry.eliminatedWeek = game.schedule.week;
-            await entry.save();
-
-            console.log(`Entry ${entry._id} eliminated in week ${game.schedule.week}`);
+            if (pick.entry) {
+              const entry = await Entry.findById(pick.entry._id);
+              if (entry) {
+                entry.status = 'eliminated';
+                entry.eliminatedWeek = game.schedule.week;
+                await entry.save();
+                console.log(`Entry ${entry._id} eliminated in week ${game.schedule.week}`);
+              } else {
+                console.log(`Warning: Entry ${pick.entry._id} not found in database for pick ${pick._id}`);
+              }
+            } else {
+              console.log(`Warning: Entry reference missing for pick ${pick._id}`);
+            }
           }
         }
       }

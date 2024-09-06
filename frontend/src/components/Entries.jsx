@@ -142,7 +142,7 @@ function StatusBadge({ status }) {
   const bgColor = status === 'active' ? 'bg-green-500' : 'bg-red-500';
   return (
     <span className={`${bgColor} text-white text-sm font-semibold px-4 py-1 rounded-full inline-block`}>
-      {status === 'active' ? 'Active' : 'Inactive'}
+      {status === 'active' ? 'Active' : 'ELIMINATED'}
     </span>
   );
 }

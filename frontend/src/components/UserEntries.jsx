@@ -138,6 +138,7 @@ function UserEntries() {
               onEntryChange={handleEntryChange}
               entryName={entries[currentEntry]?.pool.name}
               entryNumber={entries[currentEntry]?.entryNumber}
+              status={entries[currentEntry]?.status}
             />
             <div className="space-y-6 mt-8">
               {Array.from({ length: 18 }, (_, i) => i + 1).map((week) => (
@@ -147,6 +148,7 @@ function UserEntries() {
                   pick={entries[currentEntry]?.picks.find(p => p.week === week)}
                   entryId={entries[currentEntry]?._id}
                   entryNumber={entries[currentEntry]?.entryNumber}
+                  status={entries[currentEntry]?.status}
                 />
               ))}
             </div>
@@ -159,7 +161,7 @@ function UserEntries() {
   );
 }
 
-function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName, entryNumber }) {
+function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName, entryNumber, status }) {
   return (
     <div className="bg-gradient-to-r from-nfl-blue to-nfl-purple rounded-xl shadow-lg mb-8 overflow-hidden">
       <div className="p-4 sm:p-6">
@@ -170,6 +172,11 @@ function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName, e
           <p className="text-lg sm:text-xl text-nfl-gold font-semibold">
             Entry #{entryNumber}
           </p>
+          <div className={`mt-2 inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+            status === 'active' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+          }`}>
+            {status === 'active' ? 'Active' : 'ELIMINATED'}
+          </div>
         </div>
         
         <div className="flex justify-between items-center">
@@ -198,7 +205,7 @@ function EntrySelector({ currentEntry, totalEntries, onEntryChange, entryName, e
   );
 }
 
-function WeekCard({ week, pick, entryId, entryNumber }) {
+function WeekCard({ week, pick, entryId, entryNumber, status }) {
   const formatDate = (dateString) => {
     if (!dateString) return 'TBD';
     try {
@@ -258,12 +265,16 @@ function WeekCard({ week, pick, entryId, entryNumber }) {
           <p className="text-gray-500">No pick made for this week</p>
         )}
         <div className="mt-4">
-          <Link 
-            to={`/entries/${entryId}/${entryNumber}/picks/${week}`}
-            className="bg-nfl-purple hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full text-sm transition duration-300 inline-block transform hover:scale-105"
-          >
-            {pick ? 'Change Pick' : 'Make Pick'}
-          </Link>
+          {status === 'active' ? (
+            <Link 
+              to={`/entries/${entryId}/${entryNumber}/picks/${week}`}
+              className="bg-nfl-purple hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full text-sm transition duration-300 inline-block transform hover:scale-105"
+            >
+              {pick ? 'Change Pick' : 'Make Pick'}
+            </Link>
+          ) : (
+            <span className="text-red-500 font-semibold">Entry Eliminated</span>
+          )}
         </div>
       </div>
     </div>
