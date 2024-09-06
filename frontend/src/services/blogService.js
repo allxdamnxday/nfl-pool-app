@@ -67,3 +67,13 @@ export const likeComment = async (blogId, commentId) => {
   const response = await api.post(`/blogs/${blogId}/comments/${commentId}/like`);
   return response.data;
 };
+
+export const getLatestBlogPost = async () => {
+  try {
+    const response = await getBlogPosts(1, 1); // Get the first page with only one post
+    return response.data.length > 0 ? response.data[0] : null;
+  } catch (error) {
+    console.error('Error fetching latest blog post:', error);
+    throw error;
+  }
+};

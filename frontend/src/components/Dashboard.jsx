@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -8,12 +8,14 @@ import { LogoSpinner } from './CustomComponents';
 import BlogPromotion from './BlogPromotion';
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 import { TwitterEmbed, FacebookEmbed } from 'react-social-media-embed';
+import { getLatestBlogPost, likeBlogPost } from '../services/blogService';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
   const [pools, setPools] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [latestBlogPost, setLatestBlogPost] = useState(null);
   const showToast = useToast();
 
   useEffect(() => {
@@ -34,8 +36,36 @@ function Dashboard() {
       }
     };
 
+    const fetchLatestBlogPost = async () => {
+      try {
+        const post = await getLatestBlogPost();
+        setLatestBlogPost(post);
+      } catch (error) {
+        console.error('Failed to fetch latest blog post:', error);
+        // Optionally show a toast message
+      }
+    };
+
     fetchUserPools();
+    fetchLatestBlogPost();
   }, [user, showToast]);
+
+  const handleLikeBlogPost = async (postId) => {
+    if (!user) {
+      showToast('You must be logged in to like posts', 'error');
+      return;
+    }
+    try {
+      const response = await likeBlogPost(postId);
+      setLatestBlogPost(prevPost => ({
+        ...prevPost,
+        likes: response.data.likes
+      }));
+    } catch (error) {
+      console.error('Error liking post:', error);
+      showToast('Failed to like the post. Please try again.', 'error');
+    }
+  };
 
   if (loading) {
     return <LogoSpinner size={128} />;
@@ -98,8 +128,9 @@ function Dashboard() {
 
       {/* Content section with light background */}
       <div className="container mx-auto px-4 py-12">
-        {/* Add the BlogPromotion component here */}
-        <BlogPromotion />
+        {latestBlogPost && (
+          <BlogPromotion latestPost={latestBlogPost} onLike={handleLikeBlogPost} />
+        )}
 
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-semibold text-nfl-blue">Your Pools</h2>
