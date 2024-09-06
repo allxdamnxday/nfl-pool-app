@@ -2,7 +2,7 @@
     "status": "approved",
     "paymentStatus": "confirmed",
     "user": {
-      "$oid": "66d7a64f8e70e100155d9fc3"
+      "$oid": "66c3a8016aaa850015544e2b"
     },
     "pool": {
       "$oid": "66b95e013dd3003d78ab01f7"
@@ -17,7 +17,7 @@
     },
     "__v": 0,
     "paymentType": "venmo",
-    "transactionId": "Bryan Hilton Venmo"
+    "transactionId": "Weaver"
   }
 
 
@@ -26,14 +26,14 @@
     "status": "active",
     "eliminatedWeek": null,
     "user": {
-      "$oid": "66d536d06f279f0015ef0154"
+      "$oid": "66c3a8016aaa850015544e2b"
     },
     "pool": {
       "$oid": "66b95e013dd3003d78ab01f7"
     },
     "entryNumber": 3,
     "request": {
-      "$oid": "66d53a6e6f279f0015ef0351"
+      "$oid": "66db253e9f69d1b907ad0430"
     },
     "createdAt": {
       "$date": "2024-09-04T18:09:45.529Z"

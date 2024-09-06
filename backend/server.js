@@ -21,6 +21,7 @@ const swaggerSpec = require('./config/swaggerOptions');
 const apiLimiter = require('./middleware/rateLimiter');
 const upload = require('./routes/upload');
 const fileUpload = require('express-fileupload');
+const { runClosingService } = require('./services/closingService');
 
 // Log all relevant environment variables
 console.log('Environment Variables:', {

@@ -16,3 +16,9 @@ export const initializeSeasonData = async (year) => {
   const response = await api.post('/admin/initialize-season', { year });
   return response.data;
 };
+
+// New function to run the closing service
+export const runClosingService = async (date) => {
+  const response = await api.post('/season/run-closing-service', { date });
+  return response.data;
+};

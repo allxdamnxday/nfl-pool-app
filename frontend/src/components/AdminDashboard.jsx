@@ -5,7 +5,8 @@ import { useToast } from '../contexts/ToastContext';
 import { 
   syncNFLSchedule, 
   updateGameData, 
-  initializeSeasonData 
+  initializeSeasonData,
+  runClosingService
 } from '../services/adminService';
 
 function AdminDashboard() {
@@ -47,6 +48,18 @@ function AdminDashboard() {
     setLoading(false);
   };
 
+  const handleRunClosingService = async () => {
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      await runClosingService(today);
+      showToast('Closing service completed successfully', 'success');
+    } catch (error) {
+      showToast('Failed to run closing service', 'error');
+    }
+    setLoading(false);
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Data Management</h2>
@@ -71,6 +84,13 @@ function AdminDashboard() {
           className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 disabled:bg-purple-300"
         >
           Initialize New Season
+        </button>
+        <button 
+          onClick={handleRunClosingService} 
+          disabled={loading}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:bg-red-300"
+        >
+          Run Closing Service
         </button>
       </div>
       {loading && <p className="mt-4">Loading...</p>}
