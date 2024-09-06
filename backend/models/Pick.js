@@ -14,6 +14,7 @@ const mongoose = require('mongoose');
  * @property {number} week - The week number of the pick (1-18)
  * @property {string} team - The team picked
  * @property {string} result - The result of the pick (win, loss, or pending)
+ * @property {boolean|null} isWin - Boolean indicating if the pick was a win (null for pending)
  * @property {mongoose.Schema.Types.ObjectId} game - Reference to the Game model
  * @property {Date} pickMadeAt - Timestamp when the pick was made
  */
@@ -50,6 +51,10 @@ const PickSchema = new mongoose.Schema({
     enum: ['win', 'loss', 'pending'],
     default: 'pending'
   },
+  isWin: {
+    type: Boolean,
+    default: null
+  },
   game: {
     type: mongoose.Schema.ObjectId,
     ref: 'Game',
@@ -66,6 +71,19 @@ const PickSchema = new mongoose.Schema({
 
 // Index for ensuring uniqueness of entry, entryNumber, and week combination
 PickSchema.index({ entry: 1, entryNumber: 1, week: 1 }, { unique: true });
+
+// Helper methods
+PickSchema.statics.getWinningPicks = function(entryId) {
+  return this.find({ entry: entryId, isWin: true });
+};
+
+PickSchema.statics.getLosingPicks = function(entryId) {
+  return this.find({ entry: entryId, isWin: false });
+};
+
+PickSchema.statics.getPendingPicks = function(entryId) {
+  return this.find({ entry: entryId, isWin: null });
+};
 
 /**
  * Pick model
@@ -98,7 +116,7 @@ module.exports = Pick;
  * // Updating a pick's result
  * Pick.findOneAndUpdate(
  *   { entry: '60d5ecb74d6bb830b8e70bfe', entryNumber: 1, week: 5 },
- *   { result: 'win' },
+ *   { result: 'win', isWin: true },
  *   { new: true },
  *   (err, updatedPick) => {
  *     if (err) {
@@ -106,6 +124,11 @@ module.exports = Pick;
  *     } else {
  *       console.log('Pick updated successfully:', updatedPick);
  *     }
+ * });
+ * 
+ * // Using helper methods
+ * Pick.getWinningPicks('60d5ecb74d6bb830b8e70bfe').then(winningPicks => {
+ *   console.log('Winning picks:', winningPicks);
  * });
  */
 
@@ -120,6 +143,7 @@ module.exports = Pick;
  * - week is required and must be between 1 and 18
  * - team is required and should be a valid NFL team name
  * - result must be one of: 'win', 'loss', or 'pending'
+ * - isWin is a boolean or null, representing the win status of the pick
  * - game field is required and must be a valid Game ObjectId
  * - pickMadeAt is automatically set to the current time when the pick is created
  * 
@@ -127,9 +151,11 @@ module.exports = Pick;
  * - The model uses timestamps to automatically add and update createdAt and updatedAt fields
  * - A compound index ensures that each entry can have only one pick per week for each entry number
  * - The result field defaults to 'pending' and should be updated after the game is completed
+ * - The isWin field provides a quick way to determine if a pick was successful
  * - The combination of entry, entryNumber, and week must be unique to prevent duplicate picks
  * - Care should be taken to ensure that picks are made before the start of each game
  * - The model does not include game details directly; it assumes integration with a separate game/schedule system
  * - The pickMadeAt field can be used to enforce pick deadlines and for auditing purposes
- * - When updating a pick, make sure to update the pickMadeAt field if necessary
+ * - When updating a pick, make sure to update both result and isWin fields for consistency
+ * - Helper methods (getWinningPicks, getLosingPicks, getPendingPicks) provide easy ways to query picks based on their status
  */

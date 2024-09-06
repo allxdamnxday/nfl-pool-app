@@ -31,6 +31,11 @@ async function fetchDataFromRundown(date) {
   }
 }
 
+// Helper function to safely update fields
+function safeUpdate(oldValue, newValue) {
+  return newValue !== undefined ? newValue : oldValue;
+}
+
 // Function to update a single game
 async function updateGameFromRundownData(gameData) {
   const event_id = gameData.event_id;
@@ -43,37 +48,67 @@ async function updateGameFromRundownData(gameData) {
     return null;
   }
 
-  // Update game fields (as in the previous response)
-  game.event_uuid = gameData.event_uuid;
-  game.sport_id = gameData.sport_id;
-  game.event_date = new Date(gameData.event_date);
-  game.rotation_number_away = gameData.rotation_number_away;
-  game.rotation_number_home = gameData.rotation_number_home;
-  game.away_team = gameData.teams_normalized[0].name;
-  game.home_team = gameData.teams_normalized[1].name;
-  game.score = gameData.score;
-  game.teams_normalized = gameData.teams_normalized.map(team => ({
-    ...team,
-    logo_url: `/logos/${team.abbreviation}.png`
-  }));
-  game.schedule = gameData.schedule;
-
-  // Update odds (using first sportsbook as an example)
-  const firstSportsbook = Object.values(gameData.lines)[0];
-  game.odds = {
-    moneyline: firstSportsbook.moneyline,
-    spread: firstSportsbook.spread,
-    total: firstSportsbook.total
+  // Preserve existing fields that might not be in the new data
+  const preservedFields = {
+    schedule: {
+      ...game.schedule,
+      league_name: safeUpdate(game.schedule.league_name, gameData.schedule.league_name),
+      conference_competition: safeUpdate(game.schedule.conference_competition, gameData.schedule.conference_competition),
+      season_type: safeUpdate(game.schedule.season_type, gameData.schedule.season_type),
+      season_year: safeUpdate(game.schedule.season_year, gameData.schedule.season_year),
+      event_name: safeUpdate(game.schedule.event_name, gameData.schedule.event_name),
+      attendance: safeUpdate(game.schedule.attendance, gameData.schedule.attendance),
+      week: safeUpdate(game.schedule.week, gameData.schedule.week),
+    },
+    // Add any other fields here that need to be preserved
   };
-  game.total = firstSportsbook.total.total_over;
 
-  // Determine favored team
-  if (firstSportsbook.moneyline.moneyline_home < firstSportsbook.moneyline.moneyline_away) {
-    game.favored_team = game.home_team;
-  } else if (firstSportsbook.moneyline.moneyline_away < firstSportsbook.moneyline.moneyline_home) {
-    game.favored_team = game.away_team;
-  } else {
-    game.favored_team = "Even";
+  // Update basic game information
+  game.event_uuid = safeUpdate(game.event_uuid, gameData.event_uuid);
+  game.sport_id = safeUpdate(game.sport_id, gameData.sport_id);
+  game.event_date = safeUpdate(game.event_date, new Date(gameData.event_date));
+  game.rotation_number_away = safeUpdate(game.rotation_number_away, gameData.rotation_number_away);
+  game.rotation_number_home = safeUpdate(game.rotation_number_home, gameData.rotation_number_home);
+  game.away_team = safeUpdate(game.away_team, gameData.teams_normalized[0].name);
+  game.home_team = safeUpdate(game.home_team, gameData.teams_normalized[1].name);
+
+  // Update score
+  game.score = safeUpdate(game.score, gameData.score);
+
+  // Update teams_normalized
+  if (gameData.teams_normalized) {
+    game.teams_normalized = gameData.teams_normalized.map(team => ({
+      ...team,
+      logo_url: `/logos/${team.abbreviation}.png` // Assuming you have this naming convention
+    }));
+  }
+
+  // Merge preserved fields with new data
+  game.schedule = {
+    ...preservedFields.schedule,
+    // Add any new fields from gameData.schedule here
+  };
+
+  // Update odds
+  if (gameData.lines) {
+    const firstSportsbook = Object.values(gameData.lines)[0];
+    game.odds = {
+      moneyline: safeUpdate(game.odds.moneyline, firstSportsbook.moneyline),
+      spread: safeUpdate(game.odds.spread, firstSportsbook.spread),
+      total: safeUpdate(game.odds.total, firstSportsbook.total)
+    };
+
+    // Update total
+    game.total = safeUpdate(game.total, firstSportsbook.total.total_over);
+
+    // Determine favored team
+    if (firstSportsbook.moneyline.moneyline_home < firstSportsbook.moneyline.moneyline_away) {
+      game.favored_team = game.home_team;
+    } else if (firstSportsbook.moneyline.moneyline_away < firstSportsbook.moneyline.moneyline_home) {
+      game.favored_team = game.away_team;
+    } else {
+      game.favored_team = "Even";
+    }
   }
 
   // Save the updated game
@@ -112,25 +147,35 @@ async function updateRelatedModels(updatedGames) {
       }
 
       // Update picks for this game
-      const picks = await Pick.find({ game: game._id, result: 'pending' }).populate('entry');
+      const picks = await Pick.find({ game: game._id }).populate('entry');
 
       for (const pick of picks) {
-        const isCorrect = pick.team === winningTeam;
-        pick.result = isCorrect ? 'win' : 'loss';
-        await pick.save();
+        if (pick.result === 'pending') {
+          const isCorrect = pick.team === winningTeam;
+          
+          // Update both result and isWin fields
+          pick.result = isCorrect ? 'win' : 'loss';
+          pick.isWin = isCorrect;
 
-        // If the pick is incorrect, update the entry status
-        if (!isCorrect) {
-          const entry = pick.entry;
-          entry.status = 'eliminated';
-          entry.eliminatedWeek = game.schedule.week;
-          await entry.save();
+          // Use save() instead of updateOne to trigger any middleware
+          await pick.save();
 
-          console.log(`Entry ${entry._id} eliminated in week ${game.schedule.week}`);
+          // If the pick is incorrect, update the entry status
+          if (!isCorrect) {
+            const entry = pick.entry;
+            entry.status = 'eliminated';
+            entry.eliminatedWeek = game.schedule.week;
+            await entry.save();
+
+            console.log(`Entry ${entry._id} eliminated in week ${game.schedule.week}`);
+          }
         }
       }
 
       console.log(`Updated picks for game ${game.event_id}`);
+    } else {
+      // If the game is not final, ensure all picks for this game have isWin set to null
+      await Pick.updateMany({ game: game._id }, { $set: { isWin: null } });
     }
   }
 }
