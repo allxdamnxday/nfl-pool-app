@@ -202,7 +202,7 @@ router.route('/:id')
  *         description: Entry not found
  */
 router.route('/:entryId/picks')
-  .post(protect, checkGameStart, addOrUpdatePick);
+  .post(protect, checkGameStart, checkPickDeadline,addOrUpdatePick);
 
 /**
  * @swagger

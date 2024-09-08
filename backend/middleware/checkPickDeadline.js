@@ -18,24 +18,25 @@ const seasonService = require('../services/seasonService');
  */
 const checkPickDeadline = async (req, res, next) => {
   try {
-    const { week } = req.body;
+    const week = parseInt(req.params.week); // Changed from req.body to req.params
 
     // Get the current NFL week
     const { week: currentWeek } = await seasonService.getCurrentNFLWeek();
 
-    // Only check the deadline for the current week or past weeks
-    if (week <= currentWeek) {
-      const currentDate = moment().tz('America/Los_Angeles');
-      const submissionDeadline = moment().tz('America/Los_Angeles').day(0).hour(13).minute(0).second(0);
-      
-      // If it's after Sunday 1 PM, use next week's deadline
-      if (currentDate.day() === 0 && currentDate.hour() >= 13) {
-        submissionDeadline.add(1, 'week');
-      }
+    const currentDate = moment().tz('America/Los_Angeles');
+    const submissionDeadline = moment().tz('America/Los_Angeles').day(0).hour(10).minute(0).second(0);
 
-      if (currentDate.isAfter(submissionDeadline)) {
-        return next(new ErrorResponse(`Submission deadline has passed for week ${week}`, 400));
-      }
+    // If it's after Sunday 10 AM and the current day is Sunday, use this week's deadline
+    if (currentDate.day() === 0 && currentDate.hour() >= 10) {
+      // Do nothing, keep the deadline as is
+    } else {
+      // Otherwise, use last week's deadline
+      submissionDeadline.subtract(1, 'week');
+    }
+
+    // Check if the requested week is current or past, and if the deadline has passed
+    if (week <= currentWeek && currentDate.isAfter(submissionDeadline)) {
+      return next(new ErrorResponse(`Submission deadline has passed for week ${week}`, 400));
     }
 
     next();
@@ -57,10 +58,12 @@ module.exports = checkPickDeadline;
 /**
  * Additional Notes:
  * - This middleware should be used before processing pick submissions.
- * - It checks if the submission deadline (Sunday 1 PM Pacific Time) has passed for the given week.
- * - The deadline is set to Sunday 1 PM Pacific Time for the current week.
- * - If it's already past Sunday 1 PM, it uses the next week's deadline.
+ * - It checks if the submission deadline (Sunday 10 AM Pacific Time) has passed for the given week.
+ * - The deadline is set to Sunday 10 AM Pacific Time for the current week.
+ * - If it's already past Sunday 10 AM, it uses the current week's deadline.
+ * - If it's before Sunday 10 AM, it uses the previous week's deadline.
+ * - It prevents changes to picks for any past weeks and the current week after the deadline.
+ * - It allows submissions for future weeks without deadline restrictions.
  * - It uses the seasonService to get the current NFL week for comparison.
- * - The middleware allows submissions for future weeks without deadline restrictions.
  * - Moment-timezone is used to handle timezone-specific date and time calculations.
  */
