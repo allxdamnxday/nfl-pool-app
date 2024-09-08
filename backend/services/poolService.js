@@ -493,14 +493,20 @@ class PoolService extends BaseService {
       const visibleWeeks = getVisibleWeeks(currentDate);
 
       const picks = await Promise.all(entries.map(async (entry) => {
+        if (!entry || !entry.user) {
+          logger.warn(`Skipping invalid entry for pool ${poolId}`);
+          return null;
+        }
+
         const entryPicks = await Pick.find({ entry: entry._id, week: { $in: visibleWeeks } })
           .populate('game', 'away_team home_team event_date schedule.week');
+
         return {
           userId: entry.user._id,
           username: entry.user.username,
           entryId: entry._id,
-          picks: entryPicks.map(pick => ({
-            week: pick.game.schedule.week,
+          picks: entryPicks.filter(pick => pick && pick.game).map(pick => ({
+            week: pick.game.schedule ? pick.game.schedule.week : null,
             team: pick.team,
             gameId: pick.game._id,
             awayTeam: pick.game.away_team,
@@ -509,7 +515,11 @@ class PoolService extends BaseService {
           }))
         };
       }));
-      return { picks, visibleWeeks };
+
+      // Filter out any null entries
+      const validPicks = picks.filter(pick => pick !== null);
+
+      return { picks: validPicks, visibleWeeks };
     } catch (error) {
       logger.error(`Error fetching all picks for pool ${poolId}: ${error.message}`);
       throw new ErrorResponse(`Error fetching all pool picks: ${error.message}`, 500);
