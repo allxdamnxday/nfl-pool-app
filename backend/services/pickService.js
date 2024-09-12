@@ -40,52 +40,57 @@ class PickService {
   async addOrUpdatePick(entryId, entryNumber, userId, team, week, game) {
     logger.info(`Attempting to add/update pick for entry ${entryId}, user ${userId}, team ${team}, week ${week}`);
     
-    const entry = await Entry.findById(entryId).populate('pool');
-    if (!entry) {
-      logger.error(`No entry found with id ${entryId}`);
-      throw new ErrorResponse(`No entry found with id ${entryId}`, 404);
-    }
+    try {
+      const entry = await Entry.findById(entryId).populate('pool');
+      if (!entry) {
+        logger.error(`No entry found with id ${entryId}`);
+        throw new ErrorResponse(`No entry found with id ${entryId}`, 404);
+      }
 
-    if (entry.user.toString() !== userId) {
-      logger.warn(`User ${userId} attempted to update entry ${entryId} without authorization`);
-      throw new ErrorResponse(`User ${userId} is not authorized to update this entry`, 403);
-    }
+      if (entry.user.toString() !== userId) {
+        logger.warn(`User ${userId} attempted to update entry ${entryId} without authorization`);
+        throw new ErrorResponse(`User ${userId} is not authorized to update this entry`, 403);
+      }
 
-    // Check if the entry is eliminated
-    if (entry.status === 'eliminated') {
-      logger.warn(`Attempt to add/update pick for eliminated entry ${entryId}`);
-      throw new ErrorResponse(`Cannot add or update pick for eliminated entry`, 400);
-    }
+      // Check if the entry is eliminated
+      if (entry.status === 'eliminated') {
+        logger.warn(`Attempt to add/update pick for eliminated entry ${entryId}`);
+        throw new ErrorResponse(`Cannot add or update pick for eliminated entry`, 400);
+      }
 
-    if (week < 1 || week > entry.pool.numberOfWeeks) {
-      logger.warn(`Invalid week number ${week} for entry ${entryId}`);
-      throw new ErrorResponse(`Invalid week number`, 400);
-    }
+      if (week < 1 || week > entry.pool.numberOfWeeks) {
+        logger.warn(`Invalid week number ${week} for entry ${entryId}`);
+        throw new ErrorResponse(`Invalid week number`, 400);
+      }
 
-    const teamAlreadyPicked = await Pick.findOne({
-      entry: entryId,
-      team: team,
-      week: { $ne: parseInt(week) }
-    });
-
-    if (teamAlreadyPicked) {
-      logger.warn(`User attempted to pick ${team} again for entry ${entryId}`);
-      throw new ErrorResponse(`You already have a ${team} pick this season for this entry, please choose another team`, 400);
-    }
-
-    const now = moment.utc();
-    const pick = await Pick.findOneAndUpdate(
-      { entry: entryId, entryNumber, week: parseInt(week) },
-      { 
+      const teamAlreadyPicked = await Pick.findOne({
+        entry: entryId,
         team: team,
-        pickMadeAt: now.toDate(),
-        game: game._id
-      },
-      { upsert: true, new: true }
-    );
+        week: { $ne: parseInt(week) }
+      });
 
-    logger.info(`Successfully added/updated pick for entry ${entryId}, week ${week}`);
-    return pick;
+      if (teamAlreadyPicked) {
+        logger.warn(`User attempted to pick ${team} again for entry ${entryId}`);
+        throw new ErrorResponse(`You already have a ${team} pick this season for this entry, please choose another team`, 400);
+      }
+
+      const now = moment.utc();
+      const pick = await Pick.findOneAndUpdate(
+        { entry: entryId, entryNumber, week: parseInt(week) },
+        { 
+          team: team,
+          pickMadeAt: now.toDate(),
+          game: game._id
+        },
+        { upsert: true, new: true, runValidators: true }
+      );
+
+      logger.info(`Successfully added/updated pick for entry ${entryId}, week ${week}`);
+      return pick;
+    } catch (error) {
+      logger.error(`Error in addOrUpdatePick: ${error.message}`);
+      throw new ErrorResponse(`Error adding/updating pick: ${error.message}`, 500);
+    }
   }
 
   /**

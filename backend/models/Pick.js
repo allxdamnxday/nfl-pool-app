@@ -25,26 +25,31 @@ const mongoose = require('mongoose');
  * @description Mongoose model for Pick documents.
  */
 const PickSchema = new mongoose.Schema({
+  entryNumber: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 3
+  },
   entry: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Entry',
-    required: [true, 'Entry is required for a pick']
-  },
-  entryNumber: {
-    type: Number,
-    required: [true, 'Entry number is required'],
-    min: [1, 'Entry number must be at least 1'],
-    max: [3, 'Entry number cannot exceed 3']
+    required: true
   },
   week: {
     type: Number,
-    required: [true, 'Week number is required'],
-    min: [1, 'Week number must be at least 1'],
-    max: [18, 'Week number cannot exceed 18']
+    required: true,
+    min: 1,
+    max: 18
+  },
+  game: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Game',
+    required: true
   },
   team: {
     type: String,
-    required: [true, 'Team pick is required']
+    required: true
   },
   result: {
     type: String,
@@ -55,15 +60,9 @@ const PickSchema = new mongoose.Schema({
     type: Boolean,
     default: null
   },
-  game: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'Game',
-    required: true
-  },
   pickMadeAt: {
     type: Date,
-    default: Date.now,
-    required: [true, 'Pick made timestamp is required']
+    default: Date.now
   }
 }, {
   timestamps: true
@@ -71,6 +70,11 @@ const PickSchema = new mongoose.Schema({
 
 // Index for ensuring uniqueness of entry, entryNumber, and week combination
 PickSchema.index({ entry: 1, entryNumber: 1, week: 1 }, { unique: true });
+
+// Additional indexes for performance optimization
+PickSchema.index({ game: 1 });
+PickSchema.index({ entry: 1, week: 1 });
+PickSchema.index({ isWin: 1 });
 
 // Helper methods
 PickSchema.statics.getWinningPicks = function(entryId) {
@@ -83,6 +87,20 @@ PickSchema.statics.getLosingPicks = function(entryId) {
 
 PickSchema.statics.getPendingPicks = function(entryId) {
   return this.find({ entry: entryId, isWin: null });
+};
+
+// New method to get the selected team's full name
+PickSchema.methods.getSelectedTeamFullName = async function() {
+  await this.populate({
+    path: 'game',
+    select: 'teams_normalized'
+  }).execPopulate();
+  
+  const selectedTeam = this.game.teams_normalized.find(team => 
+    team.name === this.team || team.mascot === this.team || `${team.name} ${team.mascot}` === this.team
+  );
+  
+  return selectedTeam ? `${selectedTeam.name} ${selectedTeam.mascot}` : this.team;
 };
 
 /**

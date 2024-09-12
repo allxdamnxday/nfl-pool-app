@@ -1,5 +1,6 @@
 const asyncHandler = require('../middleware/async');
 const pickService = require('../services/pickService');
+const Pick = require('../models/Pick');
 
 exports.getPicksForPool = asyncHandler(async (req, res, next) => {
   const picks = await pickService.getPicksForPool(req.params.poolId);
@@ -13,6 +14,12 @@ exports.getPicksForPool = asyncHandler(async (req, res, next) => {
 exports.getPickForWeek = asyncHandler(async (req, res, next) => {
   const { entryId, entryNumber, week } = req.params;
   const pick = await pickService.getPickForWeek(entryId, entryNumber, week);
+  
+  if (pick) {
+    // Use the new method to get the full team name
+    const fullTeamName = await pick.getSelectedTeamFullName();
+    pick.team = fullTeamName;
+  }
   
   res.status(200).json({
     success: true,

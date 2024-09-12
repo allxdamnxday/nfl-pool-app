@@ -7,6 +7,7 @@ const Entry = require('../models/Entry');
 const Pool = require('../models/Pool');
 const Pick = require('../models/Pick');
 const ErrorResponse = require('../utils/errorResponse');
+const logger = require('../utils/logger');
 
 /**
  * Service class for managing entries
@@ -227,6 +228,7 @@ class EntryService {
    */
   async getUserEntriesWithPicks(userId, populate) {
     try {
+      logger.info(`Fetching entries with picks for user ${userId}`);
       let query = Entry.find({ user: userId }).populate('pool');
       
       if (populate === 'picks.game') {
@@ -241,17 +243,19 @@ class EntryService {
         query = query.populate('picks');
       }
   
-      const entries = await query.exec();
+      const entries = await query.lean().exec();
 
       // Add a timestamp to force React to recognize changes
       const entriesWithTimestamp = entries.map(entry => ({
-        ...entry.toObject(),
+        ...entry,
         _timestamp: Date.now()
       }));
 
+      logger.info(`Successfully fetched ${entriesWithTimestamp.length} entries for user ${userId}`);
       return entriesWithTimestamp;
     } catch (error) {
-      throw new ErrorResponse(`Error fetching entries with picks for user ${userId}: ${error.message}`, 500);
+      logger.error(`Error fetching entries with picks for user ${userId}: ${error.message}`);
+      throw new ErrorResponse(`Error fetching entries with picks: ${error.message}`, 500);
     }
   }
 

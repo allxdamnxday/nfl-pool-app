@@ -122,6 +122,8 @@ const userEntries = require('./routes/userEntries');
 const requests = require('./routes/requests');
 const blogs = require('./routes/blogs');
 const commentRoutes = require('./routes/commentRoutes');
+// Include kill ratio routes
+const killRatioRoutes = require('./routes/killRatioRoutes');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
@@ -137,6 +139,8 @@ app.use('/api/v1/requests', requests);
 app.use('/api/v1/blogs', blogs);
 app.use('/api/v1/blogs', commentRoutes);
 app.use('/api/v1/upload', upload);
+app.use('/api/v1/killRatio', killRatioRoutes);
+app.use('/api/v1', killRatioRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
@@ -205,5 +209,8 @@ if (process.env.NODE_ENV !== 'test') {
 if (process.env.NODE_ENV === 'development') {
   app.use(cors());
 }
+
+
+
 
 module.exports = { app, connectDB, startServer };

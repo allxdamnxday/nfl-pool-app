@@ -41,6 +41,7 @@ import AccountSettings from './components/AccountSettings';
 import Contact from './components/Contact';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
+import KillRatioSheet from './components/KillRatio/KillRatioSheet';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -157,6 +158,7 @@ const AnimatedRoutes = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/pool/:poolId/kill-ratio" element={<KillRatioSheet />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

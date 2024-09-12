@@ -188,7 +188,22 @@ const GameSchema = new mongoose.Schema({
     }
   },
   favored_team: { type: String }
-}, { timestamps: true });
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+// Add virtual fields for full team names
+GameSchema.virtual('away_team_full').get(function() {
+  const awayTeam = this.teams_normalized.find(team => team.is_away);
+  return awayTeam ? `${awayTeam.name} ${awayTeam.mascot}` : this.away_team;
+});
+
+GameSchema.virtual('home_team_full').get(function() {
+  const homeTeam = this.teams_normalized.find(team => team.is_home);
+  return homeTeam ? `${homeTeam.name} ${homeTeam.mascot}` : this.home_team;
+});
+
+// Ensure virtual fields are included when converting document to JSON
+GameSchema.set('toJSON', { virtuals: true });
+GameSchema.set('toObject', { virtuals: true });
 
 // Indexes
 GameSchema.index({ event_id: 1 }, { unique: true });
