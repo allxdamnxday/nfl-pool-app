@@ -6,8 +6,6 @@ import { getUserPoolsWithEntries } from '../services/poolService';
 import { FaFootballBall, FaCalendarAlt, FaUsers, FaCalendarWeek, FaDollarSign, FaInfoCircle } from 'react-icons/fa';
 import { LogoSpinner } from './CustomComponents';
 import BlogPromotion from './BlogPromotion';
-import { TwitterTweetEmbed } from 'react-twitter-embed';
-import { TwitterEmbed, FacebookEmbed } from 'react-social-media-embed';
 import { getLatestBlogPost, likeBlogPost } from '../services/blogService';
 
 function Dashboard() {
@@ -108,24 +106,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Enhanced Notification Section */}
-      <div className="container mx-auto px-4 mt-8">
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-lg animate-pulse">
-          <div className="flex items-center">
-            <FaInfoCircle className="flex-shrink-0 mr-4 text-yellow-500 text-3xl" />
-            <div>
-              <h3 className="font-bold text-lg mb-2">Important Notice</h3>
-              <p className="text-base md:text-lg">
-                If you've completed payment through PayPal, Zelle, or Venmo and don't see your entries or can't make picks, please contact us at:{' '}
-                <a href="mailto:info@footballeliminator.com" className="font-bold underline hover:text-yellow-800">
-                  info@footballeliminator.com
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Content section with light background */}
       <div className="container mx-auto px-4 py-12">
         {latestBlogPost && (
@@ -160,9 +140,6 @@ function Dashboard() {
             ))}
           </div>
         )}
-
-        {/* Move SocialMediaFeed to the bottom */}
-        <SocialMediaFeed />
       </div>
     </div>
   );
@@ -218,55 +195,6 @@ function InfoItem({ icon: Icon, label, value }) {
       <span className="text-lg font-bold text-nfl-blue">{value}</span>
     </div>
   );
-}
-
-function SocialMediaFeed() {
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 mt-12">
-      <h2 className="text-2xl font-semibold text-nfl-blue mb-4">Latest Updates</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <EmbedWrapper title="Twitter">
-          <TwitterEmbed url="https://twitter.com/ELIMINATORCREW/status/1830706194694185373" width={325} />
-        </EmbedWrapper>
-        <EmbedWrapper title="Facebook Video">
-          <FacebookEmbed url="https://www.facebook.com/61564423130144/videos/1034796061530727/" width={325} />
-        </EmbedWrapper>
-        <EmbedWrapper title="Facebook Post">
-          <FacebookEmbed url="https://www.facebook.com/permalink.php?story_fbid=pfbid0R854N29qpSVVwBk4fNKbWnZnLicrrdCBjihzUE61fyChMW9YqdfotBHxbg1sgghpl&id=61564423130144" width={325} />
-        </EmbedWrapper>
-      </div>
-    </div>
-  );
-}
-
-function EmbedWrapper({ title, children }) {
-  return (
-    <div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <ErrorBoundary fallback={<div>Error loading {title} embed</div>}>
-        {children}
-      </ErrorBoundary>
-    </div>
-  );
-}
-
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-
-    return this.props.children;
-  }
 }
 
 export default Dashboard;

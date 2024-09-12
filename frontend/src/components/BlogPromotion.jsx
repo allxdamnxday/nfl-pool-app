@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaBlog, FaRegComment, FaRegEye, FaRegHeart, FaHeart } from 'react-icons/fa';
+import { FaBlog, FaRegComment, FaRegEye, FaRegHeart, FaHeart, FaCrown } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 function BlogPromotion({ latestPost, onLike }) {
@@ -28,9 +28,15 @@ function BlogPromotion({ latestPost, onLike }) {
 				<div className="p-6 md:w-2/3">
 					<h3 className="text-xl font-bold text-nfl-blue mb-2 flex items-center">
 						<FaBlog className="mr-2 text-nfl-purple" />
-						Eric's Latest Blog Post
+						Latest Blog Post
 					</h3>
-					<h4 className="text-lg font-semibold text-nfl-blue mb-2">{latestPost.title}</h4>
+					<Link to={`/blog/${latestPost._id}`} className="hover:text-nfl-purple transition duration-300">
+						<h4 className="text-lg font-semibold text-nfl-blue mb-2">{latestPost.title}</h4>
+					</Link>
+					<div className="flex items-center mb-2">
+						<FaCrown className="text-nfl-gold mr-2" />
+						<span className="text-nfl-blue font-semibold">{latestPost.author.username}</span>
+					</div>
 					<p className="text-gray-600 text-sm mb-4">
 						{new Date(latestPost.createdAt).toLocaleDateString()} • {latestPost.readTimeMinutes} min read
 					</p>
