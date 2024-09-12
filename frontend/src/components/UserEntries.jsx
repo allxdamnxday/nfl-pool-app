@@ -239,7 +239,7 @@ function WeekCard({ week, pick, entryId, entryNumber, status }) {
       <div className="p-4">
         {pick && pick.game ? (
           <div className="text-gray-700">
-            <p className="font-semibold text-nfl-blue">{pick.team || 'Team Not Selected'}</p>
+            <p className="font-semibold text-nfl-blue">{pick.fullTeamName || pick.team || 'Team Not Selected'}</p>
             <div className="mt-2 space-y-1">
               <p className="text-sm flex items-center text-gray-500">
                 <FaCalendarAlt className="mr-2" />
@@ -292,7 +292,7 @@ function PickStatus({ currentPick }) {
         {currentPick && (
           <div className="flex items-center space-x-2">
             <span className="font-bold text-nfl-blue">Current Pick:</span>
-            <span className="font-semibold text-nfl-purple">{currentPick.team}</span>
+            <span className="font-semibold text-nfl-purple">{currentPick.fullTeamName || currentPick.team}</span>
           </div>
         )}
       </div>

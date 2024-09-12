@@ -83,7 +83,16 @@ class EntryService {
    * }
    */
   async getEntry(entryId, userId) {
-    const entry = await Entry.findById(entryId).populate('pool').populate('picks');
+    const entry = await Entry.findById(entryId)
+      .populate('pool')
+      .populate({
+        path: 'picks',
+        populate: {
+          path: 'game',
+          select: 'away_team home_team event_date schedule.week teams_normalized'
+        }
+      });
+
     if (!entry) {
       throw new ErrorResponse(`Entry not found with id of ${entryId}`, 404);
     }
@@ -92,7 +101,22 @@ class EntryService {
       throw new ErrorResponse(`User is not authorized to view this entry`, 403);
     }
   
-    return entry;
+    // Process picks to include full team names
+    const processedPicks = await Promise.all(entry.picks.map(async (pick) => {
+      const pickDoc = new Pick(pick);
+      const fullTeamName = await pickDoc.getSelectedTeamFullName();
+      return {
+        ...pick.toObject(),
+        fullTeamName
+      };
+    }));
+
+    const processedEntry = {
+      ...entry.toObject(),
+      picks: processedPicks
+    };
+  
+    return processedEntry;
   }
 
   /**
@@ -236,23 +260,35 @@ class EntryService {
           path: 'picks',
           populate: {
             path: 'game',
-            select: 'away_team home_team event_date schedule.week'
+            select: 'away_team home_team event_date schedule.week teams_normalized'
           }
         });
       } else {
         query = query.populate('picks');
       }
-  
-      const entries = await query.lean().exec();
 
-      // Add a timestamp to force React to recognize changes
-      const entriesWithTimestamp = entries.map(entry => ({
-        ...entry,
-        _timestamp: Date.now()
+      const entries = await query.exec();
+
+      // Process entries to include full team names
+      const processedEntries = await Promise.all(entries.map(async (entry) => {
+        const processedPicks = await Promise.all(entry.picks.map(async (pick) => {
+          const pickDoc = new Pick(pick);
+          const fullTeamName = await pickDoc.getSelectedTeamFullName();
+          return {
+            ...pick.toObject(),
+            fullTeamName
+          };
+        }));
+
+        return {
+          ...entry.toObject(),
+          picks: processedPicks,
+          _timestamp: Date.now()
+        };
       }));
 
-      logger.info(`Successfully fetched ${entriesWithTimestamp.length} entries for user ${userId}`);
-      return entriesWithTimestamp;
+      logger.info(`Successfully fetched ${processedEntries.length} entries for user ${userId}`);
+      return processedEntries;
     } catch (error) {
       logger.error(`Error fetching entries with picks for user ${userId}: ${error.message}`);
       throw new ErrorResponse(`Error fetching entries with picks: ${error.message}`, 500);

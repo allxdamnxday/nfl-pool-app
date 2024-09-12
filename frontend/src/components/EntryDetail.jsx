@@ -119,7 +119,7 @@ function EntryDetail() {
                 {entry.picks.map((pick, index) => (
                   <li key={pick._id} className="bg-gray-100 p-4 rounded-lg transition duration-300 hover:shadow-md">
                     <p className="font-semibold text-nfl-blue">Week {index + 1}</p>
-                    <p className="text-gray-600">Team: <span className="font-semibold">{pick.team}</span></p>
+                    <p className="text-gray-600">Team: <span className="font-semibold">{pick.fullTeamName || pick.team}</span></p>
                     <p className="text-gray-600 flex items-center">
                       Result: 
                       <span className={`font-semibold ml-2 flex items-center ${pick.result === 'win' ? 'text-green-500' : pick.result === 'loss' ? 'text-red-500' : 'text-yellow-500'}`}>
