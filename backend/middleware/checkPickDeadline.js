@@ -18,24 +18,21 @@ const seasonService = require('../services/seasonService');
  */
 const checkPickDeadline = async (req, res, next) => {
   try {
-    const week = parseInt(req.params.week); // Changed from req.body to req.params
+    const week = parseInt(req.params.week);
 
     // Get the current NFL week
     const { week: currentWeek } = await seasonService.getCurrentNFLWeek();
 
     const currentDate = moment().tz('America/Los_Angeles');
-    const submissionDeadline = moment().tz('America/Los_Angeles').day(0).hour(10).minute(0).second(0);
+    let submissionDeadline = moment().tz('America/Los_Angeles').day(0).hour(10).minute(0).second(0);
 
-    // If it's after Sunday 10 AM and the current day is Sunday, use this week's deadline
-    if (currentDate.day() === 0 && currentDate.hour() >= 10) {
-      // Do nothing, keep the deadline as is
-    } else {
-      // Otherwise, use last week's deadline
-      submissionDeadline.subtract(1, 'week');
+    // If current date is past Sunday 10 AM, set deadline to next Sunday
+    if (currentDate.isAfter(submissionDeadline)) {
+      submissionDeadline.add(1, 'week');
     }
 
-    // Check if the requested week is current or past, and if the deadline has passed
-    if (week <= currentWeek && currentDate.isAfter(submissionDeadline)) {
+    // Check if the requested week is past or if it's the current week and the deadline has passed
+    if (week < currentWeek || (week === currentWeek && currentDate.isAfter(submissionDeadline))) {
       return next(new ErrorResponse(`Submission deadline has passed for week ${week}`, 400));
     }
 
