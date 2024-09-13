@@ -8,8 +8,8 @@ export default {
     extend: {
       colors: {
         'nfl-blue': '#013369',
-        'nfl-purple': '#4F2D7F', // New NFL-inspired purple
-        'nfl-gold': '#D3BC8D', // Complementary gold color
+        'nfl-purple': '#4F2D7F',
+        'nfl-gold': '#D3BC8D',
         'nfl-white': '#FFFFFF',
         'nfl-light-blue': '#1B48E0',
         'field-green': '#368356',
@@ -27,7 +27,7 @@ export default {
         'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
       },
       boxShadow: {
-        'neon': '0 0 5px theme("colors.purple.400"), 0 0 20px theme("colors.purple.600")',
+        'neon': '0 0 5px theme("colors.nfl-purple"), 0 0 20px theme("colors.nfl-purple")',
         'card': '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
       },
       animation: {
@@ -43,6 +43,13 @@ export default {
       backdropFilter: {
         'none': 'none',
         'blur': 'blur(20px)',
+      },
+      zIndex: {
+        '50': '50',
+        '100': '100',
+      },
+      transitionProperty: {
+        'max-height': 'max-height',
       },
     },
   },
