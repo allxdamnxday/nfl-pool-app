@@ -43,3 +43,28 @@
     },
     "__v": 0
   }
+
+
+  {
+    "entry": {
+      "$oid": "66b95e358219fc61d08a8eec"
+    },
+    "entryNumber": 1,
+    "week": 1,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2024-09-06T15:37:03.060Z"
+    },
+    "game": {
+      "$oid": "66a05a5a35d5816d40187725"
+    },
+    "pickMadeAt": {
+      "$date": "2024-09-06T15:37:03.060Z"
+    },
+    "team": "Los Angeles",
+    "updatedAt": {
+      "$date": "2024-09-09T18:47:08.226Z"
+    },
+    "isWin": true,
+    "result": "win"
+  }

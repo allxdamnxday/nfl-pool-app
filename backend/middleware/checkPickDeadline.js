@@ -6,6 +6,7 @@
 const moment = require('moment-timezone');
 const ErrorResponse = require('../utils/errorResponse');
 const seasonService = require('../services/seasonService');
+const logger = require('../utils/logger'); // Assuming logger is defined somewhere
 
 /**
  * Checks if the pick submission deadline has passed for the given week.
@@ -17,6 +18,7 @@ const seasonService = require('../services/seasonService');
  * @throws {ErrorResponse} If the submission deadline has passed
  */
 const checkPickDeadline = async (req, res, next) => {
+  logger.info(`checkPickDeadline middleware called for ${req.method} request, week: ${req.params.week}`);
   try {
     const week = parseInt(req.params.week);
 

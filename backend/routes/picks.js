@@ -188,6 +188,6 @@ router.route('/pool/:poolId')
 router.route('/:entryId/:entryNumber?/:week')
   .get(protect, getPickForWeek)
   .put(protect, checkGameStart, checkPickDeadline, addOrUpdatePick)
-  .delete(protect, deletePick);
+  .delete(protect, checkGameStart, checkPickDeadline, deletePick);
 
 module.exports = router;

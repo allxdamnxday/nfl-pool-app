@@ -20,6 +20,7 @@ const moment = require('moment');
  * @throws {ErrorResponse} If no game found or game has already started
  */
 const checkGameStart = async (req, res, next) => {
+  logger.info(`checkGameStart middleware called for ${req.method} request, entry: ${req.params.entryId}, week: ${req.params.week}`);
   try {
     const { entryId, week } = req.params;
     const team = req.method === 'DELETE' ? null : req.body.team;
@@ -85,6 +86,29 @@ const checkGameStart = async (req, res, next) => {
       logger.info(`Game start check passed for entry ${entryId}, team ${team}, week ${weekToCheck}`);
       next();
     } else {
+      // Add checks for DELETE requests
+      const { week: currentWeek, seasonYear } = seasonService.getCurrentNFLWeek();
+      const weekToCheck = parseInt(week);
+
+      if (weekToCheck < currentWeek) {
+        logger.warn(`Attempt to delete a pick for a past week: ${weekToCheck}`);
+        return next(new ErrorResponse('Cannot delete picks for past weeks', 400));
+      }
+
+      // Check if the user has a pick for this week and if the game has started
+      const existingPick = await Pick.findOne({ entry: entryId, week: weekToCheck }).populate('game');
+
+      if (existingPick) {
+        const existingGameStart = moment(existingPick.game.event_date);
+        const now = moment();
+
+        if (now.isAfter(existingGameStart)) {
+          logger.warn(`Attempt to delete pick after game start for entry ${entryId} in week ${weekToCheck}`);
+          return next(new ErrorResponse('Cannot delete pick after the game has started', 400));
+        }
+      }
+
+      logger.info(`Game start check passed for entry ${entryId}, week ${week}`);
       next();
     }
   } catch (error) {
