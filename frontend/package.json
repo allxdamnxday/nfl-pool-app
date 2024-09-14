@@ -34,7 +34,8 @@
     "react-share": "^5.1.0",
     "react-social-media-embed": "^2.5.13",
     "react-toastify": "^10.0.5",
-    "react-transition-group": "^4.4.5"
+    "react-transition-group": "^4.4.5",
+    "swiper": "^11.1.14"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.6",
