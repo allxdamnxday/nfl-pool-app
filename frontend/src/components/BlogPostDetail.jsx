@@ -4,10 +4,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { getBlogPost, likeBlogPost, getBlogComments, createComment, likeComment } from '../services/blogService';
-import { FaRegComment, FaRegEye, FaRegHeart, FaHeart, FaArrowLeft, FaCrown } from 'react-icons/fa';
+import { FaRegComment, FaRegEye, FaRegHeart, FaHeart, FaArrowLeft, FaCrown, FaRegCalendar, FaRegClock } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import { LogoSpinner } from './CustomComponents';
-import Header from './Header';
 import CommentCard from './CommentCard';
 import ShareButtons from './ShareButtons';
 import CommentForm from './CommentForm';
@@ -108,27 +107,38 @@ function BlogPostDetail() {
         <meta property="og:type" content="article" />
       </Helmet>
 
-      {/* Header Section */}
-      <Header />
-
-      {/* Banner Section */}
-      <div className="relative bg-gradient-to-br from-nfl-blue to-nfl-purple text-white py-24">
-        <div className="absolute inset-0 overflow-hidden">
+      {/* Enhanced Banner Section with Improved Title Readability */}
+      <div className="relative bg-gradient-to-br from-nfl-blue to-nfl-purple text-white py-24 overflow-hidden">
+        <div className="absolute inset-0">
           <img
             src="/img/football_eliminator_erics_corner.png"
             alt="Eric's Corner Banner"
-            className="w-full h-full object-cover object-center opacity-70"
+            className="w-full h-full object-cover object-center opacity-30 transform scale-105 filter blur-sm"
           />
         </div>
-        <div className="absolute inset-0 bg-black opacity-40"></div>
-        <div className="relative container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-5xl sm:text-6xl font-extrabold mb-6 drop-shadow-lg">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="relative container mx-auto px-4 z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-4 leading-tight text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] bg-black bg-opacity-30 inline-block px-4 py-2 rounded">
               {blogPost.title}
             </h1>
-            <p className="text-2xl sm:text-3xl mb-8 drop-shadow-lg">
+            <p className="text-xl sm:text-2xl md:text-3xl mb-6 font-light text-shadow-md">
               {blogPost.subtitle || 'Insights and Updates'}
             </p>
+            <div className="flex justify-center items-center space-x-4 text-sm md:text-base">
+              <span className="flex items-center">
+                <FaCrown className="text-nfl-gold mr-2" />
+                <span>{blogPost.author.username}</span>
+              </span>
+              <span className="flex items-center">
+                <FaRegCalendar className="mr-2" />
+                <span>{new Date(blogPost.createdAt).toLocaleDateString()}</span>
+              </span>
+              <span className="flex items-center">
+                <FaRegClock className="mr-2" />
+                <span>{blogPost.readTimeMinutes} min read</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
