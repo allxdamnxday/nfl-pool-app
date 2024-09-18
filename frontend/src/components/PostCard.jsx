@@ -24,24 +24,24 @@ function PostCard({ post, user, onLike }) {
     >
       {/* Image Section */}
       {post.imageUrl && (
-        <div className="relative">
-          <img
-            src={post.imageUrl}
-            alt={post.title}
-            className="w-full h-56 object-cover"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-field-green via-transparent to-transparent opacity-50"></div>
-          <div className="absolute bottom-4 left-4">
-            <h3 className="text-2xl font-bold text-nfl-white text-outline">
-              {post.title}
-            </h3>
-          </div>
-        </div>
+        <img
+          src={post.imageUrl}
+          alt={post.title}
+          className="w-full h-56 object-cover"
+          loading="lazy"
+        />
       )}
 
       {/* Content Section */}
       <div className="p-6 flex flex-col flex-grow">
+        {/* Title */}
+        <Link
+          to={`/blog/${post._id}`}
+          className="text-2xl font-bold text-nfl-blue dark:text-nfl-white hover:underline mb-4"
+        >
+          {post.title}
+        </Link>
+
         {/* Author and Date */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">

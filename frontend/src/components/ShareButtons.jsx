@@ -1,19 +1,20 @@
+// src/components/ShareButtons.jsx
+
 import React from 'react';
-import { FaFacebookF, FaTwitter } from 'react-icons/fa';
+import { TwitterShareButton, FacebookShareButton, TwitterIcon, FacebookIcon } from 'react-share';
 
-const ShareButtons = ({ shareUrls }) => {
-  if (!shareUrls) return null;
-
+function ShareButtons({ url, title }) {
   return (
-    <>
-      <a href={shareUrls.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
-        <FaFacebookF className="text-xl" />
-      </a>
-      <a href={shareUrls.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-600">
-        <FaTwitter className="text-xl" />
-      </a>
-    </>
+    <div className="flex space-x-2">
+      <TwitterShareButton url={url} title={title}>
+        <TwitterIcon size={32} round />
+      </TwitterShareButton>
+      <FacebookShareButton url={url} quote={title}>
+        <FacebookIcon size={32} round />
+      </FacebookShareButton>
+      {/* Add more share buttons as needed */}
+    </div>
   );
-};
+}
 
 export default ShareButtons;

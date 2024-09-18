@@ -11,6 +11,7 @@ import {
   FaSignInAlt,
   FaUserPlus,
   FaSignOutAlt,
+  FaTable
 } from 'react-icons/fa';
 import { CSSTransition } from 'react-transition-group';
 
@@ -78,6 +79,9 @@ function MobileMenu({
                 </MobileNavLink>
                 <MobileNavLink to="/pool-picks-selection" icon={FaTrophy} onClick={toggleMobileMenu}>
                   View Pool Picks
+                </MobileNavLink>
+                <MobileNavLink to="/week-picks" icon={FaTable} onClick={toggleMobileMenu}>
+                  Weekly Picks Temp
                 </MobileNavLink>
                 <MobileNavLink to="/account-settings" icon={FaUser} onClick={toggleMobileMenu}>
                   Account Settings
