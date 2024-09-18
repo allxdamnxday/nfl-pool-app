@@ -20,8 +20,6 @@ export default {
           850: '#1a1a1a',
           900: '#121212',
         },
-        'dashboard-bg-from': '#121212',
-        'dashboard-bg-to': '#1a1a1a',
       },
       fontFamily: {
         'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],

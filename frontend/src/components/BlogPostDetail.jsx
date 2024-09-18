@@ -79,7 +79,7 @@ function BlogPostDetail() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-800">
+      <div className="flex justify-center items-center h-screen bg-gray-100">
         <LogoSpinner size={40} />
       </div>
     );
@@ -87,9 +87,9 @@ function BlogPostDetail() {
 
   if (!blogPost) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-800">
-        <p className="text-xl text-gray-700 dark:text-gray-300">Blog post not found.</p>
-        <Link to="/blogs" className="mt-4 text-nfl-purple dark:text-nfl-white hover:text-nfl-blue transition-colors duration-200 font-semibold">
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <p className="text-xl text-gray-700">Blog post not found.</p>
+        <Link to="/blogs" className="mt-4 text-nfl-purple hover:text-nfl-blue transition-colors duration-200 font-semibold">
           Back to Blog List
         </Link>
       </div>
@@ -97,7 +97,7 @@ function BlogPostDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-800">
+    <div className="min-h-screen bg-gray-100">
       <Helmet>
         <title>{blogPost.title} | Football Eliminator</title>
         <meta name="description" content={blogPost.content.substring(0, 160)} />
@@ -117,10 +117,10 @@ function BlogPostDetail() {
           <img
             src="/img/football_eliminator_erics_corner.png"
             alt="Eric's Corner Banner"
-            className="w-full h-full object-cover object-center opacity-70 dark:opacity-50"
+            className="w-full h-full object-cover object-center opacity-70"
           />
         </div>
-        <div className="absolute inset-0 bg-black opacity-40 dark:opacity-60"></div>
+        <div className="absolute inset-0 bg-black opacity-40"></div>
         <div className="relative container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl sm:text-6xl font-extrabold mb-6 drop-shadow-lg">
@@ -137,18 +137,18 @@ function BlogPostDetail() {
       <div className="container mx-auto px-4 py-12">
         <Link
           to="/blogs"
-          className="inline-flex items-center text-nfl-purple dark:text-nfl-white hover:text-nfl-blue transition-colors duration-200 mb-8 font-bold"
+          className="inline-flex items-center text-nfl-purple hover:text-nfl-blue transition-colors duration-200 mb-8 font-bold"
         >
           <FaArrowLeft className="mr-2" />
           Back to Blog List
         </Link>
 
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 transition duration-300 ease-in-out hover:shadow-xl">
+        <div className="bg-white rounded-xl shadow-lg p-6 transition duration-300 ease-in-out hover:shadow-xl">
           {/* Image Section */}
           {blogPost.imageUrl && (
             <div className="mb-6 flex justify-center">
               <div
-                className="relative w-full max-w-2xl overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700"
+                className="relative w-full max-w-2xl overflow-hidden rounded-lg bg-gray-200"
                 style={{ aspectRatio: '3 / 2' }}
               >
                 <img
@@ -165,19 +165,19 @@ function BlogPostDetail() {
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
               <FaCrown className="text-nfl-gold mr-2" />
-              <span className="text-nfl-blue dark:text-nfl-white font-semibold">{blogPost.author.username}</span>
+              <span className="text-nfl-blue font-semibold">{blogPost.author.username}</span>
             </div>
-            <div className="text-gray-500 dark:text-gray-400 text-sm">
+            <div className="text-gray-500 text-sm">
               {new Date(blogPost.createdAt).toLocaleDateString()} • {blogPost.readTimeMinutes} min read
             </div>
           </div>
 
           {/* Content Section */}
-          <div className="prose dark:prose-dark max-w-none mb-6" dangerouslySetInnerHTML={{ __html: blogPost.content }} />
+          <div className="prose max-w-none mb-6" dangerouslySetInnerHTML={{ __html: blogPost.content }} />
 
           {/* Actions Section */}
           <div className="flex justify-between items-center mt-6 border-t pt-4">
-            <div className="flex space-x-4 text-gray-600 dark:text-gray-400 text-sm">
+            <div className="flex space-x-4 text-gray-600 text-sm">
               <span className="flex items-center">
                 <FaRegEye className="mr-1" /> {blogPost.views}
               </span>
@@ -189,7 +189,7 @@ function BlogPostDetail() {
               <ShareButtons url={currentUrl} title={blogPost.title} />
               <button
                 onClick={handleLike}
-                className="flex items-center bg-transparent text-gray-500 dark:text-gray-400 hover:text-nfl-purple transition duration-300"
+                className="flex items-center bg-transparent text-gray-500 hover:text-nfl-purple transition duration-300"
                 aria-label="Like post"
               >
                 {user && blogPost.likes.includes(user._id) ? (
@@ -205,11 +205,11 @@ function BlogPostDetail() {
 
         {/* Comments Section */}
         <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-6 text-nfl-blue dark:text-nfl-white">Comments</h2>
+          <h2 className="text-3xl font-bold mb-6 text-nfl-blue">Comments</h2>
           {user ? (
             <CommentForm onSubmit={handleCommentSubmit} />
           ) : (
-            <p className="mb-6 text-gray-600 dark:text-gray-400">Please log in to leave a comment.</p>
+            <p className="mb-6 text-gray-600">Please log in to leave a comment.</p>
           )}
 
           {/* Comments List */}
@@ -223,7 +223,7 @@ function BlogPostDetail() {
               />
             ))
           ) : (
-            <p className="text-gray-600 dark:text-gray-400">No comments yet. Be the first to comment!</p>
+            <p className="text-gray-600">No comments yet. Be the first to comment!</p>
           )}
         </div>
       </div>

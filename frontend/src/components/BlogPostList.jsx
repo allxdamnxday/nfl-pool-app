@@ -56,12 +56,12 @@ function BlogPostList() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-800">
+    <div className="min-h-screen bg-gray-100">
       {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
         <Link
           to="/"
-          className="inline-flex items-center text-nfl-purple dark:text-nfl-white hover:text-nfl-blue transition-colors duration-200 mb-8 font-bold"
+          className="inline-flex items-center text-nfl-purple hover:text-nfl-blue transition-colors duration-200 mb-8 font-bold"
         >
           <FaArrowLeft className="mr-2" />
           Back to Home
@@ -77,7 +77,7 @@ function BlogPostList() {
         )}
 
         {/* Latest Posts */}
-        <h2 className="text-4xl font-bold mb-8 text-nfl-blue dark:text-nfl-white">Latest Posts</h2>
+        <h2 className="text-4xl font-bold mb-8 text-nfl-blue">Latest Posts</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {loading
             ? Array.from({ length: 6 }).map((_, index) => <SkeletonCard key={index} />)

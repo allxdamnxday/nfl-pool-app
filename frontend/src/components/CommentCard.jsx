@@ -7,22 +7,22 @@ import { motion } from 'framer-motion';
 function CommentCard({ comment, user, onLike }) {
   return (
     <motion.div
-      className="bg-nfl-white dark:bg-gray-900 rounded-lg shadow-md p-4 mb-4"
+      className="bg-white rounded-lg shadow-md p-4 mb-4"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
       <div className="flex justify-between items-center mb-2">
-        <span className="font-semibold text-nfl-blue dark:text-nfl-white">{comment.author.username}</span>
-        <span className="text-sm text-gray-500 dark:text-gray-400">
+        <span className="font-semibold text-nfl-blue">{comment.author.username}</span>
+        <span className="text-sm text-gray-500">
           {new Date(comment.createdAt).toLocaleDateString()}
         </span>
       </div>
-      <p className="text-gray-700 dark:text-gray-300 mb-3">{comment.content}</p>
+      <p className="text-gray-700 mb-3">{comment.content}</p>
       <div className="flex justify-end items-center">
         <button
           onClick={() => onLike(comment._id)}
-          className="flex items-center text-gray-500 dark:text-gray-400 hover:text-nfl-purple transition-colors duration-300"
+          className="flex items-center text-gray-500 hover:text-nfl-purple transition-colors duration-300"
           aria-label="Like comment"
         >
           {user && comment.likes.includes(user._id) ? (
