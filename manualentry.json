@@ -68,3 +68,29 @@
     "isWin": true,
     "result": "win"
   }
+
+
+
+  {
+    "entry": {
+      "$oid": "66bf8fe4c6d9440015ed6f3b"
+    },
+    "entryNumber": 3,
+    "week": 2,
+    "__v": 0,
+    "createdAt": {
+      "$date": "2024-08-26T21:03:04.936Z"
+    },
+    "game": {
+      "$oid": "66a05a5b35d5816d40187735"
+    },
+    "pickMadeAt": {
+      "$date": "2024-08-26T21:03:04.936Z"
+    },
+    "team": "New York",
+    "updatedAt": {
+      "$date": "2024-09-16T15:28:35.983Z"
+    },
+    "isWin": false,
+    "result": "loss"
+  }

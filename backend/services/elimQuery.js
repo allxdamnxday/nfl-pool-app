@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const fs = require('fs');  // Regular fs module
 const fsPromises = require('fs').promises;  // Promises version of fs
 const csvWriter = require('csv-write-stream');
+const path = require('path');
 
 const uri = process.env.MONGODB_URI;
 
@@ -103,6 +104,13 @@ async function run() {
         }
       },
       
+      // Add a $match stage to filter for weeks 1 and 2
+      {
+        $match: {
+          'pick.week': { $in: [1, 2] }
+        }
+      },
+      
       // Project the necessary fields
       {
         $project: {
@@ -129,7 +137,11 @@ async function run() {
     writer.end();
     console.log('CSV file written');
 
-    // Write to JSON
+    // Create elimData directory if it doesn't exist
+    const elimDataDir = path.join(__dirname, 'elimData');
+    await fsPromises.mkdir(elimDataDir, { recursive: true });
+
+    // Write to JSON in the elimData subdirectory
     const weekPicks = results.reduce((acc, result) => {
       const week = result.week || 'unknown';
       if (!acc[week]) {
@@ -139,8 +151,9 @@ async function run() {
       return acc;
     }, {});
 
-    await fsPromises.writeFile('weekPicks.json', JSON.stringify(weekPicks, null, 2));
-    console.log('JSON file written');
+    const jsonFilePath = path.join(elimDataDir, 'weekPicks.json');
+    await fsPromises.writeFile(jsonFilePath, JSON.stringify(weekPicks, null, 2));
+    console.log('JSON file written to elimData subdirectory');
 
   } catch (err) {
     console.error('An error occurred:', err);
