@@ -42,6 +42,7 @@ import Contact from './components/Contact';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import KillRatioSheet from './components/KillRatio/KillRatioSheet';
+import WeekPicksTable from './components/WeekPicksTable';
 
 const AnimatedRoutes = () => {
   const location = useLocation();
@@ -159,6 +160,7 @@ const AnimatedRoutes = () => {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/pool/:poolId/kill-ratio" element={<KillRatioSheet />} />
+          <Route path="/week-picks" element={<WeekPicksTable />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

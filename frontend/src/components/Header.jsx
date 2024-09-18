@@ -11,6 +11,7 @@ import {
   FaClipboardList,
   FaSignOutAlt,
   FaChevronDown,
+  FaTable,
 } from 'react-icons/fa';
 import { CSSTransition } from 'react-transition-group';
 import { useAuth } from '../contexts/AuthContext';
@@ -178,6 +179,9 @@ function PoolsMenu({ isOpen, setIsOpen, dropdownRef }) {
             </DropdownLink>
             <DropdownLink to="/pool-picks-selection" icon={FaUser}>
               View Pool Picks
+            </DropdownLink>
+            <DropdownLink to="/week-picks" icon={FaTable}>
+              Weekly Picks Temp
             </DropdownLink>
           </div>
         </div>
