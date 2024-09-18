@@ -1,10 +1,6 @@
 status,eliminatedWeek,entryNumber,username,week,pickedTeam,pickResult,isWin
 active,,1,bradenu,1,Chargers,win,true
 active,,1,bradenu,2,Commanders,win,true
-active,,1,bradenu,3,Colts,,
-active,,1,bradenu,4,Cowboys,,
-active,,1,bradenu,5,Buccaneers,,
-active,,1,bradenu,7,Denver,pending,
 eliminated,2,1,shu529,1,Buccaneers,win,true
 eliminated,2,1,shu529,2,Jaguars,loss,false
 eliminated,1,2,shu529,1,Bengals,loss,false
@@ -20,7 +16,6 @@ eliminated,2,2,Win4theGipper,1,Buccaneers,win,true
 eliminated,2,2,Win4theGipper,2,Ravens,loss,false
 active,,1,Nash415,1,Saints,win,true
 active,,1,Nash415,2,Texans,win,true
-active,,1,Nash415,3,Buccaneers,,
 eliminated,2,2,Nash415,1,Buccaneers,win,true
 eliminated,2,2,Nash415,2,Ravens,loss,false
 eliminated,2,3,Nash415,1,Bills,win,true
@@ -41,7 +36,6 @@ eliminated,2,1,WYork2510,1,Seahawks,win,true
 eliminated,2,1,WYork2510,2,Ravens,loss,false
 active,,2,WYork2510,1,Saints,win,true
 active,,2,WYork2510,2,Texans,win,true
-active,,2,WYork2510,3,Browns,,
 eliminated,1,1,SuePenn,1,Bengals,loss,false
 active,,2,SuePenn,1,Bills,win,true
 active,,2,SuePenn,2,Chiefs,win,true
@@ -62,7 +56,6 @@ eliminated,2,3,volsrunsec,1,Dolphins,win,true
 eliminated,2,3,volsrunsec,2,Eagles,loss,false
 active,,1,pugapug,1,Texans,win,true
 active,,1,pugapug,2,Commanders,win,true
-active,,1,pugapug,3,Jets,,
 eliminated,2,2,pugapug,1,Chargers,win,true
 eliminated,2,2,pugapug,2,Jaguars,loss,false
 active,,3,pugapug,1,Saints,win,true
@@ -75,8 +68,6 @@ eliminated,2,1,Jackson,1,49ers,win,true
 eliminated,2,1,Jackson,2,Jaguars,loss,false
 eliminated,2,1,jacobahill@gmail.com,1,Bills,win,true
 eliminated,2,1,jacobahill@gmail.com,2,Lions,loss,false
-eliminated,2,1,jacobahill@gmail.com,3,Jets,,
-eliminated,2,1,jacobahill@gmail.com,4,49ers,,
 eliminated,1,1,steelblitz,1,Bengals,loss,false
 active,,1,PapaBears,1,Saints,win,true
 active,,1,PapaBears,2,Chiefs,win,true
@@ -114,7 +105,6 @@ eliminated,2,2,TheBucs,1,Bills,win,true
 eliminated,2,2,TheBucs,2,Ravens,loss,false
 active,,3,TheBucs,1,Seahawks,win,true
 active,,3,TheBucs,2,Texans,win,true
-active,,3,TheBucs,3,Raiders,,
 eliminated,2,1,chernandez83,1,Seahawks,win,true
 eliminated,2,1,chernandez83,2,Cowboys,loss,false
 eliminated,2,2,chernandez83,1,Seahawks,win,true
@@ -136,19 +126,12 @@ eliminated,2,2,Plassiod,2,Lions,loss,false
 eliminated,1,1,Luxpro21,1,Bengals,loss,false
 eliminated,1,1,dalan05,1,Bengals,loss,false
 eliminated,1,1,dalan05,2,Seahawks,win,true
-eliminated,1,1,dalan05,3,Jets,,
 eliminated,2,2,dalan05,1,Chargers,win,true
 eliminated,2,2,dalan05,2,Ravens,loss,false
-eliminated,2,2,dalan05,3,Buccaneers,,
 eliminated,2,3,dalan05,1,Bears,win,true
-eliminated,2,3,dalan05,2,Giants,loss,false
-eliminated,2,3,dalan05,3,Packers,,
+eliminated,2,3,dalan05,2,Jets,win,true
 active,,2,bradenu,1,Eagles,win,true
 active,,2,bradenu,2,Vikings,win,true
-active,,2,bradenu,3,Chargers,,
-active,,2,bradenu,4,Falcons,,
-active,,2,bradenu,5,Commanders,,
-active,,2,bradenu,6,Houston,pending,
 eliminated,1,1,defrancoharris,1,Bengals,loss,false
 eliminated,2,2,defrancoharris,1,49ers,win,true
 eliminated,2,2,defrancoharris,2,Ravens,loss,false
@@ -156,7 +139,6 @@ eliminated,2,1,Gayd,1,Bills,win,true
 eliminated,2,1,Gayd,2,Cowboys,loss,false
 active,,1,gbwestwildcats,1,Saints,win,true
 active,,1,gbwestwildcats,2,Commanders,win,true
-active,,1,gbwestwildcats,3,Raiders,,
 eliminated,1,1,Scottyro,1,Bengals,loss,false
 eliminated,2,2,Scottyro,1,Bills,win,true
 eliminated,2,2,Scottyro,2,Ravens,loss,false
@@ -171,10 +153,8 @@ eliminated,2,2,cdorellana,1,Bills,win,true
 eliminated,2,2,cdorellana,2,Lions,loss,false
 active,,1,apoon,1,Texans,win,true
 active,,1,apoon,2,Jets,win,true
-active,,1,apoon,3,49ers,,
 active,,2,apoon,1,Chargers,win,true
 active,,2,apoon,2,Chiefs,win,true
-active,,2,apoon,3,Browns,,
 eliminated,2,1,bsmack2,1,Saints,win,true
 eliminated,2,1,bsmack2,2,Ravens,loss,false
 eliminated,1,2,bsmack2,1,Bengals,loss,false
@@ -221,10 +201,8 @@ eliminated,2,3,LMB,1,Buccaneers,win,true
 eliminated,2,3,LMB,2,Ravens,loss,false
 eliminated,2,1,zaruh,1,Dolphins,win,true
 eliminated,2,1,zaruh,2,Lions,loss,false
-eliminated,2,1,zaruh,3,Browns,,
 eliminated,2,2,zaruh,1,49ers,win,true
 eliminated,2,2,zaruh,2,Ravens,loss,false
-eliminated,2,2,zaruh,3,Bills,,
 eliminated,2,1,Chasman,1,Bills,win,true
 eliminated,2,1,Chasman,2,Ravens,loss,false
 eliminated,1,2,Chasman,1,Bengals,loss,false
@@ -241,10 +219,8 @@ eliminated,2,3,griffin.dahmen,1,Dolphins,win,true
 eliminated,2,3,griffin.dahmen,2,Ravens,loss,false
 active,,1,ehasz0220,1,Bills,win,true
 active,,1,ehasz0220,2,Chargers,win,true
-active,,1,ehasz0220,3,Browns,,
 active,,2,ehasz0220,1,Saints,win,true
 active,,2,ehasz0220,2,Texans,win,true
-active,,2,ehasz0220,3,Raiders,,
 eliminated,1,1,wootens,1,Bengals,loss,false
 eliminated,2,2,wootens,1,Saints,win,true
 eliminated,2,2,wootens,2,Ravens,loss,false
@@ -263,7 +239,6 @@ eliminated,2,1,MarJoan,1,Bills,win,true
 eliminated,2,1,MarJoan,2,Lions,loss,false
 active,,2,MarJoan,1,Lions,win,true
 active,,2,MarJoan,2,Texans,win,true
-active,,2,MarJoan,3,Browns,,
 eliminated,2,3,MarJoan,1,Saints,win,true
 eliminated,2,3,MarJoan,2,Ravens,loss,false
 active,,1,John,1,Bills,win,true
@@ -293,10 +268,8 @@ eliminated,1,1,brocksteady,1,Bengals,loss,false
 eliminated,1,1,brocksteady,2,Packers,win,true
 active,,2,brocksteady,1,Seahawks,win,true
 active,,2,brocksteady,2,Texans,win,true
-active,,2,brocksteady,3,Bengals,,
 eliminated,2,3,brocksteady,1,Saints,win,true
 eliminated,2,3,brocksteady,2,Lions,loss,false
-eliminated,2,3,brocksteady,3,Browns,,
 eliminated,2,1,PSUshuey103,1,Bills,win,true
 eliminated,2,1,PSUshuey103,2,Cowboys,loss,false
 eliminated,1,2,PSUshuey103,1,Bengals,loss,false
@@ -339,7 +312,6 @@ eliminated,2,2,ORORNIL,1,Dolphins,win,true
 eliminated,2,2,ORORNIL,2,Ravens,loss,false
 active,,3,ORORNIL,1,Seahawks,win,true
 active,,3,ORORNIL,2,Chiefs,win,true
-active,,3,ORORNIL,3,Raiders,,
 eliminated,2,1,Jamesrburbridge,1,Seahawks,win,true
 eliminated,2,1,Jamesrburbridge,2,Cowboys,loss,false
 active,,2,Jamesrburbridge,1,Bears,win,true
@@ -424,11 +396,9 @@ active,,3,CastorRuss,1,Bills,win,true
 active,,3,CastorRuss,2,Texans,win,true
 active,,1,Sponge,1,Saints,win,true
 active,,1,Sponge,2,Texans,win,true
-active,,1,Sponge,3,Buccaneers,,
 eliminated,1,1,Mcoyler18,1,Bengals,loss,false
 active,,2,Mcoyler18,1,Bears,win,true
 active,,2,Mcoyler18,2,Jets,win,true
-active,,2,Mcoyler18,3,Packers,,
 eliminated,1,3,Mcoyler18,1,Giants,loss,false
 eliminated,2,1,Tooltime,1,Buccaneers,win,true
 eliminated,2,1,Tooltime,2,Lions,loss,false
@@ -437,7 +407,6 @@ eliminated,1,1,etanorg,1,Packers,loss,false
 eliminated,1,2,etanorg,1,Bengals,loss,false
 active,,3,etanorg,1,Seahawks,win,true
 active,,3,etanorg,2,Chargers,win,true
-active,,3,etanorg,3,Bills,,
 eliminated,1,1,fcbaldino,1,Bengals,loss,false
 eliminated,2,2,fcbaldino,1,Seahawks,win,true
 eliminated,2,2,fcbaldino,2,Ravens,loss,false
@@ -481,13 +450,10 @@ eliminated,2,3,esimms11,1,Bills,win,true
 eliminated,2,3,esimms11,2,Ravens,loss,false
 active,,1,Chase H,1,49ers,win,true
 active,,1,Chase H,2,Chargers,win,true
-active,,1,Chase H,3,Buccaneers,,
 active,,1,yaozer,1,Texans,win,true
 active,,1,yaozer,2,Chargers,win,true
-active,,1,yaozer,3,Browns,,
 active,,2,yaozer,1,Saints,win,true
 active,,2,yaozer,2,Commanders,win,true
-active,,2,yaozer,3,Buccaneers,,
 eliminated,1,3,yaozer,1,Bengals,loss,false
 eliminated,1,1,Ndmc,1,Bengals,loss,false
 eliminated,1,2,Ndmc,1,Falcons,loss,false
@@ -495,10 +461,8 @@ eliminated,2,1,Namso21,1,Seahawks,win,true
 eliminated,2,1,Namso21,2,Ravens,loss,false
 active,,1,Keypoint34,1,Saints,win,true
 active,,1,Keypoint34,2,Chargers,win,true
-active,,1,Keypoint34,3,Colts,,
 active,,2,Keypoint34,1,Vikings,win,true
 active,,2,Keypoint34,2,Texans,win,true
-active,,2,Keypoint34,3,Buccaneers,,
 eliminated,1,3,Keypoint34,1,Bengals,loss,false
 active,,1,Jscholz,1,Saints,win,true
 active,,1,Jscholz,2,Chargers,win,true
@@ -519,7 +483,6 @@ eliminated,2,2,Wahoo Warriors,1,Bills,win,true
 eliminated,2,2,Wahoo Warriors,2,Ravens,loss,false
 active,,1,pattybear,1,Chargers,win,true
 active,,1,pattybear,2,Jets,win,true
-active,,1,pattybear,3,Buccaneers,,
 eliminated,2,2,pattybear,1,Bears,win,true
 eliminated,2,2,pattybear,2,Ravens,loss,false
 active,,1,rmid12,1,Seahawks,win,true
@@ -537,7 +500,6 @@ eliminated,2,1,tad1124,1,Saints,win,true
 eliminated,2,1,tad1124,2,Lions,loss,false
 active,,2,tad1124,1,Buccaneers,win,true
 active,,2,tad1124,2,Chargers,win,true
-active,,2,tad1124,3,Chiefs,,
 eliminated,2,3,tad1124,1,Vikings,win,true
 eliminated,2,3,tad1124,2,Ravens,loss,false
 eliminated,1,1,bill-sf,1,Bengals,loss,false
@@ -548,13 +510,6 @@ eliminated,1,2,Freedo,1,Falcons,loss,false
 eliminated,1,3,Freedo,1,Bengals,loss,false
 eliminated,2,1,Onepickwonder,1,Bengals,loss,false
 eliminated,2,1,Onepickwonder,2,Eagles,loss,false
-eliminated,2,1,Onepickwonder,3,Jets,,
-eliminated,2,1,Onepickwonder,4,49ers,,
-eliminated,2,1,Onepickwonder,5,Dolphins,,
-eliminated,2,1,Onepickwonder,6,Baltimore,pending,
-eliminated,2,1,Onepickwonder,7,Jacksonville,pending,
-eliminated,2,1,Onepickwonder,8,Detroit,pending,
-eliminated,2,1,Onepickwonder,9,Kansas City,pending,
 active,,1,tiffanycorr,1,Saints,win,true
 active,,1,tiffanycorr,2,Texans,win,true
 eliminated,2,2,tiffanycorr,1,Lions,win,true
@@ -611,7 +566,6 @@ active,,1,Naughtgawd,1,Buccaneers,win,true
 active,,1,Naughtgawd,2,Chargers,win,true
 active,,1,42naSkywalker,1,Buccaneers,win,true
 active,,1,42naSkywalker,2,Chargers,win,true
-active,,1,42naSkywalker,3,Browns,,
 eliminated,1,1,Kevin D 0007,1,Bengals,loss,false
 eliminated,2,2,Kevin D 0007,1,Dolphins,win,true
 eliminated,2,2,Kevin D 0007,2,Ravens,loss,false
@@ -661,18 +615,15 @@ eliminated,1,2,Bruinette10,1,Bengals,loss,false
 eliminated,1,3,Bruinette10,1,Bengals,loss,false
 eliminated,2,1,Burbie2121,1,Bears,win,true
 eliminated,2,1,Burbie2121,2,Eagles,loss,false
-eliminated,2,1,Burbie2121,3,Buccaneers,,
 eliminated,1,2,Burbie2121,1,Giants,loss,false
 active,,3,Burbie2121,1,Chargers,win,true
 active,,3,Burbie2121,2,Chiefs,win,true
-active,,3,Burbie2121,3,Buccaneers,,
 eliminated,2,1,Warriors2024,1,Seahawks,win,true
 eliminated,2,1,Warriors2024,2,Ravens,loss,false
 eliminated,1,1,Sigirl333,1,Bengals,loss,false
 eliminated,1,1,peter@robertory.com,1,Falcons,loss,false
 active,,2,peter@robertory.com,1,Seahawks,win,true
 active,,2,peter@robertory.com,2,Chargers,win,true
-active,,2,peter@robertory.com,3,Buccaneers,,
 eliminated,2,3,peter@robertory.com,1,Saints,win,true
 eliminated,2,3,peter@robertory.com,2,Ravens,loss,false
 eliminated,2,1,lippy,1,49ers,win,true
@@ -680,17 +631,13 @@ eliminated,2,1,lippy,2,Ravens,loss,false
 eliminated,1,2,lippy,1,Bengals,loss,false
 active,,1,JaxFlyer,1,Vikings,win,true
 active,,1,JaxFlyer,2,Chargers,win,true
-active,,1,JaxFlyer,3,Bengals,,
 eliminated,1,2,JaxFlyer,1,Bengals,loss,false
 active,,3,JaxFlyer,1,Seahawks,win,true
 active,,3,JaxFlyer,2,Commanders,win,true
-active,,3,JaxFlyer,3,Raiders,,
 eliminated,2,1,Mahomies,1,Saints,win,true
 eliminated,2,1,Mahomies,2,Ravens,loss,false
 active,,2,Mahomies,1,Seahawks,win,true
 active,,2,Mahomies,2,Chargers,win,true
-active,,2,Mahomies,3,Browns,,
-active,,2,Mahomies,4,Jets,,
 eliminated,1,3,Mahomies,1,Bengals,loss,false
 active,,1,Km1,1,Saints,win,true
 active,,1,Km1,2,Chargers,win,true
@@ -714,8 +661,6 @@ active,,2,Swillz558,1,Bills,win,true
 active,,2,Swillz558,2,Chargers,win,true
 active,,1,pcooke,1,Seahawks,win,true
 active,,1,pcooke,2,Texans,win,true
-active,,1,pcooke,3,Buccaneers,,
-active,,1,pcooke,4,Bengals,,
 eliminated,1,1,gualco7,1,Bengals,loss,false
 eliminated,2,2,gualco7,1,Dolphins,win,true
 eliminated,2,2,gualco7,2,49ers,loss,false
@@ -750,7 +695,6 @@ eliminated,2,2,noea1214,1,Bears,win,true
 eliminated,2,2,noea1214,2,Eagles,loss,false
 active,,3,noea1214,1,49ers,win,true
 active,,3,noea1214,2,Chargers,win,true
-active,,3,noea1214,3,Buccaneers,,
 eliminated,1,1,Csouthwick,1,Bengals,loss,false
 eliminated,2,2,Csouthwick,1,Bills,win,true
 eliminated,2,2,Csouthwick,2,Eagles,loss,false
@@ -785,7 +729,6 @@ eliminated,2,1,JD3,2,Eagles,loss,false
 eliminated,1,2,JD3,1,Giants,loss,false
 active,,3,JD3,1,Bills,win,true
 active,,3,JD3,2,Chargers,win,true
-active,,1,Chicken,,,,
 eliminated,1,1,Lkline,1,Bengals,loss,false
 eliminated,2,2,Lkline,1,Bills,win,true
 eliminated,2,2,Lkline,2,Cowboys,loss,false
@@ -849,7 +792,6 @@ active,,3,Whodey619,2,Texans,win,true
 eliminated,1,1,Malexander,1,Bengals,loss,false
 active,,2,Malexander,1,Seahawks,win,true
 active,,2,Malexander,2,Chargers,win,true
-active,,2,Malexander,3,Buccaneers,,
 eliminated,2,3,Malexander,1,Vikings,win,true
 eliminated,2,3,Malexander,2,Ravens,loss,false
 eliminated,1,1,DuperDu,1,Bengals,loss,false
@@ -860,8 +802,6 @@ active,,3,Kevmo,2,Texans,win,true
 eliminated,1,1,sgasquoine@gmail.com,1,Bengals,loss,false
 eliminated,2,2,sgasquoine@gmail.com,1,Saints,win,true
 eliminated,2,2,sgasquoine@gmail.com,2,Ravens,loss,false
-eliminated,2,2,sgasquoine@gmail.com,3,Browns,,
-eliminated,2,2,sgasquoine@gmail.com,4,49ers,,
 active,,1,charliescott,1,Bills,win,true
 active,,1,charliescott,2,Texans,win,true
 active,,1,Noah25547,1,49ers,win,true
@@ -870,16 +810,13 @@ active,,2,Noah25547,1,49ers,win,true
 active,,2,Noah25547,2,Texans,win,true
 active,,1,petch84,1,Seahawks,win,true
 active,,1,petch84,2,Chargers,win,true
-active,,1,petch84,3,Raiders,,
 eliminated,1,2,petch84,1,Bengals,loss,false
 eliminated,1,3,petch84,1,Bengals,loss,false
 eliminated,1,1,awoods426,1,Bengals,loss,false
 active,,1,solson,1,Saints,win,true
 active,,1,solson,2,Chargers,win,true
-active,,1,solson,3,Raiders,,
 active,,2,solson,1,Seahawks,win,true
 active,,2,solson,2,Steelers,win,true
-active,,2,solson,3,Buccaneers,,
 eliminated,1,3,solson,1,Bengals,loss,false
 eliminated,1,1,JLeonard,1,Bengals,loss,false
 active,,2,JLeonard,1,Bills,win,true
@@ -947,12 +884,10 @@ eliminated,2,3,brianburkle,1,Lions,win,true
 eliminated,2,3,brianburkle,2,Ravens,loss,false
 active,,1,mcelhank,1,Buccaneers,win,true
 active,,1,mcelhank,2,Jets,win,true
-active,,1,mcelhank,3,Seahawks,,
 eliminated,2,2,mcelhank,1,Saints,win,true
 eliminated,2,2,mcelhank,2,Jaguars,loss,false
 active,,3,mcelhank,1,Cowboys,win,true
 active,,3,mcelhank,2,Chargers,win,true
-active,,3,mcelhank,3,Seahawks,,
 eliminated,1,1,Jcampos,1,Bengals,loss,false
 eliminated,2,1,Mshep,1,Bills,win,true
 eliminated,2,1,Mshep,2,Eagles,loss,false
@@ -994,11 +929,6 @@ eliminated,2,1,dlm978,2,Ravens,loss,false
 eliminated,1,2,dlm978,1,Bengals,loss,false
 active,,3,dlm978,1,Seahawks,win,true
 active,,3,dlm978,2,Chargers,win,true
-active,,3,dlm978,3,Buccaneers,,
-active,,3,dlm978,4,Cardinals,,
-active,,3,dlm978,5,Vikings,,
-active,,3,dlm978,6,Philadelphia,,
-active,,3,dlm978,7,New Orleans,,
 eliminated,2,1,bhartmd,1,Seahawks,win,true
 eliminated,2,1,bhartmd,2,Jaguars,loss,false
 eliminated,1,2,lkdkjlklii,1,Packers,loss,false
@@ -1053,7 +983,6 @@ eliminated,2,3,Farina15,1,Dolphins,win,true
 eliminated,2,3,Farina15,2,Eagles,loss,false
 active,,1,123emanzo,1,Bills,win,true
 active,,1,123emanzo,2,Chargers,win,true
-active,,1,123emanzo,3,Raiders,,
 eliminated,1,2,123emanzo,1,Bengals,loss,false
 eliminated,2,3,123emanzo,1,Seahawks,win,true
 eliminated,2,3,123emanzo,2,Jaguars,loss,false
@@ -1071,25 +1000,13 @@ active,,2,dbowlen,1,Seahawks,win,true
 active,,2,dbowlen,2,Texans,win,true
 active,,1,DaveH,1,Saints,win,true
 active,,1,DaveH,2,Chargers,win,true
-active,,1,DaveH,3,Raiders,,
-active,,1,Dago,,,,
 eliminated,1,1,typsu014,1,Bengals,loss,false
 eliminated,1,1,BigDro,1,Bengals,loss,false
 eliminated,1,1,BigDro,2,Chargers,win,true
-eliminated,1,1,BigDro,3,Jets,,
-eliminated,1,1,BigDro,4,49ers,,
-eliminated,1,1,BigDro,5,Bears,,
-eliminated,1,1,BigDro,6,Houston,pending,
-eliminated,1,1,BigDro,7,Washington,pending,
-eliminated,1,1,BigDro,8,Denver,pending,
 active,,2,BigDro,1,Dolphins,win,true
 active,,2,BigDro,2,Chargers,win,true
-active,,2,BigDro,3,Bengals,,
-active,,2,BigDro,4,Cardinals,,
-active,,2,BigDro,5,Bears,,
 active,,3,BigDro,1,Buccaneers,win,true
 active,,3,BigDro,2,Texans,win,true
-active,,3,BigDro,3,Browns,,
 eliminated,1,1,Rosco 1,1,Bengals,loss,false
 eliminated,2,2,Rosco 1,1,Bills,win,true
 eliminated,2,2,Rosco 1,2,Ravens,loss,false
@@ -1130,7 +1047,6 @@ eliminated,2,1,Bhorrell,1,Seahawks,win,true
 eliminated,2,1,Bhorrell,2,Lions,loss,false
 eliminated,2,1,plazzari10,1,Bills,win,true
 eliminated,2,1,plazzari10,2,Ravens,loss,false
-eliminated,2,1,plazzari10,3,Chiefs,,
 eliminated,1,1,4JaviO,1,Bengals,loss,false
 eliminated,2,2,4JaviO,1,Seahawks,win,true
 eliminated,2,2,4JaviO,2,Eagles,loss,false
@@ -1211,7 +1127,6 @@ eliminated,2,2,What It Do Yo,1,Bills,win,true
 eliminated,2,2,What It Do Yo,2,Ravens,loss,false
 active,,3,What It Do Yo,1,Seahawks,win,true
 active,,3,What It Do Yo,2,Chiefs,win,true
-active,,3,What It Do Yo,3,Bills,,
 eliminated,1,1,Lloyd Nieto,1,Bengals,loss,false
 eliminated,1,1,jparias13,1,Bengals,loss,false
 active,,1,CLJeffery22,1,Saints,win,true
@@ -1244,8 +1159,6 @@ active,,1,KramersCrew,1,Bills,win,true
 active,,1,KramersCrew,2,Seahawks,win,true
 eliminated,1,1,The Next Level,1,Bengals,loss,false
 eliminated,2,1,MedicDevil42,2,Lions,loss,false
-active,,2,MedicDevil42,,,,
-active,,3,MedicDevil42,,,,
 active,,1,JasonPWeaver,1,Bills,win,true
 active,,1,JasonPWeaver,2,Texans,win,true
 active,,2,JasonPWeaver,1,Saints,win,true
@@ -1269,7 +1182,6 @@ active,,1,Rfriedla,2,Texans,win,true
 eliminated,1,2,Rfriedla,1,Bengals,loss,false
 active,,1,marcomac,1,Saints,win,true
 active,,1,marcomac,2,Chargers,win,true
-active,,1,marcomac,3,Browns,,
 eliminated,1,1,Smiddleton11,1,Bengals,loss,false
 active,,1,timmytay,1,Bills,win,true
 active,,1,timmytay,2,Chargers,win,true
@@ -1290,7 +1202,6 @@ active,,3,torisamuel1989,1,Saints,win,true
 active,,3,torisamuel1989,2,Chargers,win,true
 eliminated,2,1,skullpatrol69,1,Bills,win,true
 eliminated,2,1,skullpatrol69,2,Ravens,loss,false
-eliminated,2,1,skullpatrol69,3,Buccaneers,,
 active,,1,Kscott,1,Bills,win,true
 active,,1,Kscott,2,Chargers,win,true
 eliminated,1,2,Kscott,1,Bengals,loss,false
