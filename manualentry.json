@@ -73,24 +73,23 @@
 
   {
     "entry": {
-      "$oid": "66bf8fe4c6d9440015ed6f3b"
+      "$oid": "66d1f0a0c5cc0c0015a4cd39"
     },
-    "entryNumber": 3,
-    "week": 2,
+    "entryNumber": 2,
+    "week": 3,
     "__v": 0,
     "createdAt": {
       "$date": "2024-08-26T21:03:04.936Z"
     },
     "game": {
-      "$oid": "66a05a5b35d5816d40187735"
+      "$oid": "66a05a5d35d5816d4018776f"
     },
     "pickMadeAt": {
       "$date": "2024-08-26T21:03:04.936Z"
     },
-    "team": "New York",
+    "team": "Cincinnati",
     "updatedAt": {
       "$date": "2024-09-16T15:28:35.983Z"
     },
-    "isWin": false,
-    "result": "loss"
+    "isWin": null    
   }

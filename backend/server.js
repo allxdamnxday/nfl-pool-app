@@ -109,9 +109,11 @@ app.use((req, res, next) => {
 // Swagger documentation route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// API routes
+
+
 // Route files
 const seasonRoutes = require('./routes/season');
-
 const auth = require('./routes/auth');
 const pools = require('./routes/pools');
 const pickRoutes = require('./routes/picks');
@@ -122,8 +124,8 @@ const userEntries = require('./routes/userEntries');
 const requests = require('./routes/requests');
 const blogs = require('./routes/blogs');
 const commentRoutes = require('./routes/commentRoutes');
-// Include kill ratio routes
 const killRatioRoutes = require('./routes/killRatioRoutes');
+const statsRoutes = require('./routes/stats'); // Move this line here
 
 // Mount routers
 app.use('/api/v1/auth', auth);
@@ -140,7 +142,7 @@ app.use('/api/v1/blogs', blogs);
 app.use('/api/v1/blogs', commentRoutes);
 app.use('/api/v1/upload', upload);
 app.use('/api/v1/killRatio', killRatioRoutes);
-app.use('/api/v1', killRatioRoutes);
+app.use('/api/v1/stats', statsRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
@@ -148,7 +150,11 @@ app.use(express.static(path.join(__dirname, '../frontend/dist')));
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  if (req.url.startsWith('/api/')) {
+    res.status(404).json({ message: 'API route not found' });
+  } else {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  }
 });
 
 // Use custom error handler
@@ -209,8 +215,5 @@ if (process.env.NODE_ENV !== 'test') {
 if (process.env.NODE_ENV === 'development') {
   app.use(cors());
 }
-
-
-
 
 module.exports = { app, connectDB, startServer };

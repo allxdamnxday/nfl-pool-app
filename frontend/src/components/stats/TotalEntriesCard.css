@@ -1,0 +1,45 @@
+.total-entries-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 10px;
+  }
+  
+  .entry-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+  
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .stat-label {
+    font-weight: bold;
+    color: #666;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+    color: #333;
+  }
+  
+  .stat-value.active {
+    color: #2e7d32;
+  }
+  
+  .stat-value.eliminated {
+    color: #c62828;
+  }

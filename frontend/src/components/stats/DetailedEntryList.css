@@ -1,0 +1,218 @@
+.detailed-entry-list {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .title {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 24px;
+  }
+  
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .filters input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    flex-grow: 1;
+    min-width: 200px;
+  }
+
+  .status-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .status-filters button {
+    padding: 10px 16px;
+    border: 1px solid #4a90e2;
+    background-color: white;
+    color: #4a90e2;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+  }
+
+  .status-filters button.active {
+    background-color: #4a90e2;
+    color: white;
+  }
+
+  .status-filters button:hover {
+    background-color: #357abd;
+    color: white;
+  }
+
+  .entry-count {
+    margin: 20px 0;
+    font-size: 16px;
+    color: #666;
+    text-align: right;
+  }
+
+  .entries-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  .entries-table th,
+  .entries-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .entries-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .entries-table th:hover {
+    background-color: #e0e0e0;
+  }
+
+  .entries-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .entries-table tr:hover {
+    background-color: #f0f0f0;
+  }
+
+  .status, .result {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .status.active { background-color: #e8f5e9; color: #2e7d32; }
+  .status.eliminated { background-color: #ffebee; color: #c62828; }
+
+  .result.win { background-color: #e8f5e9; color: #2e7d32; }
+  .result.loss { background-color: #ffebee; color: #c62828; }
+  .result.pending { background-color: #fff3e0; color: #f57c00; }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pagination button {
+    padding: 10px 16px;
+    border: 1px solid #4a90e2;
+    background-color: white;
+    color: #4a90e2;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+  }
+
+  .pagination button:disabled {
+    border-color: #ccc;
+    color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .pagination button:not(:disabled):hover {
+    background-color: #4a90e2;
+    color: white;
+  }
+
+  .pagination span {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .loading,
+  .error,
+  .no-entries {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.1em;
+    color: #666;
+  }
+
+  .error {
+    color: #c62828;
+  }
+
+  @media (max-width: 768px) {
+    .entries-table {
+      font-size: 14px;
+    }
+
+    .entries-table th,
+    .entries-table td {
+      padding: 8px;
+    }
+
+    .status-filters button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .pagination button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .entries-table {
+      font-size: 12px;
+    }
+
+    .entries-table th,
+    .entries-table td {
+      padding: 6px;
+    }
+
+    .status, .result {
+      font-size: 0.8em;
+      padding: 3px 6px;
+    }
+
+    .filters {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .filters input,
+    .status-filters {
+      width: 100%;
+    }
+
+    .status-filters {
+      justify-content: space-between;
+    }
+
+    .status-filters button {
+      flex-grow: 1;
+      text-align: center;
+    }
+  }

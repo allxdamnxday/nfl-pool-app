@@ -1,0 +1,31 @@
+.week-selector {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .week-selector label {
+    margin-right: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .week-selector select {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+  }
+  
+  .week-selector select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+  
+  .week-selector select:hover {
+    border-color: #4a90e2;
+  }

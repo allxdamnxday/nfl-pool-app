@@ -3,7 +3,7 @@ const Pick = require('../models/Pick');
 const Entry = require('../models/Entry');
 const KillRatio = require('../models/KillRatio');
 const Pool = require('../models/Pool'); // Assuming you have a Pool model
-const NFLTeam = require('../models/NFLTeam'); // Assuming you have an NFLTeam model
+const NFLTeam = require('../models/Team'); // Assuming you have an NFLTeam model
 
 class KillRatioService {
   async calculateWeeklyKillRatio(poolId, week) {

@@ -7,7 +7,8 @@ import {
   FaCalendarAlt, 
   FaUsers, 
   FaCalendarWeek, 
-  FaDollarSign 
+  FaDollarSign,
+  FaChartBar // Add this import for the stats icon
 } from 'react-icons/fa'; // Import all necessary icons
 import StatusBadge from './StatusBadge';
 import InfoItem from './InfoItem';
@@ -36,12 +37,18 @@ function PoolCard({ pool }) {
           <InfoItem icon={FaUsers} label="Active Entries" value={pool.activeEntries} />
           <InfoItem icon={FaDollarSign} label="Entry Paid" value={`$${totalEntryPaid}`} />
         </div>
-        <div>
+        <div className="flex space-x-4"> {/* Add this wrapper div for button layout */}
           <Link 
             to={`/entries?poolId=${pool._id}`} 
-            className="bg-nfl-purple hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full block text-center transition duration-300 transform hover:scale-105 hover:shadow-neon"
+            className="bg-nfl-purple hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full flex-1 text-center transition duration-300 transform hover:scale-105 hover:shadow-neon"
           >
             View Entries
+          </Link>
+          <Link 
+            to={`/pool/${pool._id}/stats`} 
+            className="bg-nfl-blue hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full flex-1 text-center transition duration-300 transform hover:scale-105 hover:shadow-neon flex items-center justify-center"
+          >
+            <FaChartBar className="mr-2" /> View Stats
           </Link>
         </div>
       </div>
