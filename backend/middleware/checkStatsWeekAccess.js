@@ -10,7 +10,7 @@ const logger = require('../utils/logger');
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @param {Function} next - Express next middleware function
- * @throws {ErrorResponse} If the requested week is in the future
+ * @throws {ErrorResponse} If the requested week is not yet accessible
  */
 const checkStatsWeekAccess = async (req, res, next) => {
   logger.info(`checkStatsWeekAccess middleware called for ${req.method} request, week: ${req.query.week}`);
@@ -21,16 +21,16 @@ const checkStatsWeekAccess = async (req, res, next) => {
     const { week: currentWeek } = await seasonService.getCurrentNFLWeek();
 
     const currentDate = moment().tz('America/Los_Angeles');
-    let nextWeekDeadline = moment().tz('America/Los_Angeles').day(0).hour(10).minute(0).second(0);
+    let statsAccessDeadline = moment().tz('America/Los_Angeles').day(0).hour(10).minute(0).second(0);
 
     // If current date is past Sunday 10 AM, set deadline to next Sunday
-    if (currentDate.isAfter(nextWeekDeadline)) {
-      nextWeekDeadline.add(1, 'week');
+    if (currentDate.isAfter(statsAccessDeadline)) {
+      statsAccessDeadline.add(1, 'week');
     }
 
-    // Check if the requested week is in the future
-    if (requestedWeek > currentWeek || (requestedWeek === currentWeek + 1 && currentDate.isBefore(nextWeekDeadline))) {
-      return next(new ErrorResponse(`Stats are only available for current and past weeks. The current week is ${currentWeek}.`, 403));
+    // Check if the requested week is in the future or if it's the current week and before the deadline
+    if (requestedWeek > currentWeek || (requestedWeek === currentWeek && currentDate.isBefore(statsAccessDeadline))) {
+      return next(new ErrorResponse(`Stats for week ${requestedWeek} are not available until Sunday at 10 AM PST. The current accessible week is ${currentWeek - 1}.`, 403));
     }
 
     next();
