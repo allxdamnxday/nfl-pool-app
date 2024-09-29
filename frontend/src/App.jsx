@@ -161,15 +161,7 @@ const AnimatedRoutes = () => {
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/pool/:poolId/kill-ratio" element={<KillRatioSheet />} />
-          <Route path="/week-picks" element={<WeekPicksTable />} />
-          <Route 
-            path="/pool/:poolId/stats" 
-            element={
-              <ProtectedRoute>
-                <StatsDashboard />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/pool/:poolId/stats" element={<StatsDashboard />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>

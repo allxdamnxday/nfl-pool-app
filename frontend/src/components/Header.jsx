@@ -180,9 +180,7 @@ function PoolsMenu({ isOpen, setIsOpen, dropdownRef }) {
             <DropdownLink to="/pool-picks-selection" icon={FaUser}>
               View Pool Picks
             </DropdownLink>
-            <DropdownLink to="/week-picks" icon={FaTable}>
-              Weekly Picks Temp
-            </DropdownLink>
+            {/* Removed the Weekly Picks Temp link */}
           </div>
         </div>
       </CSSTransition>

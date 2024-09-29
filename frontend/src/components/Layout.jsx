@@ -5,8 +5,6 @@ import Footer from './Footer';
 
 function Layout({ children }) {
   const location = useLocation();
-  // We can remove this line as we're no longer using it
-  // const isPicksPage = location.pathname.includes('/entries');
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white text-gray-800">
@@ -15,8 +13,6 @@ function Layout({ children }) {
         {children}
       </main>
       <Footer />
-      {/* Remove the WhatsAppWidget component */}
-      {/* {!isPicksPage && <WhatsAppWidget />} */}
     </div>
   );
 }

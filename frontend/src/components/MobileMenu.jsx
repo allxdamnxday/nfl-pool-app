@@ -80,9 +80,7 @@ function MobileMenu({
                 <MobileNavLink to="/pool-picks-selection" icon={FaTrophy} onClick={toggleMobileMenu}>
                   View Pool Picks
                 </MobileNavLink>
-                <MobileNavLink to="/week-picks" icon={FaTable} onClick={toggleMobileMenu}>
-                  Weekly Picks Temp
-                </MobileNavLink>
+                {/* Removed the Weekly Picks Temp link */}
                 <MobileNavLink to="/account-settings" icon={FaUser} onClick={toggleMobileMenu}>
                   Account Settings
                 </MobileNavLink>
