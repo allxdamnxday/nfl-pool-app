@@ -21,28 +21,27 @@ const checkStatsWeekAccess = async (req, res, next) => {
     const { week: currentWeek } = await seasonService.getCurrentNFLWeek();
 
     const currentDate = moment().tz('America/Los_Angeles');
-    logger.info(`Current date: ${currentDate.format()}`);
+    const statsAccessDeadline = moment().tz('America/Los_Angeles').day(0).hour(10).minute(0).second(0);
 
-    const currentWeekStart = moment().tz('America/Los_Angeles').day(2).hour(0).minute(0).second(0);
-    if (currentDate.isBefore(currentWeekStart)) {
-      currentWeekStart.subtract(1, 'week');
+    // If current date is before Sunday 10 AM, adjust the deadline to previous week
+    if (currentDate.isBefore(statsAccessDeadline)) {
+      statsAccessDeadline.subtract(1, 'week');
     }
-    logger.info(`Current week start: ${currentWeekStart.format()}`);
 
-    const statsAccessDeadline = currentWeekStart.clone().add(5, 'days').hour(10); // Sunday 10:00 AM
+    logger.info(`Current date: ${currentDate.format()}`);
+    logger.info(`Current week: ${currentWeek}, Requested week: ${requestedWeek}`);
     logger.info(`Stats access deadline: ${statsAccessDeadline.format()}`);
 
-    const accessibleWeek = currentDate.isSameOrAfter(statsAccessDeadline) ? currentWeek : currentWeek - 1;
-    logger.info(`Accessible week: ${accessibleWeek}, Current week: ${currentWeek}`);
-
-    // Check if the requested week is in the future or not yet accessible
-    if (requestedWeek > accessibleWeek) {
-      logger.info(`Access denied: Requested week ${requestedWeek} is greater than accessible week ${accessibleWeek}`);
-      return next(new ErrorResponse(`Stats for week ${requestedWeek} are not available until Sunday at 10 AM PST. The current accessible week is ${accessibleWeek}.`, 403));
+    // Allow access if the requested week is less than the current week
+    // OR if it's the current week and we're past Sunday 10 AM
+    if (requestedWeek < currentWeek || (requestedWeek === currentWeek && currentDate.isSameOrAfter(statsAccessDeadline))) {
+      logger.info(`Access granted: Requested week ${requestedWeek} is accessible`);
+      return next();
     }
 
-    logger.info(`Access granted: Requested week ${requestedWeek} is accessible`);
-    next();
+    logger.info(`Access denied: Stats for week ${requestedWeek} are not yet available`);
+    return next(new ErrorResponse(`Stats for week ${requestedWeek} are not available until Sunday at 10 AM PST. The current accessible week is ${currentWeek - 1}.`, 403));
+
   } catch (error) {
     logger.error(`Error in checkStatsWeekAccess: ${error.message}`);
     next(error);
