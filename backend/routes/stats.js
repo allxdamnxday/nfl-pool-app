@@ -36,7 +36,7 @@ router.get('/:poolId/detailed-entries', checkStatsWeekAccess, statsController.ge
  * @desc    Get kill ratio per week for a pool
  * @access  Public (for testing purposes)
  */
-router.get('/:poolId/kill-ratio-per-week', (req, res, next) => {
+router.get('/:poolId/kill-ratio-per-week', checkStatsWeekAccess, (req, res, next) => {
   console.log(`Accessing /:poolId/kill-ratio-per-week with poolId: ${req.params.poolId}`);
   next();
 }, statsController.getKillRatioPerWeek);
